@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Mortgages on real estate: First mortgage on home"
+  },
+  {
+    "id": 2,
+    "name": "Second mortgage on home"
+  },
+  {
+    "id": 3,
+    "name": "Other mortgages"
+  },
+  {
+    "id": 4,
+    "name": "Charge/credit card accounts"
+  },
+  {
+    "id": 5,
+    "name": "Auto loan"
+  },
+  {
+    "id": 6,
+    "name": "Bank/Credit Union loan"
+  },
+  {
+    "id": 7,
+    "name": "Money you owe (not evidenced by a note)"
+  },
+  {
+    "id": 8,
+    "name": "Judgments"
+  },
+  {
+    "id": 9,
+    "name": "Other liabilities"
+  },
+  {
+    "id": 10,
+    "name": "Contingent Liabilities"
+  }
+]

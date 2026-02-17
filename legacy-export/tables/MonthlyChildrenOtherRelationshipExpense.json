@@ -1,0 +1,51 @@
+[
+  {
+    "MonthlyChildrenOtherRelationshipExpenseID": 11,
+    "MonthlyChildrenOtherRelationshipExpenseTypeID": 1,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyChildrenOtherRelationshipTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenOtherRelationshipExpenseID": 34,
+    "MonthlyChildrenOtherRelationshipExpenseTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenOtherRelationshipTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenOtherRelationshipExpenseID": 41,
+    "MonthlyChildrenOtherRelationshipExpenseTypeID": 1,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenOtherRelationshipTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenOtherRelationshipExpenseID": 42,
+    "MonthlyChildrenOtherRelationshipExpenseTypeID": 1,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyChildrenOtherRelationshipTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenOtherRelationshipExpenseID": 53,
+    "MonthlyChildrenOtherRelationshipExpenseTypeID": 1,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyChildrenOtherRelationshipTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenOtherRelationshipExpenseID": 54,
+    "MonthlyChildrenOtherRelationshipExpenseTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenOtherRelationshipTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenOtherRelationshipExpenseID": 55,
+    "MonthlyChildrenOtherRelationshipExpenseTypeID": 1,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenOtherRelationshipTypeIfOther": null
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "EmploymentStatusID": 1,
+    "EmploymentStatusTypeID": 1,
+    "EmploymentChangeStatusTypeID": 1,
+    "UserID": 1,
+    "ReasonForChange": "Bigger and better job",
+    "EffortsToGainEmployment": "",
+    "EffectiveAmount": 5699.22,
+    "Date": "2011-06-08T00:00:00.000Z",
+    "Main_Occupation": "Data Analyst "
+  },
+  {
+    "EmploymentStatusID": 2,
+    "EmploymentStatusTypeID": 1,
+    "EmploymentChangeStatusTypeID": 4,
+    "UserID": 7,
+    "ReasonForChange": null,
+    "EffortsToGainEmployment": null,
+    "EffectiveAmount": null,
+    "Date": null,
+    "Main_Occupation": "Supreme Court Judge"
+  },
+  {
+    "EmploymentStatusID": 3,
+    "EmploymentStatusTypeID": 1,
+    "EmploymentChangeStatusTypeID": 4,
+    "UserID": 8,
+    "ReasonForChange": null,
+    "EffortsToGainEmployment": null,
+    "EffectiveAmount": null,
+    "Date": null,
+    "Main_Occupation": "Supreme Court Judge"
+  },
+  {
+    "EmploymentStatusID": 4,
+    "EmploymentStatusTypeID": 2,
+    "EmploymentChangeStatusTypeID": 4,
+    "UserID": 3,
+    "ReasonForChange": null,
+    "EffortsToGainEmployment": null,
+    "EffectiveAmount": null,
+    "Date": null,
+    "Main_Occupation": "Actor Writer"
+  },
+  {
+    "EmploymentStatusID": 5,
+    "EmploymentStatusTypeID": 2,
+    "EmploymentChangeStatusTypeID": 4,
+    "UserID": 4,
+    "ReasonForChange": null,
+    "EffortsToGainEmployment": null,
+    "EffectiveAmount": null,
+    "Date": null,
+    "Main_Occupation": "Actress"
+  },
+  {
+    "EmploymentStatusID": 6,
+    "EmploymentStatusTypeID": 3,
+    "EmploymentChangeStatusTypeID": 4,
+    "UserID": 11,
+    "ReasonForChange": null,
+    "EffortsToGainEmployment": null,
+    "EffectiveAmount": null,
+    "Date": null,
+    "Main_Occupation": "Basket Ball Star"
+  }
+]

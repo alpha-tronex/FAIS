@@ -1,0 +1,47 @@
+[
+  {
+    "AssetsID": 5,
+    "AssetsTypeID": 18,
+    "UserID": 1,
+    "Description": "47 Inch Plasma",
+    "MarketValue": 700,
+    "NonMaritalTypeID": 2,
+    "Judge_Award": false
+  },
+  {
+    "AssetsID": 6,
+    "AssetsTypeID": 1,
+    "UserID": 1,
+    "Description": "My Money",
+    "MarketValue": 499566.23,
+    "NonMaritalTypeID": 3,
+    "Judge_Award": true
+  },
+  {
+    "AssetsID": 7,
+    "AssetsTypeID": 18,
+    "UserID": 1,
+    "Description": "49 Inch  Projection",
+    "MarketValue": 1200,
+    "NonMaritalTypeID": 1,
+    "Judge_Award": true
+  },
+  {
+    "AssetsID": 10,
+    "AssetsTypeID": 2,
+    "UserID": 1,
+    "Description": "My Money -  Checking Vangard Bank",
+    "MarketValue": 6254.12,
+    "NonMaritalTypeID": 1,
+    "Judge_Award": true
+  },
+  {
+    "AssetsID": 11,
+    "AssetsTypeID": 3,
+    "UserID": 12,
+    "Description": "WalMart",
+    "MarketValue": 5000,
+    "NonMaritalTypeID": 1,
+    "Judge_Award": true
+  }
+]

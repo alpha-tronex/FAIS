@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Monthly mortgage or rent payments"
+  },
+  {
+    "id": 2,
+    "name": "Monthly property taxes (if not included in mortgage)"
+  },
+  {
+    "id": 3,
+    "name": "Monthly insurance on residence (if not included in mortgage)"
+  },
+  {
+    "id": 4,
+    "name": "Monthly condominium maintenance fees and homeowner’s association fees"
+  },
+  {
+    "id": 5,
+    "name": "Monthly electricity"
+  },
+  {
+    "id": 6,
+    "name": "Monthly water, garbage, and sewer"
+  },
+  {
+    "id": 7,
+    "name": "Monthly telephone"
+  },
+  {
+    "id": 8,
+    "name": "Monthly fuel oil or natural gas"
+  },
+  {
+    "id": 9,
+    "name": "Monthly repairs and maintenance"
+  },
+  {
+    "id": 10,
+    "name": "Monthly lawn care"
+  },
+  {
+    "id": 11,
+    "name": "Monthly pool maintenance"
+  },
+  {
+    "id": 12,
+    "name": "Monthly pest control"
+  },
+  {
+    "id": 13,
+    "name": "Monthly misc. household"
+  },
+  {
+    "id": 14,
+    "name": "Monthly food and home supplies"
+  },
+  {
+    "id": 15,
+    "name": "Monthly meals outside home"
+  },
+  {
+    "id": 16,
+    "name": "Monthly cable t.v."
+  },
+  {
+    "id": 17,
+    "name": "Monthly alarm service contract"
+  },
+  {
+    "id": 18,
+    "name": "Monthly service contracts on appliances"
+  },
+  {
+    "id": 19,
+    "name": "Monthly maid service"
+  },
+  {
+    "id": 20,
+    "name": "Other household expense"
+  }
+]

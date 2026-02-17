@@ -1,0 +1,450 @@
+[
+  {
+    "MonthlyAutomobileExpenseID": 1,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 2,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 3,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 4,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 5,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 6,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 7,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 8,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 18,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 19,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 20,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 21,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 22,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 23,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 24,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 25,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 26,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 27,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 28,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 29,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 30,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 31,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 32,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 33,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 34,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 35,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 36,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 37,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 38,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 39,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 40,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 41,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 46,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 47,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 48,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 49,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 50,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 51,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 52,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 53,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 55,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 56,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 57,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 58,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 59,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 60,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 61,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 62,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 63,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 64,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 65,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 66,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 67,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 68,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 69,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 70,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 71,
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 72,
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 73,
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 74,
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 75,
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 76,
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 77,
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyAutomobileExpenseID": 78,
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyAutomobileExpenseTypeIfOther": null
+  }
+]

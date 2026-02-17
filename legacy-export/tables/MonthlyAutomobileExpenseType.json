@@ -1,0 +1,38 @@
+[
+  {
+    "MonthlyAutomobileExpenseTypeID": 1,
+    "MonthlyAutomobileExpenseType": "Monthly gasoline and oil "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 2,
+    "MonthlyAutomobileExpenseType": "Monthly repairs "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 3,
+    "MonthlyAutomobileExpenseType": "Monthly auto tags and emission testing "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 4,
+    "MonthlyAutomobileExpenseType": "Monthly insurance "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 5,
+    "MonthlyAutomobileExpenseType": "Monthly payments (lease or financing) "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 6,
+    "MonthlyAutomobileExpenseType": "Monthly rental/replacements "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 7,
+    "MonthlyAutomobileExpenseType": "Monthly alternative transportation (bus, rail, car pool, etc.) "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 8,
+    "MonthlyAutomobileExpenseType": "Monthly tolls and parking "
+  },
+  {
+    "MonthlyAutomobileExpenseTypeID": 9,
+    "MonthlyAutomobileExpenseType": "Other automobile expense"
+  }
+]

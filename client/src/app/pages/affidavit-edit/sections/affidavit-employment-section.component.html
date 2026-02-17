@@ -1,0 +1,68 @@
+<section class="panel">
+  <h2 class="panelTitle">Employment</h2>
+
+  <form (ngSubmit)="submit(); ensureDefaults()" class="gridForm">
+    <label>
+      Employer name
+      <input name="empName" [(ngModel)]="empName" required class="input" />
+    </label>
+
+    <label>
+      Occupation
+      <input name="empOccupation" [(ngModel)]="empOccupation" class="input" />
+    </label>
+
+    <label>
+      Pay rate
+      <input name="empPayRate" [(ngModel)]="empPayRate" inputmode="decimal" class="input" />
+    </label>
+
+    <label>
+      Pay frequency
+      <select name="empPayFrequencyTypeId" [(ngModel)]="empPayFrequencyTypeId" class="input" (click)="ensureDefaults()">
+        <option *ngFor="let t of payFrequencies" [ngValue]="t.id">{{ t.name }} ({{ t.id }})</option>
+      </select>
+    </label>
+
+    <label>
+      If Other
+      <input name="empPayFrequencyIfOther" [(ngModel)]="empPayFrequencyIfOther" class="input" />
+    </label>
+
+    <label>
+      Retired?
+      <select name="empRetired" [(ngModel)]="empRetired" class="input">
+        <option [ngValue]="false">No</option>
+        <option [ngValue]="true">Yes</option>
+      </select>
+    </label>
+
+    <div class="rowActions">
+      <button type="submit" [disabled]="busy" class="submit">Add</button>
+      <button type="button" (click)="refresh.emit()" [disabled]="busy">Refresh</button>
+    </div>
+  </form>
+
+  <table *ngIf="rows.length > 0" class="table mt12">
+    <thead>
+      <tr>
+        <th class="th">Employer</th>
+        <th class="th">Occupation</th>
+        <th class="th">Pay rate</th>
+        <th class="th">Frequency</th>
+        <th class="th"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of rows">
+        <td class="td">{{ e.name }}</td>
+        <td class="td">{{ e.occupation || '' }}</td>
+        <td class="td">{{ e.payRate | number:'1.2-2' }}</td>
+        <td class="td">{{ typeLabel(e.payFrequencyTypeId) }}</td>
+        <td class="td">
+          <button type="button" (click)="remove.emit(e.id)" [disabled]="busy" class="mini">Remove</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>

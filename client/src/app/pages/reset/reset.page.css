@@ -1,0 +1,9 @@
+.page {
+  max-width: 520px;
+}
+
+.form {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}

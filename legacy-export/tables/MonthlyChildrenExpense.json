@@ -1,0 +1,772 @@
+[
+  {
+    "MonthlyChildrenExpenseID": 1,
+    "MonthlyChildrenExpenseTypeID": 1,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 2,
+    "MonthlyChildrenExpenseTypeID": 2,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 3,
+    "MonthlyChildrenExpenseTypeID": 3,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 4,
+    "MonthlyChildrenExpenseTypeID": 4,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 5,
+    "MonthlyChildrenExpenseTypeID": 5,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 6,
+    "MonthlyChildrenExpenseTypeID": 6,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 7,
+    "MonthlyChildrenExpenseTypeID": 7,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 8,
+    "MonthlyChildrenExpenseTypeID": 8,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 9,
+    "MonthlyChildrenExpenseTypeID": 9,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 10,
+    "MonthlyChildrenExpenseTypeID": 10,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 11,
+    "MonthlyChildrenExpenseTypeID": 11,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 12,
+    "MonthlyChildrenExpenseTypeID": 12,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 13,
+    "MonthlyChildrenExpenseTypeID": 13,
+    "UserID": 1,
+    "Amount": 35.22,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 14,
+    "MonthlyChildrenExpenseTypeID": 14,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 15,
+    "MonthlyChildrenExpenseTypeID": 15,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 16,
+    "MonthlyChildrenExpenseTypeID": 16,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 17,
+    "MonthlyChildrenExpenseTypeID": 17,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 18,
+    "MonthlyChildrenExpenseTypeID": 18,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 19,
+    "MonthlyChildrenExpenseTypeID": 19,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 20,
+    "MonthlyChildrenExpenseTypeID": 20,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 21,
+    "MonthlyChildrenExpenseTypeID": 21,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 22,
+    "MonthlyChildrenExpenseTypeID": 22,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 24,
+    "MonthlyChildrenExpenseTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": "Enter New Value"
+  },
+  {
+    "MonthlyChildrenExpenseID": 25,
+    "MonthlyChildrenExpenseTypeID": 2,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 26,
+    "MonthlyChildrenExpenseTypeID": 3,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 27,
+    "MonthlyChildrenExpenseTypeID": 4,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 28,
+    "MonthlyChildrenExpenseTypeID": 5,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 29,
+    "MonthlyChildrenExpenseTypeID": 6,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 30,
+    "MonthlyChildrenExpenseTypeID": 7,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 31,
+    "MonthlyChildrenExpenseTypeID": 8,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 32,
+    "MonthlyChildrenExpenseTypeID": 9,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 33,
+    "MonthlyChildrenExpenseTypeID": 10,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 34,
+    "MonthlyChildrenExpenseTypeID": 11,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 35,
+    "MonthlyChildrenExpenseTypeID": 12,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 36,
+    "MonthlyChildrenExpenseTypeID": 13,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 37,
+    "MonthlyChildrenExpenseTypeID": 14,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 38,
+    "MonthlyChildrenExpenseTypeID": 15,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 39,
+    "MonthlyChildrenExpenseTypeID": 16,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 40,
+    "MonthlyChildrenExpenseTypeID": 17,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 41,
+    "MonthlyChildrenExpenseTypeID": 18,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 42,
+    "MonthlyChildrenExpenseTypeID": 19,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 43,
+    "MonthlyChildrenExpenseTypeID": 20,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 44,
+    "MonthlyChildrenExpenseTypeID": 21,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 45,
+    "MonthlyChildrenExpenseTypeID": 22,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 47,
+    "MonthlyChildrenExpenseTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 48,
+    "MonthlyChildrenExpenseTypeID": 2,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 49,
+    "MonthlyChildrenExpenseTypeID": 3,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 50,
+    "MonthlyChildrenExpenseTypeID": 4,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 51,
+    "MonthlyChildrenExpenseTypeID": 5,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 52,
+    "MonthlyChildrenExpenseTypeID": 6,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 53,
+    "MonthlyChildrenExpenseTypeID": 7,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 54,
+    "MonthlyChildrenExpenseTypeID": 8,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 55,
+    "MonthlyChildrenExpenseTypeID": 9,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 56,
+    "MonthlyChildrenExpenseTypeID": 10,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 57,
+    "MonthlyChildrenExpenseTypeID": 11,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 58,
+    "MonthlyChildrenExpenseTypeID": 12,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 59,
+    "MonthlyChildrenExpenseTypeID": 13,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 60,
+    "MonthlyChildrenExpenseTypeID": 14,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 61,
+    "MonthlyChildrenExpenseTypeID": 15,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 62,
+    "MonthlyChildrenExpenseTypeID": 16,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 63,
+    "MonthlyChildrenExpenseTypeID": 17,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 64,
+    "MonthlyChildrenExpenseTypeID": 18,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 65,
+    "MonthlyChildrenExpenseTypeID": 19,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 66,
+    "MonthlyChildrenExpenseTypeID": 20,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 67,
+    "MonthlyChildrenExpenseTypeID": 21,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 68,
+    "MonthlyChildrenExpenseTypeID": 22,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 69,
+    "MonthlyChildrenExpenseTypeID": 1,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 70,
+    "MonthlyChildrenExpenseTypeID": 2,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 71,
+    "MonthlyChildrenExpenseTypeID": 3,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 72,
+    "MonthlyChildrenExpenseTypeID": 4,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 73,
+    "MonthlyChildrenExpenseTypeID": 5,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 74,
+    "MonthlyChildrenExpenseTypeID": 6,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 75,
+    "MonthlyChildrenExpenseTypeID": 7,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 76,
+    "MonthlyChildrenExpenseTypeID": 8,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 77,
+    "MonthlyChildrenExpenseTypeID": 9,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 78,
+    "MonthlyChildrenExpenseTypeID": 10,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 79,
+    "MonthlyChildrenExpenseTypeID": 11,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 80,
+    "MonthlyChildrenExpenseTypeID": 12,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 81,
+    "MonthlyChildrenExpenseTypeID": 13,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 82,
+    "MonthlyChildrenExpenseTypeID": 14,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 83,
+    "MonthlyChildrenExpenseTypeID": 15,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 84,
+    "MonthlyChildrenExpenseTypeID": 16,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 85,
+    "MonthlyChildrenExpenseTypeID": 17,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 86,
+    "MonthlyChildrenExpenseTypeID": 18,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 87,
+    "MonthlyChildrenExpenseTypeID": 19,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 88,
+    "MonthlyChildrenExpenseTypeID": 20,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 89,
+    "MonthlyChildrenExpenseTypeID": 21,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 90,
+    "MonthlyChildrenExpenseTypeID": 22,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 91,
+    "MonthlyChildrenExpenseTypeID": 1,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 92,
+    "MonthlyChildrenExpenseTypeID": 2,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 93,
+    "MonthlyChildrenExpenseTypeID": 3,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 94,
+    "MonthlyChildrenExpenseTypeID": 4,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 95,
+    "MonthlyChildrenExpenseTypeID": 5,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 96,
+    "MonthlyChildrenExpenseTypeID": 6,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 97,
+    "MonthlyChildrenExpenseTypeID": 7,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 98,
+    "MonthlyChildrenExpenseTypeID": 8,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 99,
+    "MonthlyChildrenExpenseTypeID": 9,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 100,
+    "MonthlyChildrenExpenseTypeID": 10,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 101,
+    "MonthlyChildrenExpenseTypeID": 11,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 102,
+    "MonthlyChildrenExpenseTypeID": 12,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 103,
+    "MonthlyChildrenExpenseTypeID": 13,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 104,
+    "MonthlyChildrenExpenseTypeID": 14,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 105,
+    "MonthlyChildrenExpenseTypeID": 15,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 106,
+    "MonthlyChildrenExpenseTypeID": 16,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 107,
+    "MonthlyChildrenExpenseTypeID": 17,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 108,
+    "MonthlyChildrenExpenseTypeID": 18,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 109,
+    "MonthlyChildrenExpenseTypeID": 19,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 110,
+    "MonthlyChildrenExpenseTypeID": 20,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 111,
+    "MonthlyChildrenExpenseTypeID": 21,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyChildrenExpenseID": 112,
+    "MonthlyChildrenExpenseTypeID": 22,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyChildrenExpenseTypeIfOther": null
+  }
+]

@@ -1,0 +1,337 @@
+[
+  {
+    "id": 1,
+    "name": "Alachua",
+    "circuitId": 8
+  },
+  {
+    "id": 2,
+    "name": "Baker",
+    "circuitId": 8
+  },
+  {
+    "id": 3,
+    "name": "Bay",
+    "circuitId": 14
+  },
+  {
+    "id": 4,
+    "name": "Bradford",
+    "circuitId": 8
+  },
+  {
+    "id": 5,
+    "name": "Brevard",
+    "circuitId": 18
+  },
+  {
+    "id": 6,
+    "name": "Broward",
+    "circuitId": 17
+  },
+  {
+    "id": 7,
+    "name": "Calhoun",
+    "circuitId": 14
+  },
+  {
+    "id": 8,
+    "name": "Charlotte",
+    "circuitId": 20
+  },
+  {
+    "id": 9,
+    "name": "Citrus",
+    "circuitId": 5
+  },
+  {
+    "id": 10,
+    "name": "Clay",
+    "circuitId": 4
+  },
+  {
+    "id": 11,
+    "name": "Collier",
+    "circuitId": 20
+  },
+  {
+    "id": 12,
+    "name": "Columbia",
+    "circuitId": 3
+  },
+  {
+    "id": 13,
+    "name": "DeSoto",
+    "circuitId": 12
+  },
+  {
+    "id": 14,
+    "name": "Dixie",
+    "circuitId": 3
+  },
+  {
+    "id": 15,
+    "name": "Duval",
+    "circuitId": 4
+  },
+  {
+    "id": 16,
+    "name": "Escambia",
+    "circuitId": 1
+  },
+  {
+    "id": 17,
+    "name": "Flagler",
+    "circuitId": 7
+  },
+  {
+    "id": 18,
+    "name": "Franklin",
+    "circuitId": 2
+  },
+  {
+    "id": 19,
+    "name": "Gadsden",
+    "circuitId": 2
+  },
+  {
+    "id": 20,
+    "name": "Gilchrist",
+    "circuitId": 8
+  },
+  {
+    "id": 21,
+    "name": "Glades",
+    "circuitId": 20
+  },
+  {
+    "id": 22,
+    "name": "Gulf",
+    "circuitId": 14
+  },
+  {
+    "id": 23,
+    "name": "Hamilton",
+    "circuitId": 3
+  },
+  {
+    "id": 24,
+    "name": "Hardee",
+    "circuitId": 10
+  },
+  {
+    "id": 25,
+    "name": "Hendry",
+    "circuitId": 20
+  },
+  {
+    "id": 26,
+    "name": "Hernando",
+    "circuitId": 5
+  },
+  {
+    "id": 27,
+    "name": "Highlands",
+    "circuitId": 10
+  },
+  {
+    "id": 28,
+    "name": "Hillsborough",
+    "circuitId": 13
+  },
+  {
+    "id": 29,
+    "name": "Holmes",
+    "circuitId": 14
+  },
+  {
+    "id": 30,
+    "name": "Indian River",
+    "circuitId": 19
+  },
+  {
+    "id": 31,
+    "name": "Jackson",
+    "circuitId": 14
+  },
+  {
+    "id": 32,
+    "name": "Jefferson",
+    "circuitId": 2
+  },
+  {
+    "id": 33,
+    "name": "Lafayette",
+    "circuitId": 3
+  },
+  {
+    "id": 34,
+    "name": "Lake",
+    "circuitId": 5
+  },
+  {
+    "id": 35,
+    "name": "Lee",
+    "circuitId": 20
+  },
+  {
+    "id": 36,
+    "name": "Leon",
+    "circuitId": 2
+  },
+  {
+    "id": 37,
+    "name": "Levy",
+    "circuitId": 8
+  },
+  {
+    "id": 38,
+    "name": "Liberty",
+    "circuitId": 2
+  },
+  {
+    "id": 39,
+    "name": "Madison",
+    "circuitId": 3
+  },
+  {
+    "id": 40,
+    "name": "Manatee",
+    "circuitId": 12
+  },
+  {
+    "id": 41,
+    "name": "Marion",
+    "circuitId": 5
+  },
+  {
+    "id": 42,
+    "name": "Martin",
+    "circuitId": 9
+  },
+  {
+    "id": 43,
+    "name": "Miami-Dade",
+    "circuitId": 11
+  },
+  {
+    "id": 44,
+    "name": "Monroe",
+    "circuitId": 16
+  },
+  {
+    "id": 45,
+    "name": "Nassau",
+    "circuitId": 4
+  },
+  {
+    "id": 46,
+    "name": "Okaloosa",
+    "circuitId": 1
+  },
+  {
+    "id": 47,
+    "name": "Okeechobee",
+    "circuitId": 19
+  },
+  {
+    "id": 48,
+    "name": "Orange",
+    "circuitId": 9
+  },
+  {
+    "id": 49,
+    "name": "Osceola",
+    "circuitId": 9
+  },
+  {
+    "id": 50,
+    "name": "Palm Beach",
+    "circuitId": 15
+  },
+  {
+    "id": 51,
+    "name": "Pasco",
+    "circuitId": 6
+  },
+  {
+    "id": 52,
+    "name": "Pinellas",
+    "circuitId": 6
+  },
+  {
+    "id": 53,
+    "name": "Polk",
+    "circuitId": 10
+  },
+  {
+    "id": 54,
+    "name": "Putnam",
+    "circuitId": 7
+  },
+  {
+    "id": 55,
+    "name": "Santa Rosa",
+    "circuitId": 1
+  },
+  {
+    "id": 56,
+    "name": "Sarasota",
+    "circuitId": 12
+  },
+  {
+    "id": 57,
+    "name": "Seminole",
+    "circuitId": 18
+  },
+  {
+    "id": 58,
+    "name": "St. Johns",
+    "circuitId": 7
+  },
+  {
+    "id": 59,
+    "name": "St. Lucie",
+    "circuitId": 19
+  },
+  {
+    "id": 60,
+    "name": "Sumter",
+    "circuitId": 5
+  },
+  {
+    "id": 61,
+    "name": "Suwanee",
+    "circuitId": 3
+  },
+  {
+    "id": 62,
+    "name": "Taylor",
+    "circuitId": 3
+  },
+  {
+    "id": 63,
+    "name": "Union",
+    "circuitId": 8
+  },
+  {
+    "id": 64,
+    "name": "Volusia",
+    "circuitId": 7
+  },
+  {
+    "id": 65,
+    "name": "Wakulla",
+    "circuitId": 2
+  },
+  {
+    "id": 66,
+    "name": "Walton",
+    "circuitId": 1
+  },
+  {
+    "id": 67,
+    "name": "Washington",
+    "circuitId": 14
+  }
+]

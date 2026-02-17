@@ -1,0 +1,72 @@
+<div>
+  <h1>Users</h1>
+
+  <section *ngIf="canCreate" class="panel">
+    <h2 class="panelTitle">{{ editingUserId ? 'Edit user' : 'Create user' }}</h2>
+    <p *ngIf="editingUserId" class="mt10">Editing: <strong>{{ uname }}</strong></p>
+
+    <form (ngSubmit)="create()" class="gridForm">
+      <label>
+        Username
+        <input name="uname" [(ngModel)]="uname" required class="input" [disabled]="busy || !!editingUserId" />
+      </label>
+
+      <label>
+        Email
+        <input name="email" [(ngModel)]="email" required class="input" />
+      </label>
+
+      <label>
+        Password
+        <input name="password" [(ngModel)]="password" required minlength="8" class="input" type="password" />
+      </label>
+
+      <label>
+        First name
+        <input name="firstName" [(ngModel)]="firstName" class="input" />
+      </label>
+
+      <label>
+        Last name
+        <input name="lastName" [(ngModel)]="lastName" class="input" />
+      </label>
+
+      <div class="rowActions">
+        <button type="submit" [disabled]="busy" class="submit">{{ editingUserId ? 'Save' : 'Create' }}</button>
+        <button *ngIf="editingUserId" type="button" (click)="cancelEdit()" [disabled]="busy">Cancel</button>
+        <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
+      </div>
+    </form>
+
+    <p *ngIf="error" class="error">{{ error }}</p>
+  </section>
+
+  <p *ngIf="!canCreate" class="mt16">You don’t have permission to create users.</p>
+
+  <section class="mt16">
+    <h2>All users</h2>
+    <p *ngIf="busy && users.length === 0">Loading…</p>
+
+    <table *ngIf="users.length > 0" class="table">
+      <thead>
+        <tr>
+          <th class="th">Name</th>
+          <th class="th">Username</th>
+          <th class="th">Email</th>
+          <th class="th">Role</th>
+          <th class="th">Edit</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let u of users">
+          <td class="td">{{ u.lastName || '' }}, {{ u.firstName || '' }}</td>
+          <td class="td">{{ u.uname }}</td>
+          <td class="td">{{ u.email }}</td>
+          <td class="td">{{ roleTypeName(u.roleTypeId) }}</td>
+          <td class="td"><a *ngIf="canCreate" class="link" (click)="editUser(u)">Edit</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

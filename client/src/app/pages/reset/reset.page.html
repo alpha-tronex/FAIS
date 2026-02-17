@@ -1,0 +1,21 @@
+<main class="page">
+  <h1>Reset password</h1>
+  <p>Set a new password to continue.</p>
+
+  <form (ngSubmit)="onSubmit()" class="form">
+    <label>
+      New password
+      <input
+        type="password"
+        name="newPassword"
+        [(ngModel)]="newPassword"
+        required
+        minlength="8"
+        class="input"
+      />
+    </label>
+
+    <button type="submit" [disabled]="busy" class="submit">Update password</button>
+    <p *ngIf="error" class="error">{{ error }}</p>
+  </form>
+</main>

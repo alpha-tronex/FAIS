@@ -1,0 +1,1269 @@
+[
+  {
+    "MonthlyIncomeID": 1,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 1,
+    "Amount": 5246.45,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 2,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 3,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": ""
+  },
+  {
+    "MonthlyIncomeID": 4,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 1,
+    "Amount": 5.96,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 5,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 1,
+    "Amount": 48,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 6,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 7,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 8,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 1,
+    "Amount": 93,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 9,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 1,
+    "Amount": 12,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 10,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 11,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 12,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 1,
+    "Amount": 47,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 13,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 14,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 15,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 17,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 18,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 19,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 20,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 21,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 22,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 23,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 24,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 25,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 26,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 27,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 28,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 29,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 30,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 31,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 54,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 7,
+    "Amount": 89569.23,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 55,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 56,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 57,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 58,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 59,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 60,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 61,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 62,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 63,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 64,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 65,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 66,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 67,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 68,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 70,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 71,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 72,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 73,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 74,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 75,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 76,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 77,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 78,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 79,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 80,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 81,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 82,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 83,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 84,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 86,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 87,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 88,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 89,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 90,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 91,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 92,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 93,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 94,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 95,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 96,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 97,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 98,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 99,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 100,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 102,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 103,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 104,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 105,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 106,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 107,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 108,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 109,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 110,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 111,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 112,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 113,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 114,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 115,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 116,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 118,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 119,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 120,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 121,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 122,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 123,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 124,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 125,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 126,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 127,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 128,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 129,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 130,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 131,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 132,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 134,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 135,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 136,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 137,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 138,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 139,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 140,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 141,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 142,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 143,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 144,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 145,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 146,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 147,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 148,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 158,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 159,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 160,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 161,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 162,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 163,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 164,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 165,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 166,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 167,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 168,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 169,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 170,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 171,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 172,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 174,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 175,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 176,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 177,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 178,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 179,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 180,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 181,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 182,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 183,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 184,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 185,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 186,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 187,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 188,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 190,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 191,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 192,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 193,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 194,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 195,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 196,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 197,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 198,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 199,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 200,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 201,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 202,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 203,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 204,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 11,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 208,
+    "MonthlyIncomeTypeID": 1,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 209,
+    "MonthlyIncomeTypeID": 2,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 210,
+    "MonthlyIncomeTypeID": 3,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 211,
+    "MonthlyIncomeTypeID": 4,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 212,
+    "MonthlyIncomeTypeID": 5,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 213,
+    "MonthlyIncomeTypeID": 6,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 214,
+    "MonthlyIncomeTypeID": 7,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 215,
+    "MonthlyIncomeTypeID": 8,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 216,
+    "MonthlyIncomeTypeID": 9,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 217,
+    "MonthlyIncomeTypeID": 10,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 218,
+    "MonthlyIncomeTypeID": 11,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 219,
+    "MonthlyIncomeTypeID": 12,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 220,
+    "MonthlyIncomeTypeID": 13,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 221,
+    "MonthlyIncomeTypeID": 14,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 222,
+    "MonthlyIncomeTypeID": 15,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyIncomeTypeIfOther": null
+  },
+  {
+    "MonthlyIncomeID": 230,
+    "MonthlyIncomeTypeID": 16,
+    "UserID": 1,
+    "Amount": 60,
+    "MonthlyIncomeTypeIfOther": "Washing Cars"
+  }
+]

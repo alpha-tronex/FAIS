@@ -1,0 +1,24 @@
+import { inject } from '@angular/core';
+import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isLoggedIn()) {
+    return router.parseUrl('/login');
+  }
+
+  if (auth.mustCompleteRegistration()) {
+    return router.parseUrl('/register');
+  }
+
+  if (!auth.isAdmin()) {
+    return router.parseUrl('/my-cases');
+  }
+
+  return true;
+};
+
+export const adminChildGuard: CanActivateChildFn = (route, state) => adminGuard(route, state);

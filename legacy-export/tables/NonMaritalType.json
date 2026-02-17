@@ -1,0 +1,14 @@
+[
+  {
+    "NonMaritalTypeID": 1,
+    "NonMaritalType": "Husband"
+  },
+  {
+    "NonMaritalTypeID": 2,
+    "NonMaritalType": "Wife"
+  },
+  {
+    "NonMaritalTypeID": 3,
+    "NonMaritalType": "Both"
+  }
+]

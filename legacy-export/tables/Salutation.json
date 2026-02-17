@@ -1,0 +1,14 @@
+[
+  {
+    "SalutationID": 1,
+    "Salutation": "Mr."
+  },
+  {
+    "SalutationID": 2,
+    "Salutation": "Ms."
+  },
+  {
+    "SalutationID": 3,
+    "Salutation": "Mrs."
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "PayFrequencyTypeID": 1,
+    "PayFrequency": "Weekly"
+  },
+  {
+    "PayFrequencyTypeID": 2,
+    "PayFrequency": "Bi-Weekly"
+  },
+  {
+    "PayFrequencyTypeID": 3,
+    "PayFrequency": "Monthly"
+  },
+  {
+    "PayFrequencyTypeID": 4,
+    "PayFrequency": "Bi-Monthly"
+  },
+  {
+    "PayFrequencyTypeID": 5,
+    "PayFrequency": "Annually"
+  },
+  {
+    "PayFrequencyTypeID": 6,
+    "PayFrequency": "Semi-Annually"
+  },
+  {
+    "PayFrequencyTypeID": 7,
+    "PayFrequency": "Quarterly"
+  },
+  {
+    "PayFrequencyTypeID": 8,
+    "PayFrequency": "Daily"
+  },
+  {
+    "PayFrequencyTypeID": 9,
+    "PayFrequency": "Hourly"
+  },
+  {
+    "PayFrequencyTypeID": 10,
+    "PayFrequency": "Other"
+  }
+]

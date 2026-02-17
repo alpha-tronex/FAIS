@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Monthly federal, state, and local income tax (corrected for filing status and allowable dependents and income tax liabilities)"
+  },
+  {
+    "id": 2,
+    "name": "Monthly FICA or self-employment taxes"
+  },
+  {
+    "id": 3,
+    "name": "Monthly Medicare payments"
+  },
+  {
+    "id": 4,
+    "name": "Monthly mandatory union dues"
+  },
+  {
+    "id": 5,
+    "name": "Monthly mandatory retirement payments"
+  },
+  {
+    "id": 6,
+    "name": "Monthly health insurance payments (including dental insurance), excluding portion paid for any minor children of this relationship"
+  },
+  {
+    "id": 7,
+    "name": "Monthly court-ordered child support actually paid for children from another relationship"
+  },
+  {
+    "id": 8,
+    "name": "Monthly court-ordered alimony actually paid from this case"
+  },
+  {
+    "id": 9,
+    "name": "Monthly court-ordered alimony actually paid from other case(s)"
+  },
+  {
+    "id": 10,
+    "name": "Other deductions"
+  }
+]

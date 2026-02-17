@@ -1,0 +1,39 @@
+{
+  "name": "fais-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "migrate:seed:role-types": "tsx src/migrate/seed-role-types.ts",
+    "migrate:seed:lookups": "tsx src/migrate/seed-lookups.ts",
+    "migrate:seed:admin": "tsx src/migrate/seed-admin-user.ts",
+    "migrate:reset:clean": "tsx src/migrate/reset-clean-fais.ts",
+    "migrate:role:admin-4-to-5": "tsx src/migrate/role-admin-4-to-5.ts"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.1",
+    "mssql": "^11.0.1",
+    "nodemailer": "^8.0.1",
+    "pdf-lib": "^1.17.1",
+    "playwright": "^1.55.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mssql": "^9.1.9",
+    "@types/nodemailer": "^7.0.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

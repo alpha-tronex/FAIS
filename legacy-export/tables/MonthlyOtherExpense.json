@@ -1,0 +1,37 @@
+[
+  {
+    "MonthlyOtherExpenseID": 21,
+    "MonthlyOtherExpenseTypeID": 1,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyOtherExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyOtherExpenseID": 22,
+    "MonthlyOtherExpenseTypeID": 1,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyOtherExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyOtherExpenseID": 47,
+    "MonthlyOtherExpenseTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyOtherExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyOtherExpenseID": 53,
+    "MonthlyOtherExpenseTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyOtherExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyOtherExpenseID": 54,
+    "MonthlyOtherExpenseTypeID": 1,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyOtherExpenseTypeIfOther": null
+  }
+]

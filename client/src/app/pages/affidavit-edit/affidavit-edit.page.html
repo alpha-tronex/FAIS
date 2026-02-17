@@ -1,0 +1,131 @@
+<main class="page">
+  <h1>Edit affidavit data</h1>
+
+  <p *ngIf="userId" class="mt12">
+    Editing on behalf of userId: <strong>{{ userId }}</strong>
+  </p>
+
+  <nav class="mt16">
+    <a (click)="goBack()" class="link">Back to summary</a>
+    <span class="sep">|</span>
+    <a routerLink="/profile" class="link">Profile</a>
+    <span class="sep">|</span>
+    <a (click)="logout()" class="link">Logout</a>
+  </nav>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section class="panel mt16">
+    <h2 class="panelTitle">Step {{ currentStepIndex + 1 }} of {{ steps.length }}: {{ stepTitle() }}</h2>
+
+    <p class="mt12">
+      Completed {{ completedStepCount() }} of {{ steps.length }}
+    </p>
+
+    <label class="mt12">
+      <input
+        type="checkbox"
+        name="noneToReport"
+        [ngModel]="currentNoneSelected"
+        (ngModelChange)="setNoneForStep(currentStepKey, $event)"
+        [disabled]="busy"
+      />
+      {{ noneLabel(currentStepKey) }}
+    </label>
+
+    <ol class="mt12">
+      <li *ngFor="let s of steps; let i = index">
+        <strong *ngIf="i === currentStepIndex">{{ s.title }}</strong>
+        <span *ngIf="i !== currentStepIndex">{{ s.title }}</span>
+        <span *ngIf="isStepComplete(s.key)"> — Done</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="mt16">
+    <app-affidavit-employment-section
+      *ngIf="steps[currentStepIndex]?.key === 'employment'"
+      [busy]="busy"
+      [payFrequencies]="payFrequencies"
+      [rows]="employment"
+      (create)="addEmployment($event)"
+      (remove)="removeEmployment($event)"
+      (refresh)="refresh()"
+    ></app-affidavit-employment-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyIncome'"
+      title="Monthly income"
+      [busy]="busy"
+      [types]="incomeTypes"
+      [rows]="monthlyIncome"
+      (create)="addMonthlyIncome($event)"
+      (remove)="removeMonthlyIncome($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyDeductions'"
+      title="Monthly deductions"
+      [busy]="busy"
+      [types]="deductionTypes"
+      [rows]="monthlyDeductions"
+      (create)="addMonthlyDeduction($event)"
+      (remove)="removeMonthlyDeduction($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyHouseholdExpenses'"
+      title="Monthly household expenses"
+      [busy]="busy"
+      [types]="householdExpenseTypes"
+      [rows]="monthlyHouseholdExpenses"
+      (create)="addHouseholdExpense($event)"
+      (remove)="removeHouseholdExpense($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-assets-section
+      *ngIf="steps[currentStepIndex]?.key === 'assets'"
+      [busy]="busy"
+      [assetsTypes]="assetsTypes"
+      [nonMaritalTypes]="nonMaritalTypes"
+      [rows]="assets"
+      (create)="addAsset($event)"
+      (remove)="removeAsset($event)"
+    ></app-affidavit-assets-section>
+
+    <app-affidavit-liabilities-section
+      *ngIf="steps[currentStepIndex]?.key === 'liabilities'"
+      [busy]="busy"
+      [liabilitiesTypes]="liabilitiesTypes"
+      [nonMaritalTypes]="nonMaritalTypes"
+      [rows]="liabilities"
+      (create)="addLiability($event)"
+      (remove)="removeLiability($event)"
+    ></app-affidavit-liabilities-section>
+  </section>
+
+  <section class="mt16">
+    <div class="rowActions">
+      <button type="button" (click)="prevStep()" [disabled]="busy || !canGoBack()">Back</button>
+      <button
+        *ngIf="canGoNext()"
+        type="button"
+        (click)="nextStep()"
+        [disabled]="busy"
+        class="submit"
+      >
+        Next
+      </button>
+      <button
+        *ngIf="!canGoNext()"
+        type="button"
+        (click)="finish()"
+        [disabled]="busy"
+        class="submit"
+      >
+        Finish
+      </button>
+      <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
+    </div>
+  </section>
+</main>

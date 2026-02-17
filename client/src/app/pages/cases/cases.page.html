@@ -1,0 +1,109 @@
+<div>
+  <h1>Cases</h1>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section *ngIf="canCreate" class="panel">
+    <h2 class="panelTitle">Create case</h2>
+
+    <form (ngSubmit)="create()" class="gridForm">
+      <label>
+        Circuit
+        <select name="circuitId" [(ngModel)]="circuitId" (ngModelChange)="onCircuitChange()" required class="input">
+          <option *ngFor="let c of circuits" [ngValue]="c.id">{{ c.name }} ({{ c.id }})</option>
+        </select>
+      </label>
+
+      <label>
+        County
+        <select name="countyId" [(ngModel)]="countyId" required class="input">
+          <option *ngFor="let c of counties" [ngValue]="c.id">{{ c.name }} ({{ c.id }})</option>
+        </select>
+      </label>
+
+      <label>
+        Case number
+        <input name="caseNumber" [(ngModel)]="caseNumber" required class="input" />
+      </label>
+
+      <label>
+        Division
+        <select name="division" [(ngModel)]="division" required class="input">
+          <option *ngFor="let d of divisions" [ngValue]="d.name">{{ d.name }}</option>
+        </select>
+      </label>
+
+      <label>
+        Petitioner
+        <select name="petitionerId" [(ngModel)]="petitionerId" class="input">
+          <option [ngValue]="''">(none)</option>
+          <option *ngFor="let u of petitioners" [ngValue]="u.id">{{ displayName(u) }}</option>
+        </select>
+      </label>
+
+      <label>
+        Respondent
+        <select name="respondentId" [(ngModel)]="respondentId" class="input">
+          <option [ngValue]="''">(none)</option>
+          <option *ngFor="let u of respondents" [ngValue]="u.id">{{ displayName(u) }}</option>
+        </select>
+      </label>
+
+      <label>
+        Petitioner attorney
+        <select name="petitionerAttId" [(ngModel)]="petitionerAttId" class="input">
+          <option [ngValue]="''">(none)</option>
+          <option *ngFor="let u of petitionerAttorneys" [ngValue]="u.id">{{ displayName(u) }}</option>
+        </select>
+      </label>
+
+      <label>
+        Respondent attorney
+        <select name="respondentAttId" [(ngModel)]="respondentAttId" class="input">
+          <option [ngValue]="''">(none)</option>
+          <option *ngFor="let u of respondentAttorneys" [ngValue]="u.id">{{ displayName(u) }}</option>
+        </select>
+      </label>
+
+      <div class="rowActions">
+        <button type="submit" [disabled]="busy" class="submit">Create</button>
+        <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
+      </div>
+    </form>
+  </section>
+
+  <p *ngIf="!canCreate" class="mt16">You can view cases, but you don’t have permission to create them.</p>
+
+  <section class="mt16">
+    <h2>All cases</h2>
+    <p *ngIf="busy && cases.length === 0">Loading…</p>
+
+    <table *ngIf="cases.length > 0" class="table">
+      <thead>
+        <tr>
+          <th class="th">Case #</th>
+          <th class="th">Division</th>
+          <th class="th">Petitioner</th>
+          <th class="th">Respondent</th>
+          <th class="th">Edit</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of cases">
+          <td class="td">{{ c.caseNumber }}</td>
+          <td class="td">{{ c.division }}</td>
+          <td class="td">
+            {{ c.petitioner ? ((c.petitioner.lastName || '') + ', ' + (c.petitioner.firstName || '')) : '' }}
+          </td>
+          <td class="td">
+            {{ c.respondent ? ((c.respondent.lastName || '') + ', ' + (c.respondent.firstName || '')) : '' }}
+          </td>
+          <td class="td">
+            <button type="button" (click)="editCase(c.id)" [disabled]="busy" class="link">Edit</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

@@ -1,0 +1,800 @@
+[
+  {
+    "MonthlyHouseholdExpenseID": 1,
+    "MonthlyHouseholdExpenseTypeID": 1,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 2,
+    "MonthlyHouseholdExpenseTypeID": 2,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 3,
+    "MonthlyHouseholdExpenseTypeID": 3,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 4,
+    "MonthlyHouseholdExpenseTypeID": 4,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 5,
+    "MonthlyHouseholdExpenseTypeID": 5,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 6,
+    "MonthlyHouseholdExpenseTypeID": 6,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 7,
+    "MonthlyHouseholdExpenseTypeID": 7,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 8,
+    "MonthlyHouseholdExpenseTypeID": 8,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 9,
+    "MonthlyHouseholdExpenseTypeID": 9,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 10,
+    "MonthlyHouseholdExpenseTypeID": 10,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 11,
+    "MonthlyHouseholdExpenseTypeID": 11,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 12,
+    "MonthlyHouseholdExpenseTypeID": 12,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 13,
+    "MonthlyHouseholdExpenseTypeID": 13,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 14,
+    "MonthlyHouseholdExpenseTypeID": 14,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 15,
+    "MonthlyHouseholdExpenseTypeID": 15,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 16,
+    "MonthlyHouseholdExpenseTypeID": 16,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 17,
+    "MonthlyHouseholdExpenseTypeID": 17,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 18,
+    "MonthlyHouseholdExpenseTypeID": 18,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 19,
+    "MonthlyHouseholdExpenseTypeID": 19,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 21,
+    "MonthlyHouseholdExpenseTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 22,
+    "MonthlyHouseholdExpenseTypeID": 2,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 23,
+    "MonthlyHouseholdExpenseTypeID": 3,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 24,
+    "MonthlyHouseholdExpenseTypeID": 4,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 25,
+    "MonthlyHouseholdExpenseTypeID": 5,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 26,
+    "MonthlyHouseholdExpenseTypeID": 6,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 27,
+    "MonthlyHouseholdExpenseTypeID": 7,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 28,
+    "MonthlyHouseholdExpenseTypeID": 8,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 29,
+    "MonthlyHouseholdExpenseTypeID": 9,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 30,
+    "MonthlyHouseholdExpenseTypeID": 10,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 31,
+    "MonthlyHouseholdExpenseTypeID": 11,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 32,
+    "MonthlyHouseholdExpenseTypeID": 12,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 33,
+    "MonthlyHouseholdExpenseTypeID": 13,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 34,
+    "MonthlyHouseholdExpenseTypeID": 14,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 35,
+    "MonthlyHouseholdExpenseTypeID": 15,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 36,
+    "MonthlyHouseholdExpenseTypeID": 16,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 37,
+    "MonthlyHouseholdExpenseTypeID": 17,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 38,
+    "MonthlyHouseholdExpenseTypeID": 18,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 39,
+    "MonthlyHouseholdExpenseTypeID": 19,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 40,
+    "MonthlyHouseholdExpenseTypeID": 1,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 41,
+    "MonthlyHouseholdExpenseTypeID": 2,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 42,
+    "MonthlyHouseholdExpenseTypeID": 3,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 43,
+    "MonthlyHouseholdExpenseTypeID": 4,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 44,
+    "MonthlyHouseholdExpenseTypeID": 5,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 45,
+    "MonthlyHouseholdExpenseTypeID": 6,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 46,
+    "MonthlyHouseholdExpenseTypeID": 7,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 47,
+    "MonthlyHouseholdExpenseTypeID": 8,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 48,
+    "MonthlyHouseholdExpenseTypeID": 9,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 49,
+    "MonthlyHouseholdExpenseTypeID": 10,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 50,
+    "MonthlyHouseholdExpenseTypeID": 11,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 51,
+    "MonthlyHouseholdExpenseTypeID": 12,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 52,
+    "MonthlyHouseholdExpenseTypeID": 13,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 53,
+    "MonthlyHouseholdExpenseTypeID": 14,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 54,
+    "MonthlyHouseholdExpenseTypeID": 15,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 55,
+    "MonthlyHouseholdExpenseTypeID": 16,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 56,
+    "MonthlyHouseholdExpenseTypeID": 17,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 57,
+    "MonthlyHouseholdExpenseTypeID": 18,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 58,
+    "MonthlyHouseholdExpenseTypeID": 19,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 60,
+    "MonthlyHouseholdExpenseTypeID": 2,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 61,
+    "MonthlyHouseholdExpenseTypeID": 3,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 62,
+    "MonthlyHouseholdExpenseTypeID": 4,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 63,
+    "MonthlyHouseholdExpenseTypeID": 5,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 64,
+    "MonthlyHouseholdExpenseTypeID": 6,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 65,
+    "MonthlyHouseholdExpenseTypeID": 7,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 66,
+    "MonthlyHouseholdExpenseTypeID": 8,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 67,
+    "MonthlyHouseholdExpenseTypeID": 9,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 68,
+    "MonthlyHouseholdExpenseTypeID": 10,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 69,
+    "MonthlyHouseholdExpenseTypeID": 11,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 70,
+    "MonthlyHouseholdExpenseTypeID": 12,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 71,
+    "MonthlyHouseholdExpenseTypeID": 13,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 72,
+    "MonthlyHouseholdExpenseTypeID": 14,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 73,
+    "MonthlyHouseholdExpenseTypeID": 15,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 74,
+    "MonthlyHouseholdExpenseTypeID": 16,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 75,
+    "MonthlyHouseholdExpenseTypeID": 17,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 76,
+    "MonthlyHouseholdExpenseTypeID": 18,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 77,
+    "MonthlyHouseholdExpenseTypeID": 19,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 78,
+    "MonthlyHouseholdExpenseTypeID": 1,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 79,
+    "MonthlyHouseholdExpenseTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 80,
+    "MonthlyHouseholdExpenseTypeID": 2,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 81,
+    "MonthlyHouseholdExpenseTypeID": 3,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 82,
+    "MonthlyHouseholdExpenseTypeID": 4,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 83,
+    "MonthlyHouseholdExpenseTypeID": 5,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 84,
+    "MonthlyHouseholdExpenseTypeID": 6,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 85,
+    "MonthlyHouseholdExpenseTypeID": 7,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 86,
+    "MonthlyHouseholdExpenseTypeID": 8,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 87,
+    "MonthlyHouseholdExpenseTypeID": 9,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 88,
+    "MonthlyHouseholdExpenseTypeID": 10,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 89,
+    "MonthlyHouseholdExpenseTypeID": 11,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 90,
+    "MonthlyHouseholdExpenseTypeID": 12,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 91,
+    "MonthlyHouseholdExpenseTypeID": 13,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 92,
+    "MonthlyHouseholdExpenseTypeID": 14,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 93,
+    "MonthlyHouseholdExpenseTypeID": 15,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 94,
+    "MonthlyHouseholdExpenseTypeID": 16,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 95,
+    "MonthlyHouseholdExpenseTypeID": 17,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 96,
+    "MonthlyHouseholdExpenseTypeID": 18,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 97,
+    "MonthlyHouseholdExpenseTypeID": 19,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 98,
+    "MonthlyHouseholdExpenseTypeID": 1,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 99,
+    "MonthlyHouseholdExpenseTypeID": 2,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 100,
+    "MonthlyHouseholdExpenseTypeID": 3,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 101,
+    "MonthlyHouseholdExpenseTypeID": 4,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 102,
+    "MonthlyHouseholdExpenseTypeID": 5,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 103,
+    "MonthlyHouseholdExpenseTypeID": 6,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 104,
+    "MonthlyHouseholdExpenseTypeID": 7,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 105,
+    "MonthlyHouseholdExpenseTypeID": 8,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 106,
+    "MonthlyHouseholdExpenseTypeID": 9,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 107,
+    "MonthlyHouseholdExpenseTypeID": 10,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 108,
+    "MonthlyHouseholdExpenseTypeID": 11,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 109,
+    "MonthlyHouseholdExpenseTypeID": 12,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 110,
+    "MonthlyHouseholdExpenseTypeID": 13,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 111,
+    "MonthlyHouseholdExpenseTypeID": 14,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 112,
+    "MonthlyHouseholdExpenseTypeID": 15,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 113,
+    "MonthlyHouseholdExpenseTypeID": 16,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 114,
+    "MonthlyHouseholdExpenseTypeID": 17,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 115,
+    "MonthlyHouseholdExpenseTypeID": 18,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyHouseholdExpenseID": 116,
+    "MonthlyHouseholdExpenseTypeID": 19,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyHouseholdExpenseTypeIfOther": null
+  }
+]

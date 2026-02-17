@@ -1,0 +1,162 @@
+[
+  {
+    "UserID": 1,
+    "Uname": "mk",
+    "Email": "mamadou@konate.com",
+    "RoleTypeID": 1,
+    "Fname": "Mamadou",
+    "Lname": "Konate"
+  },
+  {
+    "UserID": 2,
+    "Uname": "mko",
+    "Email": "maimouna@konate.com",
+    "RoleTypeID": 1,
+    "Fname": "Maimouna",
+    "Lname": "Konate"
+  },
+  {
+    "UserID": 3,
+    "Uname": "tc",
+    "Email": "truman@capote.com",
+    "RoleTypeID": 1,
+    "Fname": "Truman",
+    "Lname": "Capote"
+  },
+  {
+    "UserID": 4,
+    "Uname": "tco",
+    "Email": "trudy@capote.com",
+    "RoleTypeID": 1,
+    "Fname": "Trudy",
+    "Lname": "Capote"
+  },
+  {
+    "UserID": 6,
+    "Uname": "vh",
+    "Email": "van@hoe.com",
+    "RoleTypeID": 2,
+    "Fname": "Alicia",
+    "Lname": "VanHoe"
+  },
+  {
+    "UserID": 7,
+    "Uname": "ss",
+    "Email": "sonya@sotomayor.com",
+    "RoleTypeID": 1,
+    "Fname": "Sonya",
+    "Lname": "Sotomayor"
+  },
+  {
+    "UserID": 8,
+    "Uname": "fs",
+    "Email": "franco@sotomayor.com",
+    "RoleTypeID": 1,
+    "Fname": "Franco",
+    "Lname": "Sotomayor"
+  },
+  {
+    "UserID": 9,
+    "Uname": "gl",
+    "Email": "george@limas.com",
+    "RoleTypeID": 3,
+    "Fname": "George",
+    "Lname": "Limas"
+  },
+  {
+    "UserID": 10,
+    "Uname": "aj",
+    "Email": "anita@jordan.com",
+    "RoleTypeID": 1,
+    "Fname": "Anita",
+    "Lname": "Jordan"
+  },
+  {
+    "UserID": 11,
+    "Uname": "mj",
+    "Email": "michal@jordan.com",
+    "RoleTypeID": 1,
+    "Fname": "Michael",
+    "Lname": "Jordan"
+  },
+  {
+    "UserID": 12,
+    "Uname": "ja",
+    "Email": "jane@alexander.com",
+    "RoleTypeID": 1,
+    "Fname": "Jane",
+    "Lname": "Alexander"
+  },
+  {
+    "UserID": 13,
+    "Uname": "ra",
+    "Email": "robert@alexander.com",
+    "RoleTypeID": 1,
+    "Fname": "Robert",
+    "Lname": "Alexander"
+  },
+  {
+    "UserID": 14,
+    "Uname": "raq",
+    "Email": "robert@aquinas.com",
+    "RoleTypeID": 1,
+    "Fname": "Thomas",
+    "Lname": "Aquinas"
+  },
+  {
+    "UserID": 15,
+    "Uname": "sa",
+    "Email": "sherri@aquinas.com",
+    "RoleTypeID": 1,
+    "Fname": "Sherri",
+    "Lname": "Aquinas"
+  },
+  {
+    "UserID": 16,
+    "Uname": "jf",
+    "Email": "john@fields.com",
+    "RoleTypeID": 2,
+    "Fname": "John",
+    "Lname": "Fields"
+  },
+  {
+    "UserID": 17,
+    "Uname": "lj",
+    "Email": "linda@jane.com",
+    "RoleTypeID": 2,
+    "Fname": "Linda",
+    "Lname": "Jane"
+  },
+  {
+    "UserID": 25,
+    "Uname": "admin",
+    "Email": "admin@alphatronex.com",
+    "RoleTypeID": 4,
+    "Fname": "Admin",
+    "Lname": "Admin"
+  },
+  {
+    "UserID": 33,
+    "Uname": "george",
+    "Email": "george@george.com",
+    "RoleTypeID": 3,
+    "Fname": "George",
+    "Lname": "Washington"
+  },
+  {
+    "UserID": 34,
+    "Uname": "tw",
+    "Email": "thersa@washington.com",
+    "RoleTypeID": 3,
+    "Fname": "Theresa",
+    "Lname": "Washington"
+  },
+  {
+    "UserID": 35,
+    "Uname": "ro",
+    "Email": "theresa@thereas.com",
+    "RoleTypeID": 3,
+    "Fname": "Ryan",
+    "Lname": "O'Neal"
+  }
+]

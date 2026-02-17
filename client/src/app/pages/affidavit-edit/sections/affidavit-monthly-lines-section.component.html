@@ -1,0 +1,43 @@
+<section class="panel">
+  <h2 class="panelTitle">{{ title }}</h2>
+
+  <form (ngSubmit)="submit(); ensureDefaults()" class="gridThree">
+    <label>
+      Type
+      <select name="typeId" [(ngModel)]="typeId" class="input" (click)="ensureDefaults()">
+        <option *ngFor="let t of types" [ngValue]="t.id">{{ t.name }} ({{ t.id }})</option>
+      </select>
+    </label>
+
+    <label>
+      Amount
+      <input name="amount" [(ngModel)]="amount" inputmode="decimal" class="input" />
+    </label>
+
+    <label>
+      If Other
+      <input name="ifOther" [(ngModel)]="ifOther" class="input" />
+    </label>
+
+    <div class="rowActions">
+      <button type="submit" [disabled]="busy" class="submit">Add</button>
+    </div>
+  </form>
+
+  <table *ngIf="rows.length > 0" class="table mt12">
+    <thead>
+      <tr>
+        <th class="th">Type</th>
+        <th class="th">Amount</th>
+        <th class="th"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows">
+        <td class="td">{{ typeLabel(r.typeId) }}</td>
+        <td class="td">{{ r.amount | number:'1.2-2' }}</td>
+        <td class="td"><button type="button" (click)="remove.emit(r.id)" [disabled]="busy" class="mini">Remove</button></td>
+      </tr>
+    </tbody>
+  </table>
+</section>

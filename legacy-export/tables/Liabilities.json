@@ -1,0 +1,56 @@
+[
+  {
+    "LiabilitiesID": 3,
+    "LiabilitiesTypeId": 1,
+    "UserID": 1,
+    "Description": "National Mortgage Corporation",
+    "AmountOwed": 365000,
+    "NonMaritalTypeID": 3,
+    "User_Owes": true
+  },
+  {
+    "LiabilitiesID": 5,
+    "LiabilitiesTypeId": 8,
+    "UserID": 3,
+    "Description": "Bad Loan1",
+    "AmountOwed": 15000,
+    "NonMaritalTypeID": 3,
+    "User_Owes": false
+  },
+  {
+    "LiabilitiesID": 6,
+    "LiabilitiesTypeId": 1,
+    "UserID": 13,
+    "Description": "Milton State Vault",
+    "AmountOwed": 203456.22,
+    "NonMaritalTypeID": 1,
+    "User_Owes": true
+  },
+  {
+    "LiabilitiesID": 7,
+    "LiabilitiesTypeId": 8,
+    "UserID": 1,
+    "Description": "My ex wife",
+    "AmountOwed": 500,
+    "NonMaritalTypeID": 1,
+    "User_Owes": true
+  },
+  {
+    "LiabilitiesID": 8,
+    "LiabilitiesTypeId": 3,
+    "UserID": 2,
+    "Description": "big mortgage",
+    "AmountOwed": 120599.23,
+    "NonMaritalTypeID": 3,
+    "User_Owes": false
+  },
+  {
+    "LiabilitiesID": 9,
+    "LiabilitiesTypeId": 4,
+    "UserID": 1,
+    "Description": "Visa",
+    "AmountOwed": 2006,
+    "NonMaritalTypeID": 3,
+    "User_Owes": false
+  }
+]

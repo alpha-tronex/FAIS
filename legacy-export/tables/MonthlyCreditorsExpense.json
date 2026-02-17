@@ -1,0 +1,37 @@
+[
+  {
+    "MonthlyCreditorsExpenseID": 15,
+    "MonthlyCreditorsExpenseTypeID": 1,
+    "UserID": 1,
+    "Amount": 2056.99,
+    "MonthlyCreditorsExpenseTypeIfOther": "Chase Visa"
+  },
+  {
+    "MonthlyCreditorsExpenseID": 22,
+    "MonthlyCreditorsExpenseTypeID": 1,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyCreditorsExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyCreditorsExpenseID": 34,
+    "MonthlyCreditorsExpenseTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyCreditorsExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyCreditorsExpenseID": 36,
+    "MonthlyCreditorsExpenseTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyCreditorsExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyCreditorsExpenseID": 37,
+    "MonthlyCreditorsExpenseTypeID": 1,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyCreditorsExpenseTypeIfOther": null
+  }
+]

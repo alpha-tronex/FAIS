@@ -1,0 +1,22 @@
+[
+  {
+    "FilingStatusTypeID": 1,
+    "FilingStatusType": "Single"
+  },
+  {
+    "FilingStatusTypeID": 2,
+    "FilingStatusType": "Married Filing Jointly"
+  },
+  {
+    "FilingStatusTypeID": 3,
+    "FilingStatusType": "Married Filing Separately"
+  },
+  {
+    "FilingStatusTypeID": 4,
+    "FilingStatusType": "Head of Household"
+  },
+  {
+    "FilingStatusTypeID": 5,
+    "FilingStatusType": "Qualifying Widow(er) with Dependent Child"
+  }
+]

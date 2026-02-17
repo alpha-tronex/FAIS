@@ -1,0 +1,67 @@
+<main class="page">
+  <h1>Financial affidavit</h1>
+
+  <nav class="mt16">
+    <a (click)="goBack()" class="link">Back</a>
+    <span class="sep">|</span>
+    <a routerLink="/affidavit" class="link">Summary</a>
+    <span class="sep">|</span>
+    <a
+      [routerLink]="['/affidavit/edit']"
+      [queryParams]="userId ? { userId } : {}"
+      class="link"
+    >
+      Edit data
+    </a>
+    <span class="sep">|</span>
+    <a routerLink="/profile" class="link">Profile</a>
+    <span class="sep">|</span>
+    <a (click)="logout()" class="link">Logout</a>
+  </nav>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section class="mt16">
+    <div class="rowActions">
+      <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
+      <span *ngIf="busy">Loading…</span>
+    </div>
+
+    <div *ngIf="summary" class="panel mt12">
+      <h2 class="panelTitle">Summary</h2>
+      <p>
+        Gross annual income: <strong>{{ summary.grossAnnualIncome | number:'1.2-2' }}</strong>
+      </p>
+
+      <p class="mt10">
+        Annual income (from employment):
+        <strong>{{ summary.grossAnnualIncomeFromEmployment | number:'1.2-2' }}</strong>
+      </p>
+      <p>
+        Monthly income (from MonthlyIncome rows):
+        <strong>{{ summary.grossMonthlyIncomeFromMonthlyIncome | number:'1.2-2' }}</strong>
+      </p>
+      <p>
+        Annual income (from MonthlyIncome rows):
+        <strong>{{ summary.grossAnnualIncomeFromMonthlyIncome | number:'1.2-2' }}</strong>
+      </p>
+      <p>
+        Threshold: <strong>{{ summary.threshold | number:'1.0-0' }}</strong>
+      </p>
+
+      <p class="mt12">
+        Form to generate:
+        <strong>{{ summary.form === 'short' ? 'Short form' : 'Long form' }}</strong>
+      </p>
+
+      <div class="rowActions mt12">
+        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy">Generate PDF</button>
+        <span *ngIf="pdfBusy">Generating…</span>
+      </div>
+
+      <p class="mt12">Legacy User ID: <strong>{{ summary.legacyUserId }}</strong></p>
+    </div>
+
+    <p *ngIf="!busy && !summary && !error" class="mt12">No summary available.</p>
+  </section>
+</main>

@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "Monthly gross salary or wages"
+  },
+  {
+    "id": 2,
+    "name": "Monthly bonuses, commissions, allowances, overtime, tips, and similar"
+  },
+  {
+    "id": 3,
+    "name": "Monthly business income from sources such as self-employment,"
+  },
+  {
+    "id": 4,
+    "name": "Monthly disability benefits/SSI"
+  },
+  {
+    "id": 5,
+    "name": "Monthly Workers’ Compensation"
+  },
+  {
+    "id": 6,
+    "name": "Monthly Unemployment Compensation"
+  },
+  {
+    "id": 7,
+    "name": "Monthly pension, retirement, or annuity payments"
+  },
+  {
+    "id": 8,
+    "name": "Monthly Social Security benefits"
+  },
+  {
+    "id": 9,
+    "name": "Monthly alimony actually received from this case"
+  },
+  {
+    "id": 10,
+    "name": "Monthly alimony actually received from other case(s)"
+  },
+  {
+    "id": 11,
+    "name": "Monthly interest and dividends"
+  },
+  {
+    "id": 12,
+    "name": "Monthly rental income (gross receipts minus ordinary and necessary expenses required to produce income) (Attach sheet itemizing such income and expense items.)"
+  },
+  {
+    "id": 13,
+    "name": "Monthly income from royalties, trusts, or estates"
+  },
+  {
+    "id": 14,
+    "name": "Monthly reimbursed expenses and in-kind payments to the extent that they reduce personal living expenses (Attach sheet itemizing each item and amount.)"
+  },
+  {
+    "id": 15,
+    "name": "Monthly gains derived from dealing in property (not including nonrecurring gains)"
+  },
+  {
+    "id": 16,
+    "name": "Other"
+  }
+]

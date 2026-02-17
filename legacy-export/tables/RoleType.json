@@ -1,0 +1,18 @@
+[
+  {
+    "RoleTypeID": 1,
+    "Roles": "User"
+  },
+  {
+    "RoleTypeID": 2,
+    "Roles": "Attorney"
+  },
+  {
+    "RoleTypeID": 3,
+    "Roles": "Staff Attorney"
+  },
+  {
+    "RoleTypeID": 4,
+    "Roles": "Administrator"
+  }
+]

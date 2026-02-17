@@ -1,0 +1,295 @@
+/* Global theme (A/B/C) controlled by html[data-theme].
+	 Default is Option B (compact data grid). */
+:root {
+	--radius: 10px;
+
+	/* Layout + density knobs */
+	--bodyFontSize: 16px;
+	--pageMaxWidth: 1024px;
+	--pageMarginY: 36px;
+	--panelPadding: 16px;
+
+	--controlHeight: 36px;
+	--controlPaddingY: 7px;
+	--controlPaddingX: 10px;
+	--controlFontSize: 0.93rem;
+	--buttonFontWeight: 700;
+
+	--tableBorderWidth: 2px;
+	--thPaddingY: 8px;
+	--thPaddingX: 10px;
+	--tdPaddingY: 7px;
+	--tdPaddingX: 10px;
+
+	/* Default palette = Option B */
+	--bodyFontSize: 14px;
+	--pageMaxWidth: 1200px;
+	--pageMarginY: 18px;
+	--panelPadding: 12px;
+
+	--controlHeight: 34px;
+	--controlPaddingY: 6px;
+	--controlPaddingX: 10px;
+	--controlFontSize: 0.9rem;
+	--buttonFontWeight: 600;
+
+	--tableBorderWidth: 1px;
+	--thPaddingY: 8px;
+	--thPaddingX: 10px;
+	--tdPaddingY: 7px;
+	--tdPaddingX: 10px;
+
+	--bg: #ffffff;
+	--surface: #fbfdff;
+	--text: #0b1220;
+	--muted: #475569;
+	--border: #dbe2ea;
+	--border2: #dbe2ea;
+	--accent: #0ea5e9;
+	--danger: #dc2626;
+	--focus: color-mix(in srgb, var(--accent) 25%, transparent);
+	--panelBorderWidth: 1px;
+	--tableHeaderBg: #ffffff;
+}
+
+/* Option A - Clean Gov/Admin */
+html[data-theme='a'] {
+	--bodyFontSize: 16px;
+	--pageMaxWidth: 1024px;
+	--pageMarginY: 36px;
+
+	--bg: #f7f8fa;
+	--surface: #ffffff;
+	--text: #111827;
+	--muted: #6b7280;
+	--border: #e5e7eb;
+	--border2: #eef2f7;
+	--accent: #1f6feb;
+	--danger: #b42318;
+	--focus: color-mix(in srgb, var(--accent) 25%, transparent);
+	--panelBorderWidth: 1px;
+	--tableBorderWidth: 1px;
+	--tableHeaderBg: #fafbfc;
+}
+
+/* Option B - Compact Data Grid */
+html[data-theme='b'] {
+	--bodyFontSize: 14px;
+	--pageMaxWidth: 1200px;
+	--pageMarginY: 18px;
+	--panelPadding: 12px;
+
+	--controlHeight: 34px;
+	--controlPaddingY: 6px;
+	--controlPaddingX: 10px;
+	--controlFontSize: 0.9rem;
+	--buttonFontWeight: 600;
+
+	--bg: #ffffff;
+	--surface: #fbfdff;
+	--text: #0b1220;
+	--muted: #475569;
+	--border: #dbe2ea;
+	--border2: #dbe2ea;
+	--accent: #0ea5e9;
+	--danger: #dc2626;
+	--focus: color-mix(in srgb, var(--accent) 25%, transparent);
+	--panelBorderWidth: 1px;
+	--tableBorderWidth: 1px;
+	--tableHeaderBg: #ffffff;
+}
+
+/* Option C - High Contrast */
+html[data-theme='c'] {
+	--bodyFontSize: 16px;
+	--pageMaxWidth: 980px;
+	--pageMarginY: 28px;
+
+	--bg: #ffffff;
+	--surface: #ffffff;
+	--text: #000000;
+	--muted: #1f2937;
+	--border: #111827;
+	--border2: #374151;
+	--accent: #003b9e;
+	--danger: #8a0000;
+	--focus: #ffbf47;
+	--panelBorderWidth: 2px;
+	--tableBorderWidth: 2px;
+	--tableHeaderBg: #f3f4f6;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+	font-size: var(--bodyFontSize);
+	line-height: 1.4;
+}
+
+/* Shared layout primitives used across pages */
+.page {
+	max-width: var(--pageMaxWidth);
+	margin: var(--pageMarginY) auto;
+	padding: 0 16px;
+}
+
+h1,
+h2 {
+	letter-spacing: -0.01em;
+}
+
+.link {
+	cursor: pointer;
+	color: var(--accent);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.sep {
+	margin: 0 8px;
+}
+
+.panel {
+	margin-top: 16px;
+	padding: var(--panelPadding);
+	border: var(--panelBorderWidth) solid var(--border);
+	background: var(--surface);
+	border-radius: var(--radius);
+}
+
+.panelTitle {
+	margin: 0 0 8px 0;
+	font-size: 1.05rem;
+}
+
+.gridForm {
+	display: grid;
+	gap: 12px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gridForm label {
+	display: grid;
+	gap: 8px;
+	color: var(--muted);
+	font-size: 0.92rem;
+}
+
+.input {
+	width: 100%;
+	display: block;
+	box-sizing: border-box;
+	margin-top: 2px;
+	height: var(--controlHeight);
+	padding: var(--controlPaddingY) var(--controlPaddingX);
+	border: var(--panelBorderWidth) solid var(--border);
+	background: #fff;
+	border-radius: 8px;
+	color: var(--text);
+	font-size: var(--controlFontSize);
+	line-height: 1.25;
+}
+
+.input:focus {
+	outline: 3px solid var(--focus);
+	outline-offset: 2px;
+}
+
+.rowActions {
+	display: flex;
+	align-items: end;
+	gap: 10px;
+}
+
+button {
+	min-height: var(--controlHeight);
+	border: var(--panelBorderWidth) solid var(--border);
+	background: #fff;
+	color: var(--text);
+	padding: var(--controlPaddingY) var(--controlPaddingX);
+	border-radius: 10px;
+	cursor: pointer;
+	font-weight: var(--buttonFontWeight);
+	line-height: 1.25;
+}
+
+button:focus {
+	outline: 3px solid var(--focus);
+	outline-offset: 2px;
+}
+
+button[disabled] {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.submit {
+	border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+	background: color-mix(in srgb, var(--accent) 10%, #fff);
+}
+
+html[data-theme='c'] .submit {
+	border-color: var(--accent);
+	background: #e8f0ff;
+}
+
+.table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	background: var(--surface);
+	border: var(--tableBorderWidth) solid var(--border);
+	border-radius: var(--radius);
+	overflow: hidden;
+}
+
+.th {
+	text-align: left;
+	font-weight: 600;
+	color: var(--muted);
+	background: var(--tableHeaderBg);
+	border-bottom: var(--tableBorderWidth) solid var(--border);
+	padding: var(--thPaddingY) var(--thPaddingX);
+}
+
+.td {
+	border-bottom: 1px solid var(--border);
+	padding: var(--tdPaddingY) var(--tdPaddingX);
+	line-height: 1.25;
+}
+
+tbody tr:hover .td {
+	background: #fbfdff;
+}
+
+html[data-theme='b'] .table {
+	border-collapse: collapse;
+	border-radius: 0;
+}
+
+html[data-theme='b'] tbody tr:hover {
+	background: #f8fbff;
+}
+
+.mt10 {
+	margin-top: 10px;
+}
+
+.mt12 {
+	margin-top: 12px;
+}
+
+.mt16 {
+	margin-top: 16px;
+}
+
+.error {
+	color: var(--danger);
+}

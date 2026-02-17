@@ -1,0 +1,178 @@
+<main class="page">
+  <h1>Profile</h1>
+
+  <p *ngIf="editingUserId" class="mt10">
+    Editing user: <strong>{{ uname }}</strong>
+  </p>
+
+  <nav class="mt16">
+    <a routerLink="/my-cases" class="link">My cases</a>
+    <span class="sep">|</span>
+    <a routerLink="/affidavit" class="link">Affidavit</a>
+    <span class="sep">|</span>
+    <a (click)="logout()" class="link">Logout</a>
+  </nav>
+
+  <section class="panel mt16">
+    <h2 class="panelTitle">Your information</h2>
+
+    <form (ngSubmit)="onSubmit()" class="gridForm">
+      <label>
+        Username
+        <input name="uname" [(ngModel)]="uname" disabled class="input" />
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="email" [(ngModel)]="email" required class="input" />
+      </label>
+
+      <label>
+        First name
+        <input name="firstName" [(ngModel)]="firstName" class="input" />
+      </label>
+
+      <label>
+        Last name
+        <input name="lastName" [(ngModel)]="lastName" class="input" />
+      </label>
+
+      <label>
+        Address line 1
+        <input name="addressLine1" [(ngModel)]="addressLine1" required class="input" />
+      </label>
+
+      <label>
+        Address line 2 (optional)
+        <input name="addressLine2" [(ngModel)]="addressLine2" class="input" />
+      </label>
+
+      <label>
+        City
+        <input name="city" [(ngModel)]="city" required class="input" />
+      </label>
+
+      <label>
+        State
+        <select name="state" [(ngModel)]="state" required class="input">
+          <option *ngFor="let s of states" [value]="s.abbrev ?? s.name">{{ s.name }}</option>
+        </select>
+      </label>
+
+      <label>
+        Zip
+        <input name="zipCode" [(ngModel)]="zipCode" required class="input" />
+      </label>
+
+      <label>
+        Phone
+        <input name="phone" [(ngModel)]="phone" required class="input" />
+      </label>
+
+      <label>
+        Social security
+        <div class="inputWithToggle">
+          <input
+            name="ssn"
+            [ngModel]="showSsn ? (ssnFull ?? '') : maskedSsn"
+            disabled
+            class="input"
+            type="text"
+          />
+          <button
+            type="button"
+            class="iconBtn"
+            (click)="toggleSsn()"
+            [disabled]="busy"
+            [attr.aria-label]="showSsn ? 'Hide SSN' : 'Show SSN'"
+          >
+            <svg *ngIf="!showSsn" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M12 5c6 0 10 7 10 7s-4 7-10 7S2 12 2 12s4-7 10-7Zm0 2C8 7 4.9 10.9 4.1 12c.8 1.1 3.9 5 7.9 5s7.1-3.9 7.9-5C19.1 10.9 16 7 12 7Zm0 2.5A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5Z"/>
+            </svg>
+            <svg *ngIf="showSsn" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M3 5.3 4.3 4 20 19.7 18.7 21l-3.1-3.1A11 11 0 0 1 12 19C6 19 2 12 2 12a20 20 0 0 1 5.1-5.9L3 5.3Zm9 3.7c-.3 0-.6 0-.9.1l1.3 1.3c.4.4.6.9.6 1.6 0 .3 0 .6-.1.9l1.8 1.8c.2-.4.3-.9.3-1.4A3 3 0 0 0 12 9Zm0-4c6 0 10 7 10 7a20 20 0 0 1-4.6 5.4l-1.4-1.4A18 18 0 0 0 19.9 12C19.1 10.9 16 7 12 7c-.7 0-1.3.1-1.9.2L8.5 5.6C9.6 5.2 10.8 5 12 5Z"/>
+            </svg>
+          </button>
+        </div>
+      </label>
+
+
+      <label *ngIf="editingUserId">
+        Role
+        <select name="roleTypeId" [(ngModel)]="roleTypeId" class="input" [disabled]="busy || roleTypes.length === 0">
+          <option *ngFor="let rt of roleTypes" [ngValue]="rt.id">{{ rt.name }}</option>
+        </select>
+      </label>
+
+      <div class="fullRow rowActions rowActionsCenter mt12">
+        <button type="submit" [disabled]="busy">Update profile</button>
+        <span *ngIf="busy">Saving…</span>
+        <span *ngIf="profileSaved" class="muted">Saved.</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel mt16">
+    <h2 class="panelTitle">Update SSN</h2>
+
+    <form (ngSubmit)="updateSsn()" class="gridForm">
+      <label>
+        New social security
+        <div class="inputWithToggle">
+          <input
+            name="newSsn"
+            [(ngModel)]="newSsn"
+            class="input"
+            [type]="showNewSsn ? 'text' : 'password'"
+            autocomplete="off"
+          />
+          <button
+            type="button"
+            class="iconBtn"
+            (click)="showNewSsn = !showNewSsn"
+            [attr.aria-label]="showNewSsn ? 'Hide new SSN' : 'Show new SSN'"
+          >
+            <svg *ngIf="!showNewSsn" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M12 5c6 0 10 7 10 7s-4 7-10 7S2 12 2 12s4-7 10-7Zm0 2C8 7 4.9 10.9 4.1 12c.8 1.1 3.9 5 7.9 5s7.1-3.9 7.9-5C19.1 10.9 16 7 12 7Zm0 2.5A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5Z"/>
+            </svg>
+            <svg *ngIf="showNewSsn" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M3 5.3 4.3 4 20 19.7 18.7 21l-3.1-3.1A11 11 0 0 1 12 19C6 19 2 12 2 12a20 20 0 0 1 5.1-5.9L3 5.3Zm9 3.7c-.3 0-.6 0-.9.1l1.3 1.3c.4.4.6.9.6 1.6 0 .3 0 .6-.1.9l1.8 1.8c.2-.4.3-.9.3-1.4A3 3 0 0 0 12 9Zm0-4c6 0 10 7 10 7a20 20 0 0 1-4.6 5.4l-1.4-1.4A18 18 0 0 0 19.9 12C19.1 10.9 16 7 12 7c-.7 0-1.3.1-1.9.2L8.5 5.6C9.6 5.2 10.8 5 12 5Z"/>
+            </svg>
+          </button>
+        </div>
+      </label>
+
+      <label>
+        Confirm new social security
+        <div class="inputWithToggle">
+          <input
+            name="confirmNewSsn"
+            [(ngModel)]="confirmNewSsn"
+            class="input"
+            [type]="showConfirmNewSsn ? 'text' : 'password'"
+            autocomplete="off"
+          />
+          <button
+            type="button"
+            class="iconBtn"
+            (click)="showConfirmNewSsn = !showConfirmNewSsn"
+            [attr.aria-label]="showConfirmNewSsn ? 'Hide confirm new SSN' : 'Show confirm new SSN'"
+          >
+            <svg *ngIf="!showConfirmNewSsn" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M12 5c6 0 10 7 10 7s-4 7-10 7S2 12 2 12s4-7 10-7Zm0 2C8 7 4.9 10.9 4.1 12c.8 1.1 3.9 5 7.9 5s7.1-3.9 7.9-5C19.1 10.9 16 7 12 7Zm0 2.5A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5Z"/>
+            </svg>
+            <svg *ngIf="showConfirmNewSsn" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M3 5.3 4.3 4 20 19.7 18.7 21l-3.1-3.1A11 11 0 0 1 12 19C6 19 2 12 2 12a20 20 0 0 1 5.1-5.9L3 5.3Zm9 3.7c-.3 0-.6 0-.9.1l1.3 1.3c.4.4.6.9.6 1.6 0 .3 0 .6-.1.9l1.8 1.8c.2-.4.3-.9.3-1.4A3 3 0 0 0 12 9Zm0-4c6 0 10 7 10 7a20 20 0 0 1-4.6 5.4l-1.4-1.4A18 18 0 0 0 19.9 12C19.1 10.9 16 7 12 7c-.7 0-1.3.1-1.9.2L8.5 5.6C9.6 5.2 10.8 5 12 5Z"/>
+            </svg>
+          </button>
+        </div>
+      </label>
+
+      <div class="fullRow rowActions rowActionsCenter mt12">
+        <button type="submit" [disabled]="busy">Update SSN</button>
+      </div>
+    </form>
+  </section>
+
+  <p *ngIf="error" class="error mt12">{{ error }}</p>
+</main>

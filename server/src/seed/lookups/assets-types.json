@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Cash (on hand)"
+  },
+  {
+    "id": 2,
+    "name": "Cash (in banks or credit union)"
+  },
+  {
+    "id": 3,
+    "name": "Stocks/Bonds"
+  },
+  {
+    "id": 4,
+    "name": "Notes (money owed to you in writing)"
+  },
+  {
+    "id": 5,
+    "name": "Money owed to you (not evidenced by a note)"
+  },
+  {
+    "id": 6,
+    "name": "Real estate: (home)"
+  },
+  {
+    "id": 7,
+    "name": "Real estate: (other)"
+  },
+  {
+    "id": 8,
+    "name": "Business interests"
+  },
+  {
+    "id": 9,
+    "name": "Automobiles"
+  },
+  {
+    "id": 10,
+    "name": "Boats"
+  },
+  {
+    "id": 11,
+    "name": "Other Vehicles"
+  },
+  {
+    "id": 12,
+    "name": "Retirement plans (Profit Sharing, Pension, IRA, 401(k)s, etc.)"
+  },
+  {
+    "id": 13,
+    "name": "Furniture & furnishings in home"
+  },
+  {
+    "id": 14,
+    "name": "Furniture & furnishings elsewhere"
+  },
+  {
+    "id": 15,
+    "name": "Collectibles"
+  },
+  {
+    "id": 16,
+    "name": "Jewelry"
+  },
+  {
+    "id": 17,
+    "name": "Life insurance (cash surrender value)"
+  },
+  {
+    "id": 18,
+    "name": "Sporting and entertainment (T.V., stereo, etc.) equipment"
+  },
+  {
+    "id": 19,
+    "name": "Other assets"
+  },
+  {
+    "id": 20,
+    "name": "Contingent Assets"
+  }
+]

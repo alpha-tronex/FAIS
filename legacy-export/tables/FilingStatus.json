@@ -1,0 +1,32 @@
+[
+  {
+    "FilingStatusID": 1,
+    "FilingStatusTypeID": 2,
+    "UserID": 1,
+    "NumChildrenClaimed": 3
+  },
+  {
+    "FilingStatusID": 2,
+    "FilingStatusTypeID": 3,
+    "UserID": 2,
+    "NumChildrenClaimed": 5
+  },
+  {
+    "FilingStatusID": 3,
+    "FilingStatusTypeID": 3,
+    "UserID": 4,
+    "NumChildrenClaimed": 4
+  },
+  {
+    "FilingStatusID": 4,
+    "FilingStatusTypeID": 1,
+    "UserID": 9,
+    "NumChildrenClaimed": 4
+  },
+  {
+    "FilingStatusID": 5,
+    "FilingStatusTypeID": 1,
+    "UserID": 12,
+    "NumChildrenClaimed": 1
+  }
+]

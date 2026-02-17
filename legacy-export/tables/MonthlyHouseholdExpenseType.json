@@ -1,0 +1,82 @@
+[
+  {
+    "MonthlyHouseholdExpenseTypeID": 1,
+    "MonthlyHouseholdExpenseType": "Monthly mortgage or rent payments"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 2,
+    "MonthlyHouseholdExpenseType": "Monthly property taxes (if not included in mortgage)"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 3,
+    "MonthlyHouseholdExpenseType": "Monthly insurance on residence (if not included in mortgage)"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 4,
+    "MonthlyHouseholdExpenseType": "Monthly condominium maintenance fees and homeowner’s association fees"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 5,
+    "MonthlyHouseholdExpenseType": "Monthly electricity "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 6,
+    "MonthlyHouseholdExpenseType": "Monthly water, garbage, and sewer"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 7,
+    "MonthlyHouseholdExpenseType": "Monthly telephone"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 8,
+    "MonthlyHouseholdExpenseType": "Monthly fuel oil or natural gas"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 9,
+    "MonthlyHouseholdExpenseType": "Monthly repairs and maintenance"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 10,
+    "MonthlyHouseholdExpenseType": "Monthly lawn care "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 11,
+    "MonthlyHouseholdExpenseType": "Monthly pool maintenance "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 12,
+    "MonthlyHouseholdExpenseType": "Monthly pest control "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 13,
+    "MonthlyHouseholdExpenseType": "Monthly misc. household "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 14,
+    "MonthlyHouseholdExpenseType": "Monthly food and home supplies "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 15,
+    "MonthlyHouseholdExpenseType": "Monthly meals outside home "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 16,
+    "MonthlyHouseholdExpenseType": "Monthly cable t.v. "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 17,
+    "MonthlyHouseholdExpenseType": "Monthly alarm service contract "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 18,
+    "MonthlyHouseholdExpenseType": "Monthly service contracts on appliances "
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 19,
+    "MonthlyHouseholdExpenseType": "Monthly maid service"
+  },
+  {
+    "MonthlyHouseholdExpenseTypeID": 20,
+    "MonthlyHouseholdExpenseType": "Other household expense"
+  }
+]

@@ -1,0 +1,29 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: fais-mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # Optional: legacy SQL Server for migration/export.
+  # Note: on Apple Silicon, this may require x86 emulation and can be slow.
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: fais-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-ChangeMe123!}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      # Mount legacy MDF/LDF + scripts (read-only) so tooling can access them.
+      - "../FAIS/sql scripts:/legacy:ro"
+
+volumes:
+  mongo_data:
+  sqlserver_data:

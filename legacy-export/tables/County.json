@@ -1,0 +1,337 @@
+[
+  {
+    "CountyID": 1,
+    "County": "Alachua ",
+    "CircuitID": 8
+  },
+  {
+    "CountyID": 2,
+    "County": "Baker",
+    "CircuitID": 8
+  },
+  {
+    "CountyID": 3,
+    "County": "Bay",
+    "CircuitID": 14
+  },
+  {
+    "CountyID": 4,
+    "County": "Bradford",
+    "CircuitID": 8
+  },
+  {
+    "CountyID": 5,
+    "County": "Brevard",
+    "CircuitID": 18
+  },
+  {
+    "CountyID": 6,
+    "County": "Broward",
+    "CircuitID": 17
+  },
+  {
+    "CountyID": 7,
+    "County": "Calhoun",
+    "CircuitID": 14
+  },
+  {
+    "CountyID": 8,
+    "County": "Charlotte",
+    "CircuitID": 20
+  },
+  {
+    "CountyID": 9,
+    "County": "Citrus",
+    "CircuitID": 5
+  },
+  {
+    "CountyID": 10,
+    "County": "Clay",
+    "CircuitID": 4
+  },
+  {
+    "CountyID": 11,
+    "County": "Collier",
+    "CircuitID": 20
+  },
+  {
+    "CountyID": 12,
+    "County": "Columbia",
+    "CircuitID": 3
+  },
+  {
+    "CountyID": 13,
+    "County": "DeSoto",
+    "CircuitID": 12
+  },
+  {
+    "CountyID": 14,
+    "County": "Dixie",
+    "CircuitID": 3
+  },
+  {
+    "CountyID": 15,
+    "County": "Duval",
+    "CircuitID": 4
+  },
+  {
+    "CountyID": 16,
+    "County": "Escambia",
+    "CircuitID": 1
+  },
+  {
+    "CountyID": 17,
+    "County": "Flagler",
+    "CircuitID": 7
+  },
+  {
+    "CountyID": 18,
+    "County": "Franklin",
+    "CircuitID": 2
+  },
+  {
+    "CountyID": 19,
+    "County": "Gadsden",
+    "CircuitID": 2
+  },
+  {
+    "CountyID": 20,
+    "County": "Gilchrist",
+    "CircuitID": 8
+  },
+  {
+    "CountyID": 21,
+    "County": "Glades",
+    "CircuitID": 20
+  },
+  {
+    "CountyID": 22,
+    "County": "Gulf",
+    "CircuitID": 14
+  },
+  {
+    "CountyID": 23,
+    "County": "Hamilton",
+    "CircuitID": 3
+  },
+  {
+    "CountyID": 24,
+    "County": "Hardee",
+    "CircuitID": 10
+  },
+  {
+    "CountyID": 25,
+    "County": "Hendry",
+    "CircuitID": 20
+  },
+  {
+    "CountyID": 26,
+    "County": "Hernando",
+    "CircuitID": 5
+  },
+  {
+    "CountyID": 27,
+    "County": "Highlands",
+    "CircuitID": 10
+  },
+  {
+    "CountyID": 28,
+    "County": "Hillsborough",
+    "CircuitID": 13
+  },
+  {
+    "CountyID": 29,
+    "County": "Holmes",
+    "CircuitID": 14
+  },
+  {
+    "CountyID": 30,
+    "County": "Indian River",
+    "CircuitID": 19
+  },
+  {
+    "CountyID": 31,
+    "County": "Jackson",
+    "CircuitID": 14
+  },
+  {
+    "CountyID": 32,
+    "County": "Jefferson",
+    "CircuitID": 2
+  },
+  {
+    "CountyID": 33,
+    "County": "Lafayette",
+    "CircuitID": 3
+  },
+  {
+    "CountyID": 34,
+    "County": "Lake",
+    "CircuitID": 5
+  },
+  {
+    "CountyID": 35,
+    "County": "Lee",
+    "CircuitID": 20
+  },
+  {
+    "CountyID": 36,
+    "County": "Leon",
+    "CircuitID": 2
+  },
+  {
+    "CountyID": 37,
+    "County": "Levy",
+    "CircuitID": 8
+  },
+  {
+    "CountyID": 38,
+    "County": "Liberty",
+    "CircuitID": 2
+  },
+  {
+    "CountyID": 39,
+    "County": "Madison",
+    "CircuitID": 3
+  },
+  {
+    "CountyID": 40,
+    "County": "Manatee",
+    "CircuitID": 12
+  },
+  {
+    "CountyID": 41,
+    "County": "Marion",
+    "CircuitID": 5
+  },
+  {
+    "CountyID": 42,
+    "County": "Martin",
+    "CircuitID": 9
+  },
+  {
+    "CountyID": 43,
+    "County": "Miami-Dade",
+    "CircuitID": 11
+  },
+  {
+    "CountyID": 44,
+    "County": "Monroe",
+    "CircuitID": 16
+  },
+  {
+    "CountyID": 45,
+    "County": "Nassau",
+    "CircuitID": 4
+  },
+  {
+    "CountyID": 46,
+    "County": "Okaloosa",
+    "CircuitID": 1
+  },
+  {
+    "CountyID": 47,
+    "County": "Okeechobee",
+    "CircuitID": 19
+  },
+  {
+    "CountyID": 48,
+    "County": "Orange",
+    "CircuitID": 9
+  },
+  {
+    "CountyID": 49,
+    "County": "Osceola",
+    "CircuitID": 9
+  },
+  {
+    "CountyID": 50,
+    "County": "Palm Beach",
+    "CircuitID": 15
+  },
+  {
+    "CountyID": 51,
+    "County": "Pasco",
+    "CircuitID": 6
+  },
+  {
+    "CountyID": 52,
+    "County": "Pinellas",
+    "CircuitID": 6
+  },
+  {
+    "CountyID": 53,
+    "County": "Polk",
+    "CircuitID": 10
+  },
+  {
+    "CountyID": 54,
+    "County": "Putnam",
+    "CircuitID": 7
+  },
+  {
+    "CountyID": 55,
+    "County": "Santa Rosa",
+    "CircuitID": 1
+  },
+  {
+    "CountyID": 56,
+    "County": "Sarasota",
+    "CircuitID": 12
+  },
+  {
+    "CountyID": 57,
+    "County": "Seminole",
+    "CircuitID": 18
+  },
+  {
+    "CountyID": 58,
+    "County": "St. Johns",
+    "CircuitID": 7
+  },
+  {
+    "CountyID": 59,
+    "County": "St. Lucie",
+    "CircuitID": 19
+  },
+  {
+    "CountyID": 60,
+    "County": "Sumter",
+    "CircuitID": 5
+  },
+  {
+    "CountyID": 61,
+    "County": "Suwanee",
+    "CircuitID": 3
+  },
+  {
+    "CountyID": 62,
+    "County": "Taylor",
+    "CircuitID": 3
+  },
+  {
+    "CountyID": 63,
+    "County": "Union",
+    "CircuitID": 8
+  },
+  {
+    "CountyID": 64,
+    "County": "Volusia",
+    "CircuitID": 7
+  },
+  {
+    "CountyID": 65,
+    "County": "Wakulla",
+    "CircuitID": 2
+  },
+  {
+    "CountyID": 66,
+    "County": "Walton",
+    "CircuitID": 1
+  },
+  {
+    "CountyID": 67,
+    "County": "Washington",
+    "CircuitID": 14
+  }
+]

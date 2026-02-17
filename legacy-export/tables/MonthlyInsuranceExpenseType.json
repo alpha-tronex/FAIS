@@ -1,0 +1,18 @@
+[
+  {
+    "MonthlyInsuranceExpenseTypeID": 1,
+    "MonthlyInsuranceExpenseType": "Health insurance, excluding portion paid for any minor child(ren) of this relationship "
+  },
+  {
+    "MonthlyInsuranceExpenseTypeID": 2,
+    "MonthlyInsuranceExpenseType": "Life insurance"
+  },
+  {
+    "MonthlyInsuranceExpenseTypeID": 3,
+    "MonthlyInsuranceExpenseType": "Dental insurance"
+  },
+  {
+    "MonthlyInsuranceExpenseTypeID": 4,
+    "MonthlyInsuranceExpenseType": "Other insurance"
+  }
+]

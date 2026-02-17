@@ -1,0 +1,102 @@
+[
+  {
+    "CaseID": 47,
+    "UserID": 11,
+    "UserTypeID": 1
+  },
+  {
+    "CaseID": 47,
+    "UserID": 10,
+    "UserTypeID": 2
+  },
+  {
+    "CaseID": 47,
+    "UserID": 6,
+    "UserTypeID": 3
+  },
+  {
+    "CaseID": 47,
+    "UserID": 34,
+    "UserTypeID": 4
+  },
+  {
+    "CaseID": 48,
+    "UserID": 1,
+    "UserTypeID": 1
+  },
+  {
+    "CaseID": 48,
+    "UserID": 2,
+    "UserTypeID": 2
+  },
+  {
+    "CaseID": 48,
+    "UserID": 9,
+    "UserTypeID": 3
+  },
+  {
+    "CaseID": 48,
+    "UserID": 6,
+    "UserTypeID": 4
+  },
+  {
+    "CaseID": 49,
+    "UserID": 12,
+    "UserTypeID": 1
+  },
+  {
+    "CaseID": 49,
+    "UserID": 13,
+    "UserTypeID": 2
+  },
+  {
+    "CaseID": 49,
+    "UserID": 9,
+    "UserTypeID": 3
+  },
+  {
+    "CaseID": 49,
+    "UserID": 6,
+    "UserTypeID": 4
+  },
+  {
+    "CaseID": 51,
+    "UserID": 7,
+    "UserTypeID": 1
+  },
+  {
+    "CaseID": 51,
+    "UserID": 8,
+    "UserTypeID": 2
+  },
+  {
+    "CaseID": 51,
+    "UserID": 35,
+    "UserTypeID": 3
+  },
+  {
+    "CaseID": 51,
+    "UserID": 16,
+    "UserTypeID": 4
+  },
+  {
+    "CaseID": 52,
+    "UserID": 15,
+    "UserTypeID": 1
+  },
+  {
+    "CaseID": 52,
+    "UserID": 14,
+    "UserTypeID": 2
+  },
+  {
+    "CaseID": 52,
+    "UserID": 16,
+    "UserTypeID": 3
+  },
+  {
+    "CaseID": 52,
+    "UserID": 17,
+    "UserTypeID": 4
+  }
+]

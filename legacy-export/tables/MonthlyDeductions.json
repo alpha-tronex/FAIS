@@ -1,0 +1,779 @@
+[
+  {
+    "MonthlyDeductionsID": 13,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 1,
+    "Amount": 478.23,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 14,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 1,
+    "Amount": 40,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 15,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 16,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 17,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 1,
+    "Amount": 40,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 18,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 19,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 20,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 21,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 24,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 25,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 26,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 27,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 28,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 29,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 30,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 31,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 32,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 33,
+    "MonthlyDeductionsTypeID": 10,
+    "UserID": 1,
+    "Amount": 29.99,
+    "MonthlyDeductionsTypeIfOther": "Boat Tax"
+  },
+  {
+    "MonthlyDeductionsID": 36,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 37,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 38,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 39,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 40,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 41,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 42,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 43,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 44,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 45,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 46,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 47,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 48,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 49,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 50,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 51,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 52,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 53,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 4,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 55,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 56,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 57,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 58,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 59,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 60,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 61,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 62,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 3,
+    "Amount": 200,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 63,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 3,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 64,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 65,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 66,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 67,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 68,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 69,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 70,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 71,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 72,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 13,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 73,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 74,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 75,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 76,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 77,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 78,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 79,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 80,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 81,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 10,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 82,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 83,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 84,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 85,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 86,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 87,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 88,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 89,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 90,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 117,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 118,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 119,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 120,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 121,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 122,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 123,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 124,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 125,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 9,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 127,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 128,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 129,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 130,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 131,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 132,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 133,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 134,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 135,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 8,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 136,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 137,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 138,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 139,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 140,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 141,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 142,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 143,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 144,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 14,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 145,
+    "MonthlyDeductionsTypeID": 1,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 146,
+    "MonthlyDeductionsTypeID": 2,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 147,
+    "MonthlyDeductionsTypeID": 3,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 148,
+    "MonthlyDeductionsTypeID": 4,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 149,
+    "MonthlyDeductionsTypeID": 5,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 150,
+    "MonthlyDeductionsTypeID": 6,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 151,
+    "MonthlyDeductionsTypeID": 7,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 152,
+    "MonthlyDeductionsTypeID": 8,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 153,
+    "MonthlyDeductionsTypeID": 9,
+    "UserID": 15,
+    "Amount": 0,
+    "MonthlyDeductionsTypeIfOther": null
+  },
+  {
+    "MonthlyDeductionsID": 155,
+    "MonthlyDeductionsTypeID": 10,
+    "UserID": 7,
+    "Amount": 239.22,
+    "MonthlyDeductionsTypeIfOther": "Student loan default"
+  },
+  {
+    "MonthlyDeductionsID": 158,
+    "MonthlyDeductionsTypeID": 10,
+    "UserID": 3,
+    "Amount": 56,
+    "MonthlyDeductionsTypeIfOther": "Boat Tax"
+  }
+]

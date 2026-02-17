@@ -1,0 +1,39 @@
+<main class="page">
+  <h1 style="font-size: 24px;">Financial Affidavit Inventory System (FAIS)</h1>
+  <p>Log in to continue.</p>
+
+  <section class="panel mt16">
+    <h2 class="panelTitle">Log in</h2>
+
+    <form (ngSubmit)="onSubmit()" class="form">
+      <label>
+        Username
+        <input name="uname" [(ngModel)]="uname" required class="input" />
+      </label>
+
+      <label>
+        Password
+        <div class="inputWithToggle">
+          <input name="password" [(ngModel)]="password" required class="input" [type]="showPassword ? 'text' : 'password'" />
+          <button type="button" class="iconBtn" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <svg *ngIf="!showPassword" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M12 5c6 0 10 7 10 7s-4 7-10 7S2 12 2 12s4-7 10-7Zm0 2C8 7 4.9 10.9 4.1 12c.8 1.1 3.9 5 7.9 5s7.1-3.9 7.9-5C19.1 10.9 16 7 12 7Zm0 2.5A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5Z"/>
+            </svg>
+            <svg *ngIf="showPassword" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path fill="currentColor" d="M3 5.3 4.3 4 20 19.7 18.7 21l-3.1-3.1A11 11 0 0 1 12 19C6 19 2 12 2 12a20 20 0 0 1 5.1-5.9L3 5.3Zm9 3.7c-.3 0-.6 0-.9.1l1.3 1.3c.4.4.6.9.6 1.6 0 .3 0 .6-.1.9l1.8 1.8c.2-.4.3-.9.3-1.4A3 3 0 0 0 12 9Zm0-4c6 0 10 7 10 7a20 20 0 0 1-4.6 5.4l-1.4-1.4A18 18 0 0 0 19.9 12C19.1 10.9 16 7 12 7c-.7 0-1.3.1-1.9.2L8.5 5.6C9.6 5.2 10.8 5 12 5Z"/>
+            </svg>
+          </button>
+        </div>
+      </label>
+
+      <button type="submit" [disabled]="busy" class="submit">Log in</button>
+
+      <p class="mt10">
+        New here?
+        <a routerLink="/register" class="link">Create an account</a>
+      </p>
+
+      <p *ngIf="error" class="error">{{ error }}</p>
+    </form>
+  </section>
+</main>

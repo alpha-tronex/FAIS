@@ -1,0 +1,17 @@
+<main class="page">
+  <h1>Admin</h1>
+
+  <nav class="mt16">
+    <a routerLink="users" class="link">Users</a>
+    <span class="sep">|</span>
+    <a routerLink="cases" class="link">Cases</a>
+    <span class="sep">|</span>
+    <a routerLink="affidavit" class="link">Affidavit</a>
+    <span class="sep">|</span>
+    <a (click)="logout()" class="link">Logout</a>
+  </nav>
+
+  <section class="mt16">
+    <router-outlet />
+  </section>
+</main>

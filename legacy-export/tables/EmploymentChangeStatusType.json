@@ -1,0 +1,18 @@
+[
+  {
+    "EmploymentChangeStatusTypeID": 1,
+    "EmploymentChangeStatus": "Gain of Employment"
+  },
+  {
+    "EmploymentChangeStatusTypeID": 2,
+    "EmploymentChangeStatus": "Loss of Employment"
+  },
+  {
+    "EmploymentChangeStatusTypeID": 3,
+    "EmploymentChangeStatus": "Change of Employment"
+  },
+  {
+    "EmploymentChangeStatusTypeID": 4,
+    "EmploymentChangeStatus": "No Change"
+  }
+]

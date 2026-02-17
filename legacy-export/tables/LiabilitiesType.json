@@ -1,0 +1,52 @@
+[
+  {
+    "LiabilitiesTypeID": 1,
+    "LiabilitiesType": "Mortgages on real estate: First mortgage on home",
+    "LiabilitiesGroupID": "A"
+  },
+  {
+    "LiabilitiesTypeID": 2,
+    "LiabilitiesType": "Second mortgage on home ",
+    "LiabilitiesGroupID": "A"
+  },
+  {
+    "LiabilitiesTypeID": 3,
+    "LiabilitiesType": "Other mortgages",
+    "LiabilitiesGroupID": "A"
+  },
+  {
+    "LiabilitiesTypeID": 4,
+    "LiabilitiesType": "Charge/credit card accounts",
+    "LiabilitiesGroupID": "B"
+  },
+  {
+    "LiabilitiesTypeID": 5,
+    "LiabilitiesType": "Auto loan",
+    "LiabilitiesGroupID": "C"
+  },
+  {
+    "LiabilitiesTypeID": 6,
+    "LiabilitiesType": "Bank/Credit Union loan",
+    "LiabilitiesGroupID": "D"
+  },
+  {
+    "LiabilitiesTypeID": 7,
+    "LiabilitiesType": "Money you owe (not evidenced by a note) ",
+    "LiabilitiesGroupID": "E"
+  },
+  {
+    "LiabilitiesTypeID": 8,
+    "LiabilitiesType": "Judgments",
+    "LiabilitiesGroupID": "F"
+  },
+  {
+    "LiabilitiesTypeID": 9,
+    "LiabilitiesType": "Other liabilities",
+    "LiabilitiesGroupID": "G"
+  },
+  {
+    "LiabilitiesTypeID": 10,
+    "LiabilitiesType": "Contingent Liabilities",
+    "LiabilitiesGroupID": "H"
+  }
+]

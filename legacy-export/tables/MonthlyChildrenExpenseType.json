@@ -1,0 +1,94 @@
+[
+  {
+    "MonthlyChildrenExpenseTypeID": 1,
+    "MonthlyChildrenExpenseType": "Monthly nursery, babysitting, or day care "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 2,
+    "MonthlyChildrenExpenseType": "Monthly school tuition "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 3,
+    "MonthlyChildrenExpenseType": "Monthly school supplies, books, and fees "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 4,
+    "MonthlyChildrenExpenseType": "Monthly after school activities "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 5,
+    "MonthlyChildrenExpenseType": "Monthly lunch money "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 6,
+    "MonthlyChildrenExpenseType": "Monthly private lessons or tutoring "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 7,
+    "MonthlyChildrenExpenseType": "Monthly allowances "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 8,
+    "MonthlyChildrenExpenseType": "Monthly clothing and uniforms "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 9,
+    "MonthlyChildrenExpenseType": "Monthly entertainment (movies, parties, etc.) "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 10,
+    "MonthlyChildrenExpenseType": "Monthly health insurance "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 11,
+    "MonthlyChildrenExpenseType": "Monthly medical, dental, prescriptions (nonreimbursed only) "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 12,
+    "MonthlyChildrenExpenseType": "Monthly psychiatric/psychological/counselor "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 13,
+    "MonthlyChildrenExpenseType": "Monthly orthodontic "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 14,
+    "MonthlyChildrenExpenseType": "Monthly vitamins "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 15,
+    "MonthlyChildrenExpenseType": "Monthly beauty parlor/barber shop "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 16,
+    "MonthlyChildrenExpenseType": "Monthly nonprescription medication "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 17,
+    "MonthlyChildrenExpenseType": "Monthly cosmetics, toiletries, and sundries "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 18,
+    "MonthlyChildrenExpenseType": "Monthly gifts from child(ren) to others (other children, relatives, teachers, etc.) "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 19,
+    "MonthlyChildrenExpenseType": "Monthly camp or summer activities "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 20,
+    "MonthlyChildrenExpenseType": "Monthly clubs (Boy/Girl Scouts, etc.) "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 21,
+    "MonthlyChildrenExpenseType": "Monthly access expenses (for nonresidential parent) "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 22,
+    "MonthlyChildrenExpenseType": "Monthly miscellaneous "
+  },
+  {
+    "MonthlyChildrenExpenseTypeID": 23,
+    "MonthlyChildrenExpenseType": "Other"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "UserTypeID": 1,
+    "UserType": "Petitioner"
+  },
+  {
+    "UserTypeID": 2,
+    "UserType": "Respondent"
+  },
+  {
+    "UserTypeID": 3,
+    "UserType": "Petitioner Attorney"
+  },
+  {
+    "UserTypeID": 4,
+    "UserType": "Respondent Attorney"
+  },
+  {
+    "UserTypeID": 5,
+    "UserType": "Administrator"
+  }
+]

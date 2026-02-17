@@ -1,0 +1,102 @@
+[
+  {
+    "CircuitID": 1,
+    "Circuit": "First",
+    "Counties": "Escambia,Okaloosa,Santa Rosa,Walton "
+  },
+  {
+    "CircuitID": 2,
+    "Circuit": "Second",
+    "Counties": "Franklin,Gadsden,Jefferson,Leon,Liberty,Wakulla"
+  },
+  {
+    "CircuitID": 3,
+    "Circuit": "Third",
+    "Counties": "Columbia,Dixie,Hamilton,Lafayette,Madison,Suwannee,Taylor"
+  },
+  {
+    "CircuitID": 4,
+    "Circuit": "Fourth",
+    "Counties": "Clay,Duval,Nassau"
+  },
+  {
+    "CircuitID": 5,
+    "Circuit": "Fifth",
+    "Counties": "Citrus,Hernando,Lake,Marion,Sumter"
+  },
+  {
+    "CircuitID": 6,
+    "Circuit": "Sixth",
+    "Counties": "Pasco,Pinellas"
+  },
+  {
+    "CircuitID": 7,
+    "Circuit": "Seventh",
+    "Counties": "Flagler,Putnam,St. Johns,Volusia"
+  },
+  {
+    "CircuitID": 8,
+    "Circuit": "Eighth",
+    "Counties": "Alachua,Baker,Bradford,Gilchrist,Levy,Union"
+  },
+  {
+    "CircuitID": 9,
+    "Circuit": "Ninth",
+    "Counties": "Orange,Osceola"
+  },
+  {
+    "CircuitID": 10,
+    "Circuit": "Tenth",
+    "Counties": "Hardee,Highlands,Polk"
+  },
+  {
+    "CircuitID": 11,
+    "Circuit": "Eleventh",
+    "Counties": "Dade"
+  },
+  {
+    "CircuitID": 12,
+    "Circuit": "Twelfth",
+    "Counties": "DeSoto,Manatee,Sarasota"
+  },
+  {
+    "CircuitID": 13,
+    "Circuit": "Thirteenth",
+    "Counties": "Hillsborough"
+  },
+  {
+    "CircuitID": 14,
+    "Circuit": "Fourteenth",
+    "Counties": "Bay,Calhoun,Gulf,Holmes,Jackson,Washington"
+  },
+  {
+    "CircuitID": 15,
+    "Circuit": "Fifteenthn",
+    "Counties": "Palm Beach"
+  },
+  {
+    "CircuitID": 16,
+    "Circuit": "Sixteenth",
+    "Counties": "Monroe"
+  },
+  {
+    "CircuitID": 17,
+    "Circuit": "Seventeenth",
+    "Counties": "Broward"
+  },
+  {
+    "CircuitID": 18,
+    "Circuit": "Eighteenth",
+    "Counties": "Brevard,Seminole"
+  },
+  {
+    "CircuitID": 19,
+    "Circuit": "Nineteenth",
+    "Counties": "Indian River,Martin,Okeechobee,St. Lucie"
+  },
+  {
+    "CircuitID": 20,
+    "Circuit": "Twentieth",
+    "Counties": "Charlotte,Collier,Glades, Hendry,Lee "
+  }
+]

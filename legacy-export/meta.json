@@ -1,0 +1,22 @@
+{
+  "exportedAt": "2026-02-14T01:35:47.190Z",
+  "outDir": "/Users/alphathiam/Documents/GitHub/FAIS/legacy-export",
+  "schema": "dbo",
+  "top": 100,
+  "files": {
+    "users": "users.json",
+    "cases": "cases.json",
+    "caseUserLinks": "case_user_lu.json",
+    "userTypes": null,
+    "roleTypes": null
+  },
+  "resolvedTables": {
+    "users": "dbo.Users",
+    "cases": "dbo.Case",
+    "caseUserLinks": null
+  },
+  "caseUserLinks": {
+    "source": "derived-from-case",
+    "derivedCount": 20
+  }
+}

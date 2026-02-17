@@ -1,0 +1,93 @@
+[
+  {
+    "MonthlyInsuranceExpenseID": 1,
+    "MonthlyInsuranceExpenseTypeID": 1,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 2,
+    "MonthlyInsuranceExpenseTypeID": 2,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 3,
+    "MonthlyInsuranceExpenseTypeID": 3,
+    "UserID": 1,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 8,
+    "MonthlyInsuranceExpenseTypeID": 1,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 9,
+    "MonthlyInsuranceExpenseTypeID": 2,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 10,
+    "MonthlyInsuranceExpenseTypeID": 3,
+    "UserID": 12,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 11,
+    "MonthlyInsuranceExpenseTypeID": 1,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 12,
+    "MonthlyInsuranceExpenseTypeID": 2,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 13,
+    "MonthlyInsuranceExpenseTypeID": 3,
+    "UserID": 2,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 14,
+    "MonthlyInsuranceExpenseTypeID": 1,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 15,
+    "MonthlyInsuranceExpenseTypeID": 2,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 16,
+    "MonthlyInsuranceExpenseTypeID": 3,
+    "UserID": 7,
+    "Amount": 0,
+    "MonthlyInsuranceExpenseTypeIfOther": null
+  },
+  {
+    "MonthlyInsuranceExpenseID": 17,
+    "MonthlyInsuranceExpenseTypeID": 4,
+    "UserID": 7,
+    "Amount": 569.56,
+    "MonthlyInsuranceExpenseTypeIfOther": "Judicial Insurance"
+  }
+]

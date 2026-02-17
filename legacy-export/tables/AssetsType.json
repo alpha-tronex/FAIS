@@ -1,0 +1,102 @@
+[
+  {
+    "AssetsTypeID": 1,
+    "AssetsType": "Cash (on hand)",
+    "AssetGroupID": "A"
+  },
+  {
+    "AssetsTypeID": 2,
+    "AssetsType": "Cash (in banks or credit union)",
+    "AssetGroupID": "A"
+  },
+  {
+    "AssetsTypeID": 3,
+    "AssetsType": "Stocks/Bonds",
+    "AssetGroupID": "B"
+  },
+  {
+    "AssetsTypeID": 4,
+    "AssetsType": "Notes (money owed to you in writing)",
+    "AssetGroupID": "A"
+  },
+  {
+    "AssetsTypeID": 5,
+    "AssetsType": "Money owed to you (not evidenced by a note)",
+    "AssetGroupID": "A"
+  },
+  {
+    "AssetsTypeID": 6,
+    "AssetsType": "Real estate: (home)",
+    "AssetGroupID": "C"
+  },
+  {
+    "AssetsTypeID": 7,
+    "AssetsType": "Real estate: (other)",
+    "AssetGroupID": "C"
+  },
+  {
+    "AssetsTypeID": 8,
+    "AssetsType": "Business interests",
+    "AssetGroupID": "D"
+  },
+  {
+    "AssetsTypeID": 9,
+    "AssetsType": "Automobiles",
+    "AssetGroupID": "E"
+  },
+  {
+    "AssetsTypeID": 10,
+    "AssetsType": "Boats",
+    "AssetGroupID": "E"
+  },
+  {
+    "AssetsTypeID": 11,
+    "AssetsType": "Other Vehicles",
+    "AssetGroupID": "E"
+  },
+  {
+    "AssetsTypeID": 12,
+    "AssetsType": "Retirement plans (Profit Sharing, Pension, IRA, 401(k)s, etc.)",
+    "AssetGroupID": "B"
+  },
+  {
+    "AssetsTypeID": 13,
+    "AssetsType": "Furniture & furnishings in home",
+    "AssetGroupID": "F"
+  },
+  {
+    "AssetsTypeID": 14,
+    "AssetsType": "Furniture & furnishings elsewhere",
+    "AssetGroupID": "F"
+  },
+  {
+    "AssetsTypeID": 15,
+    "AssetsType": "Collectibles",
+    "AssetGroupID": "G"
+  },
+  {
+    "AssetsTypeID": 16,
+    "AssetsType": "Jewelry",
+    "AssetGroupID": "G"
+  },
+  {
+    "AssetsTypeID": 17,
+    "AssetsType": "Life insurance (cash surrender value)",
+    "AssetGroupID": "B"
+  },
+  {
+    "AssetsTypeID": 18,
+    "AssetsType": "Sporting and entertainment (T.V., stereo, etc.) equipment",
+    "AssetGroupID": "F"
+  },
+  {
+    "AssetsTypeID": 19,
+    "AssetsType": "Other assets",
+    "AssetGroupID": "H"
+  },
+  {
+    "AssetsTypeID": 20,
+    "AssetsType": "Contingent Assets",
+    "AssetGroupID": "I"
+  }
+]

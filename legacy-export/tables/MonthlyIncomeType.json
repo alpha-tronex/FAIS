@@ -1,0 +1,66 @@
+[
+  {
+    "MonthlyIncomeTypeID": 1,
+    "MonthlyIncomeType": "Monthly gross salary or wages"
+  },
+  {
+    "MonthlyIncomeTypeID": 2,
+    "MonthlyIncomeType": "Monthly bonuses, commissions, allowances, overtime, tips, and similar "
+  },
+  {
+    "MonthlyIncomeTypeID": 3,
+    "MonthlyIncomeType": "Monthly business income from sources such as self-employment, "
+  },
+  {
+    "MonthlyIncomeTypeID": 4,
+    "MonthlyIncomeType": "Monthly disability benefits/SSI "
+  },
+  {
+    "MonthlyIncomeTypeID": 5,
+    "MonthlyIncomeType": "Monthly Workers’ Compensation"
+  },
+  {
+    "MonthlyIncomeTypeID": 6,
+    "MonthlyIncomeType": "Monthly Unemployment Compensation"
+  },
+  {
+    "MonthlyIncomeTypeID": 7,
+    "MonthlyIncomeType": "Monthly pension, retirement, or annuity payments"
+  },
+  {
+    "MonthlyIncomeTypeID": 8,
+    "MonthlyIncomeType": "Monthly Social Security benefits"
+  },
+  {
+    "MonthlyIncomeTypeID": 9,
+    "MonthlyIncomeType": "Monthly alimony actually received from this case"
+  },
+  {
+    "MonthlyIncomeTypeID": 10,
+    "MonthlyIncomeType": "Monthly alimony actually received from other case(s)"
+  },
+  {
+    "MonthlyIncomeTypeID": 11,
+    "MonthlyIncomeType": "Monthly interest and dividends"
+  },
+  {
+    "MonthlyIncomeTypeID": 12,
+    "MonthlyIncomeType": "Monthly rental income (gross receipts minus ordinary and necessary expenses required to produce income) (Attach sheet itemizing such income and expense items.)"
+  },
+  {
+    "MonthlyIncomeTypeID": 13,
+    "MonthlyIncomeType": "Monthly income from royalties, trusts, or estates"
+  },
+  {
+    "MonthlyIncomeTypeID": 14,
+    "MonthlyIncomeType": "Monthly reimbursed expenses and in-kind payments to the extent that they reduce personal living expenses (Attach sheet itemizing each item and amount.)"
+  },
+  {
+    "MonthlyIncomeTypeID": 15,
+    "MonthlyIncomeType": "Monthly gains derived from dealing in property (not including nonrecurring gains)"
+  },
+  {
+    "MonthlyIncomeTypeID": 16,
+    "MonthlyIncomeType": "Other"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "EmploymentStatusTypeID": 1,
+    "EmploymentStatusType": "Employed"
+  },
+  {
+    "EmploymentStatusTypeID": 2,
+    "EmploymentStatusType": "Unemployed"
+  },
+  {
+    "EmploymentStatusTypeID": 3,
+    "EmploymentStatusType": "Retired"
+  }
+]

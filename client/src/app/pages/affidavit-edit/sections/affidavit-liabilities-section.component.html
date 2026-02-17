@@ -1,0 +1,61 @@
+<section class="panel">
+  <h2 class="panelTitle">Liabilities</h2>
+
+  <form (ngSubmit)="submit(); ensureDefaults()" class="gridForm">
+    <label>
+      Type
+      <select name="liabilityTypeId" [(ngModel)]="liabilityTypeId" class="input" (click)="ensureDefaults()">
+        <option *ngFor="let t of liabilitiesTypes" [ngValue]="t.id">{{ t.name }} ({{ t.id }})</option>
+      </select>
+    </label>
+
+    <label>
+      Description
+      <input name="description" [(ngModel)]="description" class="input" />
+    </label>
+
+    <label>
+      Amount owed
+      <input name="amountOwed" [(ngModel)]="amountOwed" inputmode="decimal" class="input" />
+    </label>
+
+    <label>
+      Non-marital type
+      <select name="liabilityNonMaritalTypeId" [(ngModel)]="nonMaritalTypeId" class="input">
+        <option [ngValue]="null">(none)</option>
+        <option *ngFor="let t of nonMaritalTypes" [ngValue]="t.id">{{ t.name }} ({{ t.id }})</option>
+      </select>
+    </label>
+
+    <label>
+      User owes?
+      <select name="userOwes" [(ngModel)]="userOwes" class="input">
+        <option [ngValue]="true">Yes</option>
+        <option [ngValue]="false">No</option>
+      </select>
+    </label>
+
+    <div class="rowActions">
+      <button type="submit" [disabled]="busy" class="submit">Add</button>
+    </div>
+  </form>
+
+  <table *ngIf="rows.length > 0" class="table mt12">
+    <thead>
+      <tr>
+        <th class="th">Type</th>
+        <th class="th">Description</th>
+        <th class="th">Owed</th>
+        <th class="th"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let l of rows">
+        <td class="td">{{ typeLabel(liabilitiesTypes, l.liabilitiesTypeId) }}</td>
+        <td class="td">{{ l.description }}</td>
+        <td class="td">{{ l.amountOwed | number:'1.2-2' }}</td>
+        <td class="td"><button type="button" (click)="remove.emit(l.id)" [disabled]="busy" class="mini">Remove</button></td>
+      </tr>
+    </tbody>
+  </table>
+</section>

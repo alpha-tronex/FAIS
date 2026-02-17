@@ -1,0 +1,26 @@
+<div>
+  <h1>Admin affidavit</h1>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section class="panel mt16">
+    <h2 class="panelTitle">Select user</h2>
+
+    <label>
+      User
+      <select name="selectedUserId" [(ngModel)]="selectedUserId" class="input" [disabled]="busy">
+        <option *ngFor="let u of users" [ngValue]="u.id">{{ u.uname }} ({{ u.email }})</option>
+      </select>
+    </label>
+
+    <div class="rowActions mt12">
+      <button type="button" (click)="refresh()" [disabled]="busy">Refresh users</button>
+      <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy || !selectedUserId">Generate PDF</button>
+      <span *ngIf="pdfBusy">Generating…</span>
+    </div>
+  </section>
+
+  <section *ngIf="selectedUserId" class="mt16">
+    <app-affidavit-edit-page [userId]="selectedUserId"></app-affidavit-edit-page>
+  </section>
+</div>
