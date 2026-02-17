@@ -213,6 +213,18 @@ export class CasesPage implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.caseNumber.trim()) {
+      this.error = 'Case number is required.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    if (!this.division.trim()) {
+      this.error = 'Division is required.';
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.subscription?.unsubscribe();
 
     this.busy = true;
@@ -268,7 +280,11 @@ export class CasesPage implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (e: any) => {
-          this.error = e?.error?.error ?? 'Failed to create case';
+          const raw = e?.error?.error;
+          this.error =
+            raw === 'Invalid payload'
+              ? 'Please fill out all required fields (Circuit, County, Case number, Division).'
+              : (raw ?? 'Failed to create case');
           this.cdr.markForCheck();
         }
       });

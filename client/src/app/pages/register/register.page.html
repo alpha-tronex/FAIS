@@ -123,7 +123,7 @@
         <a *ngIf="!finishMode" routerLink="/login" class="link">Back to login</a>
       </div>
 
-      <p *ngIf="error" class="error fullRow">{{ error }}</p>
+      <p *ngIf="error" class="error fullRow" role="alert" aria-live="polite">{{ error }}</p>
     </form>
   </section>
 </main>

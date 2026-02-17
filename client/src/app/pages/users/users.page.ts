@@ -16,12 +16,14 @@ export class UsersPage implements OnInit, OnDestroy {
   roleTypes: RoleTypeItem[] = [];
   busy = false;
   error: string | null = null;
+  success: string | null = null;
 
   canCreate = false;
 
   uname = '';
   email = '';
   password = '';
+  showPassword = false;
   firstName = '';
   lastName = '';
 
@@ -51,6 +53,7 @@ export class UsersPage implements OnInit, OnDestroy {
   refresh() {
     this.busy = true;
     this.error = null;
+    this.success = null;
     this.cdr.markForCheck();
 
     void this.roleTypesApi
@@ -94,6 +97,7 @@ export class UsersPage implements OnInit, OnDestroy {
   create() {
     if (!this.canCreate) {
       this.error = 'Forbidden';
+      this.success = null;
       return;
     }
 
@@ -104,6 +108,7 @@ export class UsersPage implements OnInit, OnDestroy {
 
     this.busy = true;
     this.error = null;
+    this.success = null;
     this.cdr.markForCheck();
 
     const req = {
@@ -118,9 +123,11 @@ export class UsersPage implements OnInit, OnDestroy {
       .create(req)
       .pipe(
         switchMap((res) => {
+          this.success = 'User created.';
           this.uname = '';
           this.email = '';
           this.password = '';
+          this.showPassword = false;
           this.firstName = '';
           this.lastName = '';
           this.cdr.markForCheck();
@@ -138,6 +145,7 @@ export class UsersPage implements OnInit, OnDestroy {
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to create user';
+          this.success = null;
           this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
@@ -155,10 +163,12 @@ export class UsersPage implements OnInit, OnDestroy {
   cancelEdit() {
     this.editingUserId = null;
     this.error = null;
+    this.success = null;
 
     this.uname = '';
     this.email = '';
     this.password = '';
+    this.showPassword = false;
     this.firstName = '';
     this.lastName = '';
 
@@ -170,6 +180,7 @@ export class UsersPage implements OnInit, OnDestroy {
 
     this.busy = true;
     this.error = null;
+    this.success = null;
     this.cdr.markForCheck();
 
     const req: UpdateUserRequest = {
@@ -183,6 +194,7 @@ export class UsersPage implements OnInit, OnDestroy {
       .update(this.editingUserId, req)
       .pipe(
         switchMap(() => {
+          this.success = 'User saved.';
           this.editingUserId = null;
           this.uname = '';
           this.email = '';
@@ -203,6 +215,7 @@ export class UsersPage implements OnInit, OnDestroy {
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to update user';
+          this.success = null;
           this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();

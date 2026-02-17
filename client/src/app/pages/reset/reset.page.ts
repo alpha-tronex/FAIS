@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ResetPage {
   newPassword = '';
+  showNewPassword = false;
   busy = false;
   error: string | null = null;
 

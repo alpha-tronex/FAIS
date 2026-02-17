@@ -1,7 +1,7 @@
 <div>
   <h1>Cases</h1>
 
-  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="error" class="error" role="alert" aria-live="polite">{{ error }}</p>
 
   <section *ngIf="canCreate" class="panel">
     <h2 class="panelTitle">Create case</h2>

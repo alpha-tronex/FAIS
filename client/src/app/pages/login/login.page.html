@@ -33,7 +33,7 @@
         <a routerLink="/register" class="link">Create an account</a>
       </p>
 
-      <p *ngIf="error" class="error">{{ error }}</p>
+      <p *ngIf="error" class="error" role="alert" aria-live="polite">{{ error }}</p>
     </form>
   </section>
 </main>

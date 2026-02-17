@@ -188,16 +188,47 @@ export class ProfilePage implements OnInit {
     this.profileSaved = false;
     this.cdr.markForCheck();
     try {
+      if (!this.email.trim()) {
+        this.error = 'Email is required';
+        this.cdr.markForCheck();
+        return;
+      }
+      if (!this.addressLine1.trim()) {
+        this.error = 'Address line 1 is required';
+        this.cdr.markForCheck();
+        return;
+      }
+      if (!this.city.trim()) {
+        this.error = 'City is required';
+        this.cdr.markForCheck();
+        return;
+      }
+      if (!this.state.trim()) {
+        this.error = 'State is required';
+        this.cdr.markForCheck();
+        return;
+      }
+      if (!this.zipCode.trim()) {
+        this.error = 'Zip is required';
+        this.cdr.markForCheck();
+        return;
+      }
+      if (!this.phone.trim()) {
+        this.error = 'Phone is required';
+        this.cdr.markForCheck();
+        return;
+      }
+
       const meReq: UpdateMeRequest = {
-        email: this.email.trim(),
+        email: this.email.trim() || undefined,
         firstName: this.firstName.trim() || undefined,
         lastName: this.lastName.trim() || undefined,
-        addressLine1: this.addressLine1.trim(),
+        addressLine1: this.addressLine1.trim() || undefined,
         addressLine2: this.addressLine2.trim() || undefined,
-        city: this.city.trim(),
-        state: this.state.trim(),
-        zipCode: this.zipCode.trim(),
-        phone: this.phone.trim()
+        city: this.city.trim() || undefined,
+        state: this.state.trim() || undefined,
+        zipCode: this.zipCode.trim() || undefined,
+        phone: this.phone.trim() || undefined
       };
 
       const updated = this.editingUserId
@@ -212,7 +243,11 @@ export class ProfilePage implements OnInit {
       this.profileSaved = true;
       this.cdr.markForCheck();
     } catch (e: any) {
-      this.error = e?.error?.error ?? 'Failed to save profile';
+      const raw = e?.error?.error;
+      this.error =
+        raw === 'Invalid payload'
+          ? 'Please fill out all required profile fields.'
+          : (raw ?? 'Failed to save profile');
       this.cdr.markForCheck();
     } finally {
       this.busy = false;
@@ -231,18 +266,22 @@ export class ProfilePage implements OnInit {
 
       if (!ssn || !confirmSsn) {
         this.error = 'SSN and confirm SSN are required';
+        this.cdr.markForCheck();
         return;
       }
       if (!SSN_REGEX.test(ssn)) {
         this.error = 'Social security format is invalid';
+        this.cdr.markForCheck();
         return;
       }
       if (!SSN_REGEX.test(confirmSsn)) {
         this.error = 'Confirm social security format is invalid';
+        this.cdr.markForCheck();
         return;
       }
       if (ssn !== confirmSsn) {
         this.error = 'Social security numbers do not match';
+        this.cdr.markForCheck();
         return;
       }
 
@@ -252,7 +291,8 @@ export class ProfilePage implements OnInit {
 			this.applyMe(updated as unknown as MeResponse);
       this.cdr.markForCheck();
     } catch (e: any) {
-      this.error = e?.error?.error ?? 'Failed to update SSN';
+      const raw = e?.error?.error;
+      this.error = raw === 'Invalid payload' ? 'Social security input is invalid.' : (raw ?? 'Failed to update SSN');
       this.cdr.markForCheck();
     } finally {
       this.busy = false;

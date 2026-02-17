@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -15,11 +15,16 @@ export class LoginPage {
   busy = false;
   error: string | null = null;
 
-  constructor(private readonly auth: AuthService, private readonly router: Router) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
 
   async onSubmit() {
     this.busy = true;
     this.error = null;
+    this.cdr.markForCheck();
     try {
       const res = await this.auth.login(this.uname.trim(), this.password);
       if (res.mustResetPassword) {
@@ -31,8 +36,10 @@ export class LoginPage {
       }
     } catch (e: any) {
       this.error = e?.error?.error ?? 'Login failed';
+      this.cdr.markForCheck();
     } finally {
       this.busy = false;
+      this.cdr.markForCheck();
     }
   }
 }
