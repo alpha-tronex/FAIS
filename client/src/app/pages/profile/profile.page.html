@@ -8,7 +8,7 @@
   <nav class="mt16">
     <a routerLink="/my-cases" class="link">My cases</a>
     <span class="sep">|</span>
-    <a routerLink="/affidavit" class="link">Affidavit</a>
+    <a [routerLink]="['/affidavit']" [queryParams]="navQueryParams()" class="link">Affidavit</a>
     <span class="sep">|</span>
     <a (click)="logout()" class="link">Logout</a>
   </nav>

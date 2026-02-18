@@ -89,6 +89,9 @@ export function createCasesRouter(
   router.get('/cases', auth.requireAuth, async (_req, res) => {
     const authPayload = (_req as any).auth as AuthPayload;
 
+    const queryUserIdRaw = String(((_req as any)?.query?.userId ?? '') as any).trim();
+    const queryUserId = queryUserIdRaw.length > 0 ? queryUserIdRaw : null;
+
     const filter: Record<string, any> = {};
     if (authPayload.roleTypeId !== 5) {
       filter.$or = [
@@ -96,6 +99,17 @@ export function createCasesRouter(
         { respondentId: new mongoose.Types.ObjectId(authPayload.sub) },
         { petitionerAttId: new mongoose.Types.ObjectId(authPayload.sub) },
         { respondentAttId: new mongoose.Types.ObjectId(authPayload.sub) }
+      ];
+    } else if (queryUserId) {
+      if (!mongoose.isValidObjectId(queryUserId)) {
+        return res.status(400).json({ error: 'Invalid userId' });
+      }
+      const oid = new mongoose.Types.ObjectId(queryUserId);
+      filter.$or = [
+        { petitionerId: oid },
+        { respondentId: oid },
+        { petitionerAttId: oid },
+        { respondentAttId: oid }
       ];
     }
 

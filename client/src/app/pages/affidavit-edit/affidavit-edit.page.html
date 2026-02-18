@@ -8,7 +8,7 @@
   <nav class="mt16">
     <a (click)="goBack()" class="link">Back to summary</a>
     <span class="sep">|</span>
-    <a routerLink="/profile" class="link">Profile</a>
+    <a [routerLink]="['/profile']" [queryParams]="caseId ? { caseId } : {}" class="link">Profile</a>
     <span class="sep">|</span>
     <a (click)="logout()" class="link">Logout</a>
   </nav>

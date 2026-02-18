@@ -8,8 +8,7 @@ server/dist/
 # Local env
 server/.env
 
-# Local-only court form templates (do not commit)
-server/private/forms/
+
 
 # System
 .DS_Store

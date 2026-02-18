@@ -1,8 +1,6 @@
 <main class="page">
   <h1>My cases</h1>
   <nav class="mt16">
-    <a routerLink="/affidavit" class="link">Affidavit</a>
-    <span class="sep">|</span>
     <a routerLink="/profile" class="link">Profile</a>
     <span class="sep">|</span>
     <a (click)="logout()" class="link">Logout</a>
@@ -24,6 +22,7 @@
           <th class="th">Petitioner</th>
           <th class="th">Respondent</th>
           <th class="th">Created</th>
+          <th class="th">Affidavit</th>
         </tr>
       </thead>
 
@@ -38,6 +37,15 @@
             {{ c.respondent ? ((c.respondent.lastName || '') + ', ' + (c.respondent.firstName || '')) : '' }}
           </td>
           <td class="td">{{ c.createdAt | date:'short' }}</td>
+          <td class="td">
+            <a
+              [routerLink]="['/affidavit']"
+              [queryParams]="{ caseId: c.id }"
+              class="link"
+            >
+              Affidavit
+            </a>
+          </td>
         </tr>
       </tbody>
     </table>

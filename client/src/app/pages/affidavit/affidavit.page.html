@@ -4,17 +4,17 @@
   <nav class="mt16">
     <a (click)="goBack()" class="link">Back</a>
     <span class="sep">|</span>
-    <a routerLink="/affidavit" class="link">Summary</a>
+    <a [routerLink]="['/affidavit']" [queryParams]="navQueryParams()" class="link">Summary</a>
     <span class="sep">|</span>
     <a
       [routerLink]="['/affidavit/edit']"
-      [queryParams]="userId ? { userId } : {}"
+      [queryParams]="navQueryParams()"
       class="link"
     >
       Edit data
     </a>
     <span class="sep">|</span>
-    <a routerLink="/profile" class="link">Profile</a>
+    <a [routerLink]="['/profile']" [queryParams]="navQueryParams()" class="link">Profile</a>
     <span class="sep">|</span>
     <a (click)="logout()" class="link">Logout</a>
   </nav>

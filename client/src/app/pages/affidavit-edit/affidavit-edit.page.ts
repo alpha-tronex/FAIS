@@ -17,6 +17,7 @@ import { MonthlyLineCreatePayload } from './sections/affidavit-monthly-lines-sec
 })
 export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   @Input() userId: string | null = null;
+  @Input() caseId: string | null = null;
 
   steps = [
     { key: 'employment', title: 'Employment' },
@@ -83,6 +84,11 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       this.userId = qpUserId;
     }
 
+    const qpCaseId = this.route.snapshot.queryParamMap.get('caseId');
+    if (qpCaseId && !this.caseId) {
+      this.caseId = qpCaseId;
+    }
+
     if (this.userId && !this.auth.isAdmin()) {
       void this.router.navigateByUrl('/my-cases');
       return;
@@ -104,6 +110,10 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       this.syncCurrentStepKey();
       this.loadNoneSelections();
       this.refresh();
+    }
+
+    if (changes['caseId'] && !changes['caseId'].firstChange) {
+      this.cdr.markForCheck();
     }
   }
 
@@ -238,11 +248,11 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   }
 
   goBack() {
-    if (this.userId) {
-      void this.router.navigate(['/affidavit'], { queryParams: { userId: this.userId } });
-      return;
-    }
-    void this.router.navigateByUrl('/affidavit');
+    const queryParams: Record<string, string> = {};
+    if (this.userId) queryParams['userId'] = this.userId;
+    if (this.caseId) queryParams['caseId'] = this.caseId;
+
+    void this.router.navigate(['/affidavit'], { queryParams });
   }
 
   finish() {

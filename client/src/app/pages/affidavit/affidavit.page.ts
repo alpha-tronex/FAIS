@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, from } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitService, AffidavitSummary } from '../../services/affidavit.service';
+import { FileSaveService } from '../../services/file-save.service';
 
 @Component({
   standalone: false,
@@ -13,6 +14,7 @@ import { AffidavitService, AffidavitSummary } from '../../services/affidavit.ser
 export class AffidavitPage implements OnInit, OnDestroy {
   summary: AffidavitSummary | null = null;
   userId: string | null = null;
+  caseId: string | null = null;
 
   busy = false;
   pdfBusy = false;
@@ -23,6 +25,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
   constructor(
     private readonly auth: AuthService,
     private readonly affidavitApi: AffidavitService,
+    private readonly fileSave: FileSaveService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef
@@ -43,7 +46,19 @@ export class AffidavitPage implements OnInit, OnDestroy {
       this.userId = qpUserId;
     }
 
+    const qpCaseId = this.route.snapshot.queryParamMap.get('caseId');
+    if (qpCaseId) {
+      this.caseId = qpCaseId;
+    }
+
     this.refresh();
+  }
+
+  navQueryParams(): Record<string, string> {
+    const qp: Record<string, string> = {};
+    if (this.userId) qp['userId'] = this.userId;
+    if (this.caseId) qp['caseId'] = this.caseId;
+    return qp;
   }
 
   ngOnDestroy(): void {
@@ -97,15 +112,9 @@ export class AffidavitPage implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     try {
-      const blob = await this.affidavitApi.generatePdf('auto', this.userId || undefined);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `financial-affidavit-${this.summary?.form ?? 'auto'}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const blob = await this.affidavitApi.generateOfficialPdf('auto', this.userId || undefined, this.caseId || undefined);
+      const fileName = `financial-affidavit-${this.summary?.form ?? 'auto'}.pdf`;
+      await this.fileSave.savePdf(blob, fileName);
     } catch (e: any) {
       this.error = e?.error?.error ?? 'Failed to generate PDF';
       if (e?.status === 401) {

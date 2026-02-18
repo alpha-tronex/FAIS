@@ -48,8 +48,9 @@ export class CasesService {
 
   constructor(private readonly http: HttpClient) {}
 
-  async list(): Promise<CaseListItem[]> {
-    return await firstValueFrom(this.http.get<CaseListItem[]>(`${this.apiBase}/cases`));
+  async list(userId?: string): Promise<CaseListItem[]> {
+    const qs = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+    return await firstValueFrom(this.http.get<CaseListItem[]>(`${this.apiBase}/cases${qs}`));
   }
 
   async create(req: CreateCaseRequest): Promise<{ id: string }> {

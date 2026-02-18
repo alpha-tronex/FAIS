@@ -34,4 +34,17 @@ export class AffidavitService {
       })
     );
   }
+
+  async generateOfficialPdf(
+    form: 'auto' | 'short' | 'long' = 'auto',
+    userId?: string,
+    caseId?: string
+  ): Promise<Blob> {
+    return await firstValueFrom(
+      this.http.get(`${this.apiBase}/affidavit/pdf-template`, {
+        params: { ...(userId ? { userId } : {}), ...(caseId ? { caseId } : {}), form },
+        responseType: 'blob'
+      })
+    );
+  }
 }

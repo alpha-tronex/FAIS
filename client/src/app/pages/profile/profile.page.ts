@@ -45,6 +45,7 @@ export class ProfilePage implements OnInit {
   states: LookupItem[] = [];
 
   editingUserId: string | null = null;
+  caseId: string | null = null;
 
   constructor(
     private readonly auth: AuthService,
@@ -60,7 +61,18 @@ export class ProfilePage implements OnInit {
   ngOnInit(): void {
 		const id = this.route.snapshot.paramMap.get('id');
 		this.editingUserId = id && this.auth.isAdmin() ? id : null;
+
+		const qpCaseId = this.route.snapshot.queryParamMap.get('caseId');
+		if (qpCaseId) {
+			this.caseId = qpCaseId;
+		}
     void this.init();
+  }
+
+  navQueryParams(): Record<string, string> {
+    const qp: Record<string, string> = {};
+    if (this.caseId) qp['caseId'] = this.caseId;
+    return qp;
   }
 
   private async init() {
