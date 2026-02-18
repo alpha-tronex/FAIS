@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -17,29 +17,29 @@ export class LoginPage {
 
   constructor(
     private readonly auth: AuthService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {}
 
-  async onSubmit() {
+  onSubmit() {
+    if (this.busy) return;
+
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
-    try {
-      const res = await this.auth.login(this.uname.trim(), this.password);
-      if (res.mustResetPassword) {
-        await this.router.navigateByUrl('/register');
-      } else if (res.user?.roleTypeId === 5) {
-        await this.router.navigateByUrl('/admin');
-      } else {
-        await this.router.navigateByUrl('/my-cases');
+
+    this.auth.login$(this.uname.trim(), this.password).subscribe({
+      next: (res) => {
+        if (res.mustResetPassword) {
+          this.router.navigateByUrl('/register');
+        } else if (res.user?.roleTypeId === 5) {
+          this.router.navigateByUrl('/admin');
+        } else {
+          this.router.navigateByUrl('/my-cases');
+        }
+      },
+      error: (e) => {
+        this.error = e?.error?.error ?? 'Login failed';
+        this.busy = false;
       }
-    } catch (e: any) {
-      this.error = e?.error?.error ?? 'Login failed';
-      this.cdr.markForCheck();
-    } finally {
-      this.busy = false;
-      this.cdr.markForCheck();
-    }
+    });
   }
 }

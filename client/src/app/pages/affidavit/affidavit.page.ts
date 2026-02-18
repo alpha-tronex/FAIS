@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, from } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -27,8 +27,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
     private readonly affidavitApi: AffidavitService,
     private readonly fileSave: FileSaveService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -70,24 +69,20 @@ export class AffidavitPage implements OnInit, OnDestroy {
 
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.affidavitApi.summary(this.userId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (summary) => {
           this.summary = summary;
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.summary = null;
           this.error = e?.error?.error ?? 'Failed to load affidavit summary';
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
@@ -109,7 +104,6 @@ export class AffidavitPage implements OnInit, OnDestroy {
     if (this.pdfBusy) return;
     this.pdfBusy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     try {
       const blob = await this.affidavitApi.generateOfficialPdf('auto', this.userId || undefined, this.caseId || undefined);
@@ -123,7 +117,6 @@ export class AffidavitPage implements OnInit, OnDestroy {
       }
     } finally {
       this.pdfBusy = false;
-      this.cdr.markForCheck();
     }
   }
 }

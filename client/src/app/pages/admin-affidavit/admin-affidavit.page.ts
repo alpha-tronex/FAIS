@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -32,8 +32,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     private readonly affidavitApi: AffidavitService,
     private readonly casesApi: CasesService,
     private readonly fileSave: FileSaveService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +56,6 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
   refresh() {
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription?.unsubscribe();
     this.subscription = this.usersApi
@@ -65,7 +63,6 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
@@ -76,11 +73,9 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
           }
           this.selectedCaseId = null;
           void this.loadCasesForSelectedUser();
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load users';
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
@@ -98,13 +93,11 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
   async loadCasesForSelectedUser() {
     this.cases = [];
     if (!this.selectedUserId) {
-      this.cdr.markForCheck();
       return;
     }
 
     this.casesBusy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     try {
       this.cases = await this.casesApi.list(this.selectedUserId);
@@ -116,18 +109,15 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
       }
     } finally {
       this.casesBusy = false;
-      this.cdr.markForCheck();
     }
   }
 
   selectCase(caseId: string) {
     this.selectedCaseId = caseId;
-    this.cdr.markForCheck();
   }
 
   clearCaseSelection() {
     this.selectedCaseId = null;
-    this.cdr.markForCheck();
   }
 
   private sanitizeFilenamePart(value: string): string {
@@ -178,7 +168,6 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
 
     this.pdfBusy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     try {
       const blob = await this.affidavitApi.generateOfficialPdf('auto', this.selectedUserId, this.selectedCaseId);
@@ -191,7 +180,6 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
       }
     } finally {
       this.pdfBusy = false;
-      this.cdr.markForCheck();
     }
   }
 }

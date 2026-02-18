@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, provideZoneChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -44,7 +44,10 @@ import { AffidavitLiabilitiesSectionComponent } from './pages/affidavit-edit/sec
     AdminAffidavitPage
   ],
   imports: [BrowserModule, FormsModule, RouterModule.forRoot(routes)],
-  providers: [provideHttpClient(withInterceptors([authInterceptor]))],
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideHttpClient(withInterceptors([authInterceptor]))
+  ],
   bootstrap: [App]
 })
 export class AppModule {}

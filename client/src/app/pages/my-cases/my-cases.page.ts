@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, finalize, from } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -21,8 +21,7 @@ export class MyCasesPage implements OnInit, OnDestroy {
   constructor(
     private readonly auth: AuthService,
     private readonly casesApi: CasesService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -42,23 +41,19 @@ export class MyCasesPage implements OnInit, OnDestroy {
 
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.casesApi.list())
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (cases) => {
           this.cases = cases;
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load cases';
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');

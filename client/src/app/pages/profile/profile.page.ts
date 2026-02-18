@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -53,8 +53,7 @@ export class ProfilePage implements OnInit {
     private readonly roleTypesApi: RoleTypesService,
     private readonly usersApi: UsersService,
     private readonly router: Router,
-    private readonly route: ActivatedRoute,
-    private readonly cdr: ChangeDetectorRef
+    private readonly route: ActivatedRoute
   ) {
   }
 
@@ -78,7 +77,6 @@ export class ProfilePage implements OnInit {
   private async init() {
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
     try {
       await this.loadStates();
       if (this.editingUserId) {
@@ -88,13 +86,10 @@ export class ProfilePage implements OnInit {
 				? await firstValueFrom(this.usersApi.get(this.editingUserId))
 				: await this.auth.me();
 			this.applyMe(me as unknown as MeResponse);
-      this.cdr.markForCheck();
     } catch (e: any) {
       this.error = e?.error?.error ?? 'Failed to load profile';
-      this.cdr.markForCheck();
     } finally {
       this.busy = false;
-      this.cdr.markForCheck();
     }
   }
 
@@ -103,8 +98,6 @@ export class ProfilePage implements OnInit {
       this.states = await this.lookups.list('states');
     } catch {
       this.states = [];
-    } finally {
-      this.cdr.markForCheck();
     }
   }
 
@@ -113,8 +106,6 @@ export class ProfilePage implements OnInit {
       this.roleTypes = await this.roleTypesApi.list();
     } catch {
       this.roleTypes = [];
-    } finally {
-      this.cdr.markForCheck();
     }
   }
 
@@ -146,8 +137,6 @@ export class ProfilePage implements OnInit {
     this.confirmNewSsn = '';
     this.showNewSsn = false;
     this.showConfirmNewSsn = false;
-
-    this.cdr.markForCheck();
   }
 
   get maskedSsn(): string {
@@ -158,34 +147,27 @@ export class ProfilePage implements OnInit {
   async toggleSsn() {
     this.error = null;
     this.profileSaved = false;
-    this.cdr.markForCheck();
 
     if (this.showSsn) {
       this.showSsn = false;
-      this.cdr.markForCheck();
       return;
     }
 
     this.showSsn = true;
-    this.cdr.markForCheck();
     if (this.ssnFull) return;
 
     this.busy = true;
-    this.cdr.markForCheck();
     try {
 				const res = this.editingUserId
 					? await firstValueFrom(this.usersApi.getSsn(this.editingUserId))
 					: await this.auth.mySsn();
       this.ssnFull = res.ssn;
       if (res.ssnLast4) this.ssnLast4 = res.ssnLast4;
-      this.cdr.markForCheck();
     } catch (e: any) {
       this.showSsn = false;
       this.error = e?.error?.error ?? 'Failed to load SSN';
-      this.cdr.markForCheck();
     } finally {
       this.busy = false;
-      this.cdr.markForCheck();
     }
   }
 
@@ -198,36 +180,29 @@ export class ProfilePage implements OnInit {
     this.busy = true;
     this.error = null;
     this.profileSaved = false;
-    this.cdr.markForCheck();
     try {
       if (!this.email.trim()) {
         this.error = 'Email is required';
-        this.cdr.markForCheck();
         return;
       }
       if (!this.addressLine1.trim()) {
         this.error = 'Address line 1 is required';
-        this.cdr.markForCheck();
         return;
       }
       if (!this.city.trim()) {
         this.error = 'City is required';
-        this.cdr.markForCheck();
         return;
       }
       if (!this.state.trim()) {
         this.error = 'State is required';
-        this.cdr.markForCheck();
         return;
       }
       if (!this.zipCode.trim()) {
         this.error = 'Zip is required';
-        this.cdr.markForCheck();
         return;
       }
       if (!this.phone.trim()) {
         this.error = 'Phone is required';
-        this.cdr.markForCheck();
         return;
       }
 
@@ -253,17 +228,14 @@ export class ProfilePage implements OnInit {
 				: await this.auth.updateMe(meReq);
 			this.applyMe(updated as unknown as MeResponse);
       this.profileSaved = true;
-      this.cdr.markForCheck();
     } catch (e: any) {
       const raw = e?.error?.error;
       this.error =
         raw === 'Invalid payload'
           ? 'Please fill out all required profile fields.'
           : (raw ?? 'Failed to save profile');
-      this.cdr.markForCheck();
     } finally {
       this.busy = false;
-      this.cdr.markForCheck();
     }
   }
 
@@ -271,29 +243,24 @@ export class ProfilePage implements OnInit {
     this.busy = true;
     this.error = null;
     this.profileSaved = false;
-    this.cdr.markForCheck();
     try {
       const ssn = this.newSsn.trim();
       const confirmSsn = this.confirmNewSsn.trim();
 
       if (!ssn || !confirmSsn) {
         this.error = 'SSN and confirm SSN are required';
-        this.cdr.markForCheck();
         return;
       }
       if (!SSN_REGEX.test(ssn)) {
         this.error = 'Social security format is invalid';
-        this.cdr.markForCheck();
         return;
       }
       if (!SSN_REGEX.test(confirmSsn)) {
         this.error = 'Confirm social security format is invalid';
-        this.cdr.markForCheck();
         return;
       }
       if (ssn !== confirmSsn) {
         this.error = 'Social security numbers do not match';
-        this.cdr.markForCheck();
         return;
       }
 
@@ -301,14 +268,11 @@ export class ProfilePage implements OnInit {
 				? await firstValueFrom(this.usersApi.updateSsn(this.editingUserId, { ssn, confirmSsn }))
 				: await this.auth.updateMySsn({ ssn, confirmSsn });
 			this.applyMe(updated as unknown as MeResponse);
-      this.cdr.markForCheck();
     } catch (e: any) {
       const raw = e?.error?.error;
       this.error = raw === 'Invalid payload' ? 'Social security input is invalid.' : (raw ?? 'Failed to update SSN');
-      this.cdr.markForCheck();
     } finally {
       this.busy = false;
-      this.cdr.markForCheck();
     }
   }
 }

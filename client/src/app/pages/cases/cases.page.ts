@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subscription, forkJoin, from } from 'rxjs';
 import { finalize, switchMap } from 'rxjs/operators';
@@ -56,8 +56,7 @@ export class CasesPage implements OnInit, OnDestroy {
     private readonly usersApi: UsersService,
     private readonly casesApi: CasesService,
     private readonly lookups: LookupsService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {
   }
 
@@ -154,13 +153,11 @@ export class CasesPage implements OnInit, OnDestroy {
 
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = this.loadAll()
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
@@ -181,12 +178,9 @@ export class CasesPage implements OnInit, OnDestroy {
           }
 
           this.applyCountyFilter();
-
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load cases';
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
@@ -197,31 +191,26 @@ export class CasesPage implements OnInit, OnDestroy {
 
   onCircuitChange() {
     this.applyCountyFilter();
-    this.cdr.markForCheck();
   }
 
   create() {
     if (!this.canCreate) {
       this.error = 'Forbidden';
-      this.cdr.markForCheck();
       return;
     }
 
     if (this.circuitId == null || this.countyId == null) {
       this.error = 'Circuit and County are required.';
-      this.cdr.markForCheck();
       return;
     }
 
     if (!this.caseNumber.trim()) {
       this.error = 'Case number is required.';
-      this.cdr.markForCheck();
       return;
     }
 
     if (!this.division.trim()) {
       this.error = 'Division is required.';
-      this.cdr.markForCheck();
       return;
     }
 
@@ -229,7 +218,6 @@ export class CasesPage implements OnInit, OnDestroy {
 
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     const req = {
       caseNumber: this.caseNumber.trim(),
@@ -252,12 +240,10 @@ export class CasesPage implements OnInit, OnDestroy {
       .pipe(
         switchMap(() => {
           this.resetForm();
-          this.cdr.markForCheck();
           return this.loadAll();
         }),
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
@@ -276,8 +262,6 @@ export class CasesPage implements OnInit, OnDestroy {
             this.division = this.divisions[0]!.name;
           }
           this.applyCountyFilter();
-
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           const raw = e?.error?.error;
@@ -285,7 +269,6 @@ export class CasesPage implements OnInit, OnDestroy {
             raw === 'Invalid payload'
               ? 'Please fill out all required fields (Circuit, County, Case number, Division).'
               : (raw ?? 'Failed to create case');
-          this.cdr.markForCheck();
         }
       });
   }
@@ -293,20 +276,17 @@ export class CasesPage implements OnInit, OnDestroy {
   editCase(caseId: string) {
     if (!this.canCreate) {
       this.error = 'Forbidden';
-      this.cdr.markForCheck();
       return;
     }
 
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.casesApi.get(caseId))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
@@ -325,12 +305,9 @@ export class CasesPage implements OnInit, OnDestroy {
           this.respondentId = c.respondentId ?? '';
           this.petitionerAttId = c.petitionerAttId ?? '';
           this.respondentAttId = c.respondentAttId ?? '';
-
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load case';
-          this.cdr.markForCheck();
         }
       });
   }

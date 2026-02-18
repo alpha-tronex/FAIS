@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, forkJoin, from } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -69,8 +69,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     private readonly api: AffidavitDataService,
     private readonly lookups: LookupsService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -113,7 +112,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     }
 
     if (changes['caseId'] && !changes['caseId'].firstChange) {
-      this.cdr.markForCheck();
+      // View will update automatically with Zone.js
     }
   }
 
@@ -134,7 +133,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       this.noneSelected[step.key] = raw === '1';
     }
     this.currentNoneSelected = Boolean(this.noneSelected[this.currentStepKey]);
-    this.cdr.markForCheck();
   }
 
   setNoneForStep(stepKey: (typeof this.steps)[number]['key'], value: boolean) {
@@ -145,7 +143,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
     // Keep the checkbox controlled for the current step.
     this.currentNoneSelected = Boolean(this.noneSelected[this.currentStepKey]);
-    this.cdr.markForCheck();
 
     if (shouldAdvance) {
       // Defer step change so ngModel/DOM state doesn't "stick" across steps.
@@ -156,7 +153,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
         this.currentStepIndex += 1;
         this.syncCurrentStepKey();
-        this.cdr.markForCheck();
       }, 0);
     }
   }
@@ -202,13 +198,11 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = this.loadAll(this.userId || undefined)
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
@@ -227,12 +221,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
           this.monthlyHouseholdExpenses = r.monthlyHouseholdExpenses;
           this.assets = r.assets;
           this.liabilities = r.liabilities;
-
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load affidavit data';
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
@@ -303,14 +294,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     if (!this.canGoBack()) return;
     this.currentStepIndex -= 1;
     this.syncCurrentStepKey();
-    this.cdr.markForCheck();
   }
 
   nextStep() {
     if (!this.canGoNext()) return;
     this.currentStepIndex += 1;
     this.syncCurrentStepKey();
-    this.cdr.markForCheck();
   }
 
   addEmployment(payload: EmploymentCreatePayload) {
@@ -319,7 +308,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(
       this.api.createEmployment(payload, this.userId || undefined)
@@ -327,14 +315,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to add employment';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -343,20 +329,17 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.api.deleteEmployment(id, this.userId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove employment';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -367,7 +350,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(
       this.api.createMonthlyIncome(payload, this.userId || undefined)
@@ -375,14 +357,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to add monthly income';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -391,20 +371,17 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.api.deleteMonthlyIncome(id, this.userId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove monthly income';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -415,7 +392,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(
       this.api.createMonthlyDeductions(payload, this.userId || undefined)
@@ -423,14 +399,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to add monthly deduction';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -439,20 +413,17 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.api.deleteMonthlyDeductions(id, this.userId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove monthly deduction';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -463,7 +434,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(
       this.api.createMonthlyHouseholdExpenses(payload, this.userId || undefined)
@@ -471,14 +441,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to add household expense';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -487,20 +455,17 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.api.deleteMonthlyHouseholdExpenses(id, this.userId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove household expense';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -511,7 +476,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(
       this.api.createAsset(payload, this.userId || undefined)
@@ -519,14 +483,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to add asset';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -535,20 +497,17 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.api.deleteAsset(id, this.userId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove asset';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -559,7 +518,6 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(
       this.api.createLiability(payload, this.userId || undefined)
@@ -567,14 +525,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to add liability';
-          this.cdr.markForCheck();
         }
       });
   }
@@ -583,20 +539,17 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
 
     this.subscription = from(this.api.deleteLiability(id, this.userId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove liability';
-          this.cdr.markForCheck();
         }
       });
   }

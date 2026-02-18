@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { LookupsService, LookupItem } from '../../services/lookups.service';
@@ -43,8 +43,7 @@ export class RegisterPage {
   constructor(
     private readonly auth: AuthService,
     private readonly lookups: LookupsService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {
     this.finishMode = this.auth.mustCompleteRegistration();
     if (this.finishMode) {
@@ -69,8 +68,6 @@ export class RegisterPage {
       this.phone = me.phone ?? this.phone;
     } catch {
       // keep page usable even if /me fails
-    } finally {
-      this.cdr.markForCheck();
     }
   }
 
@@ -83,15 +80,12 @@ export class RegisterPage {
     } catch {
       // keep registration usable even if lookups are unavailable
       this.states = [];
-    } finally {
-      this.cdr.markForCheck();
     }
   }
 
   async onSubmit() {
     this.busy = true;
     this.error = null;
-    this.cdr.markForCheck();
     try {
       const errors = validateRegistration({
         uname: this.uname,
@@ -111,7 +105,6 @@ export class RegisterPage {
       });
       if (errors.length > 0) {
         this.error = errors[0] ?? 'Invalid registration';
-        this.cdr.markForCheck();
         return;
       }
 
@@ -158,10 +151,8 @@ export class RegisterPage {
       }
     } catch (e: any) {
       this.error = e?.error?.error ?? 'Registration failed';
-      this.cdr.markForCheck();
     } finally {
       this.busy = false;
-      this.cdr.markForCheck();
     }
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, finalize, switchMap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -35,8 +35,7 @@ export class UsersPage implements OnInit, OnDestroy {
     private readonly auth: AuthService,
     private readonly roleTypesApi: RoleTypesService,
     private readonly usersApi: UsersService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private readonly router: Router
   ) {
   }
 
@@ -54,13 +53,11 @@ export class UsersPage implements OnInit, OnDestroy {
     this.busy = true;
     this.error = null;
     this.success = null;
-    this.cdr.markForCheck();
 
     void this.roleTypesApi
       .list()
       .then((items) => {
         this.roleTypes = items;
-        this.cdr.markForCheck();
       })
       .catch(() => {
         // role types are used for display only; keep page usable if unavailable
@@ -71,17 +68,14 @@ export class UsersPage implements OnInit, OnDestroy {
       .pipe(
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (users) => {
           this.users = users;
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load users';
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
@@ -109,7 +103,6 @@ export class UsersPage implements OnInit, OnDestroy {
     this.busy = true;
     this.error = null;
     this.success = null;
-    this.cdr.markForCheck();
 
     const req = {
       uname: this.uname.trim(),
@@ -130,23 +123,19 @@ export class UsersPage implements OnInit, OnDestroy {
           this.showPassword = false;
           this.firstName = '';
           this.lastName = '';
-          this.cdr.markForCheck();
           return this.usersApi.list();
         }),
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (users) => {
           this.users = users;
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to create user';
           this.success = null;
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
@@ -171,8 +160,6 @@ export class UsersPage implements OnInit, OnDestroy {
     this.showPassword = false;
     this.firstName = '';
     this.lastName = '';
-
-    this.cdr.markForCheck();
   }
 
   private update() {
@@ -181,7 +168,6 @@ export class UsersPage implements OnInit, OnDestroy {
     this.busy = true;
     this.error = null;
     this.success = null;
-    this.cdr.markForCheck();
 
     const req: UpdateUserRequest = {
       email: this.email.trim() || undefined,
@@ -200,23 +186,19 @@ export class UsersPage implements OnInit, OnDestroy {
           this.email = '';
           this.firstName = '';
           this.lastName = '';
-          this.cdr.markForCheck();
           return this.usersApi.list();
         }),
         finalize(() => {
           this.busy = false;
-          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (users) => {
           this.users = users;
-          this.cdr.markForCheck();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to update user';
           this.success = null;
-          this.cdr.markForCheck();
           if (e?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
