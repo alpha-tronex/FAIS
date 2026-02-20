@@ -56,7 +56,7 @@
 
       <div class="rowActions">
         <button type="submit" [disabled]="busy" class="submit">{{ editingUserId ? 'Save' : 'Create' }}</button>
-        <button *ngIf="editingUserId" type="button" (click)="cancelEdit()" [disabled]="busy">Cancel</button>
+        <button *ngIf="editingUserId" type="button" (click)="requestCancelEdit()" [disabled]="busy">Cancel</button>
         <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
       </div>
     </form>
@@ -88,9 +88,22 @@
           <td class="td">{{ u.uname }}</td>
           <td class="td">{{ u.email }}</td>
           <td class="td">{{ roleTypeName(u.roleTypeId) }}</td>
-          <td class="td"><a *ngIf="canCreate" class="link" (click)="editUser(u)">Edit</a></td>
+          <td class="td">
+            <button *ngIf="canCreate" type="button" (click)="editUser(u)" [disabled]="busy" class="submit">Edit</button>
+          </td>
         </tr>
       </tbody>
     </table>
   </section>
+
+  <app-confirm-popup
+    [open]="showCancelConfirm"
+    title="Discard changes?"
+    message="Any unsaved changes to this user will be lost."
+    confirmText="Discard"
+    cancelText="Keep editing"
+    [danger]="true"
+    (confirm)="cancelEdit()"
+    (cancel)="showCancelConfirm = false"
+  />
 </div>

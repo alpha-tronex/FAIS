@@ -1,0 +1,27 @@
+@if (open) {
+  <div
+    class="confirmOverlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirm-popup-title"
+    aria-describedby="confirm-popup-message"
+    data-confirm-backdrop
+    (click)="onBackdropClick($event)"
+  >
+    <div class="confirmPanel">
+      <h2 id="confirm-popup-title" class="panelTitle">{{ title }}</h2>
+      <p id="confirm-popup-message" class="confirmMessage">{{ message }}</p>
+      <div class="rowActions confirmActions">
+        <button type="button" (click)="onCancel()">{{ cancelText }}</button>
+        <button
+          type="button"
+          class="confirmButton"
+          [class.confirmButtonDanger]="danger"
+          (click)="onConfirm()"
+        >
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -29,6 +29,7 @@ export class UsersPage implements OnInit, OnDestroy {
 
   editingUserId: string | null = null;
 
+  showCancelConfirm = false;
   subscription: Subscription | null = null;
 
   constructor(
@@ -149,7 +150,12 @@ export class UsersPage implements OnInit, OnDestroy {
     void this.router.navigate(['/admin/users', u.id, 'profile']);
   }
 
-  cancelEdit() {
+  requestCancelEdit(): void {
+    this.showCancelConfirm = true;
+  }
+
+  cancelEdit(): void {
+    this.showCancelConfirm = false;
     this.editingUserId = null;
     this.error = null;
     this.success = null;

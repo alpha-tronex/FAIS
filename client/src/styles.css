@@ -137,7 +137,7 @@ body {
 .page {
 	max-width: var(--pageMaxWidth);
 	margin: var(--pageMarginY) auto;
-	padding: 0 16px;
+	padding: 0 16px 50px 16px;
 }
 
 h1,
@@ -263,6 +263,10 @@ html[data-theme='c'] .submit {
 	border-bottom: 1px solid var(--border);
 	padding: var(--tdPaddingY) var(--tdPaddingX);
 	line-height: 1.25;
+}
+
+.right {
+	text-align: right;
 }
 
 tbody tr:hover .td {

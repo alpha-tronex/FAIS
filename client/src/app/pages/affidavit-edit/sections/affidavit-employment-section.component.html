@@ -1,7 +1,7 @@
 <section class="panel">
   <h2 class="panelTitle">Employment</h2>
 
-  <form (ngSubmit)="submit(); ensureDefaults()" class="gridForm">
+  <form (ngSubmit)="submit()" class="gridForm">
     <label>
       Employer name
       <input name="empName" [(ngModel)]="empName" required class="input" />
@@ -38,7 +38,11 @@
     </label>
 
     <div class="rowActions">
-      <button type="submit" [disabled]="busy" class="submit">Add</button>
+      <button *ngIf="!editingId" type="submit" [disabled]="busy" class="submit">Add</button>
+      <ng-container *ngIf="editingId">
+        <button type="button" (click)="cancelEdit()" [disabled]="busy">Cancel</button>
+        <button type="button" (click)="doUpdate($event)" [disabled]="busy" class="submit">Update</button>
+      </ng-container>
       <button type="button" (click)="refresh.emit()" [disabled]="busy">Refresh</button>
     </div>
   </form>
@@ -54,13 +58,14 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let e of rows">
-        <td class="td">{{ e.name }}</td>
-        <td class="td">{{ e.occupation || '' }}</td>
-        <td class="td">{{ e.payRate | number:'1.2-2' }}</td>
-        <td class="td">{{ typeLabel(e.payFrequencyTypeId) }}</td>
+      <tr *ngFor="let row of rows; trackBy: trackByRowId">
+        <td class="td">{{ row.name }}</td>
+        <td class="td">{{ row.occupation || '' }}</td>
+        <td class="td">{{ row.payRate | number:'1.2-2' }}</td>
+        <td class="td">{{ typeLabel(row.payFrequencyTypeId) }}</td>
         <td class="td">
-          <button type="button" (click)="remove.emit(e.id)" [disabled]="busy" class="mini">Remove</button>
+          <button type="button" (click)="onEditRow($event, row)" (mousedown)="onEditRow($event, row)" [disabled]="editingId !== null" class="mini">Edit</button>
+          <button type="button" (click)="remove.emit(row.id)" [disabled]="busy" class="mini">Remove</button>
         </td>
       </tr>
     </tbody>

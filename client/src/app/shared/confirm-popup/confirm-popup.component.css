@@ -1,0 +1,64 @@
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--text) 35%, transparent);
+  cursor: default;
+}
+
+.confirmPanel {
+  cursor: default;
+  margin-top: 16px;
+  padding: var(--panelPadding);
+  border: var(--panelBorderWidth) solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  min-width: 280px;
+  max-width: 420px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--text) 20%, transparent);
+}
+
+.confirmPanel:focus {
+  outline: none;
+}
+
+.confirmMessage {
+  margin: 0 0 16px 0;
+  color: var(--muted);
+  font-size: var(--controlFontSize);
+  line-height: 1.4;
+}
+
+.confirmActions {
+  margin-top: 0;
+  justify-content: flex-end;
+}
+
+.confirmButton {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
+}
+
+.confirmButtonDanger {
+  border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+  background: color-mix(in srgb, var(--danger) 12%, #fff);
+  color: var(--danger);
+}
+
+.confirmButtonDanger:hover {
+  background: color-mix(in srgb, var(--danger) 20%, #fff);
+}
+
+html[data-theme='c'] .confirmButton {
+  border-color: var(--accent);
+  background: #e8f0ff;
+}
+
+html[data-theme='c'] .confirmButtonDanger {
+  border-color: var(--danger);
+  background: #ffe8e8;
+}

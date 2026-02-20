@@ -66,4 +66,8 @@ export class MyCasesPage implements OnInit, OnDestroy {
     this.auth.logout();
     void this.router.navigateByUrl('/login');
   }
+
+  selectCase(caseId: string) {
+    void this.router.navigate(['/affidavit'], { queryParams: { caseId } });
+  }
 }

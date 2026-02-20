@@ -2,14 +2,22 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
+export type MonthlyIncomeBreakdownRow = {
+  typeId: number | null;
+  typeName: string;
+  amount: number;
+  ifOther: string | null;
+};
+
 export type AffidavitSummary = {
-  legacyUserId: number;
+  legacyUserId?: number;
   grossAnnualIncome: number;
   grossAnnualIncomeFromEmployment: number;
   grossMonthlyIncomeFromMonthlyIncome: number;
   grossAnnualIncomeFromMonthlyIncome: number;
   threshold: number;
   form: 'short' | 'long';
+  monthlyIncomeBreakdown?: MonthlyIncomeBreakdownRow[];
 };
 
 @Injectable({ providedIn: 'root' })

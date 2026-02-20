@@ -22,7 +22,7 @@
           <th class="th">Petitioner</th>
           <th class="th">Respondent</th>
           <th class="th">Created</th>
-          <th class="th">Affidavit</th>
+          <th class="th">Select</th>
         </tr>
       </thead>
 
@@ -38,13 +38,7 @@
           </td>
           <td class="td">{{ c.createdAt | date:'short' }}</td>
           <td class="td">
-            <a
-              [routerLink]="['/affidavit']"
-              [queryParams]="{ caseId: c.id }"
-              class="link"
-            >
-              Affidavit
-            </a>
+            <button type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">Select</button>
           </td>
         </tr>
       </tbody>

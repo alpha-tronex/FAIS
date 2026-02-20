@@ -7,7 +7,7 @@ import { LookupsService, LookupItem } from '../../services/lookups.service';
 import { AssetCreatePayload } from './sections/affidavit-assets-section.component';
 import { EmploymentCreatePayload } from './sections/affidavit-employment-section.component';
 import { LiabilityCreatePayload } from './sections/affidavit-liabilities-section.component';
-import { MonthlyLineCreatePayload } from './sections/affidavit-monthly-lines-section.component';
+import { MonthlyLineCreatePayload, MonthlyLineUpdatePayload } from './sections/affidavit-monthly-lines-section.component';
 
 @Component({
   standalone: false,
@@ -18,6 +18,7 @@ import { MonthlyLineCreatePayload } from './sections/affidavit-monthly-lines-sec
 export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   @Input() userId: string | null = null;
   @Input() caseId: string | null = null;
+  @Input() hideNav = false;
 
   steps = [
     { key: 'employment', title: 'Employment' },
@@ -61,6 +62,14 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
   busy = false;
   error: string | null = null;
+
+  /** When set, confirm popup is open; on confirm we remove this id for current step type. */
+  showRemoveConfirm = false;
+  pendingRemoveId: string | null = null;
+
+  /** When set, user clicked Next on Monthly income but employment vs type-1 salary mismatch. */
+  showMonthlyIncomeMismatchConfirm = false;
+  monthlyIncomeMismatchMessage = '';
 
   subscription: Subscription | null = null;
 
@@ -296,10 +305,102 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.syncCurrentStepKey();
   }
 
+  goToStep(index: number) {
+    if (index < 0 || index >= this.steps.length) return;
+    this.currentStepIndex = index;
+    this.syncCurrentStepKey();
+  }
+
+  /** Pay periods per year (must match server). */
+  private payFrequencyToAnnualMultiplier(payFrequencyTypeId: number | null): number | null {
+    switch (payFrequencyTypeId) {
+      case 1: return 52;   // Weekly
+      case 2: return 26;   // Bi-Weekly
+      case 3: return 12;   // Monthly
+      case 4: return 24;   // Bi-Monthly
+      case 5: return 1;   // Annually
+      case 6: return 2;   // Semi-Annually
+      case 7: return 4;   // Quarterly
+      case 8: return 260; // Daily (5 days/week)
+      case 9: return 2080; // Hourly (40 hrs/week)
+      default: return null;
+    }
+  }
+
+  /** Annual income derived from Employment rows (pay rate × frequency). */
+  private getEmploymentAnnual(): number {
+    return this.employment.reduce((sum, row) => {
+      const payRate = Number(row.payRate);
+      const mult = this.payFrequencyToAnnualMultiplier(row.payFrequencyTypeId);
+      if (!Number.isFinite(payRate) || payRate <= 0 || mult == null) return sum;
+      return sum + payRate * mult;
+    }, 0);
+  }
+
+  /** Sum of amounts for Monthly income rows with typeId 1 (Monthly gross salary or wages). */
+  private getMonthlyIncomeType1Sum(): number {
+    return this.monthlyIncome
+      .filter((r) => r.typeId === 1)
+      .reduce((sum, r) => sum + Number(r.amount ?? 0), 0);
+  }
+
+  /** Returns true if both employment-derived monthly and type-1 monthly are present and differ beyond tolerance. */
+  private checkMonthlyIncomeMismatch(): { mismatch: boolean; employmentMonthly: number; type1Monthly: number } {
+    const employmentAnnual = this.getEmploymentAnnual();
+    const employmentMonthly = employmentAnnual / 12;
+    const type1Monthly = this.getMonthlyIncomeType1Sum();
+    const tolerance = 0.50; // allow rounding within 50 cents
+    const mismatch =
+      employmentMonthly > 0 &&
+      type1Monthly > 0 &&
+      Math.abs(employmentMonthly - type1Monthly) > tolerance;
+    return { mismatch, employmentMonthly, type1Monthly };
+  }
+
   nextStep() {
     if (!this.canGoNext()) return;
+
+    if (this.currentStepKey === 'monthlyIncome') {
+      const { mismatch, employmentMonthly, type1Monthly } = this.checkMonthlyIncomeMismatch();
+      if (mismatch) {
+        this.monthlyIncomeMismatchMessage =
+          `The monthly amount from Employment (${employmentMonthly.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) ` +
+          `does not match the amount entered for "Monthly gross salary or wages" (${type1Monthly.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}). ` +
+          `Please fix the discrepancy, or choose "Continue anyway" to proceed.`;
+        this.showMonthlyIncomeMismatchConfirm = true;
+        return;
+      }
+    }
+
     this.currentStepIndex += 1;
     this.syncCurrentStepKey();
+  }
+
+  onConfirmMonthlyIncomeMismatchContinue(): void {
+    this.showMonthlyIncomeMismatchConfirm = false;
+    this.monthlyIncomeMismatchMessage = '';
+    this.currentStepIndex += 1;
+    this.syncCurrentStepKey();
+  }
+
+  onCancelMonthlyIncomeMismatch(): void {
+    this.showMonthlyIncomeMismatchConfirm = false;
+    this.monthlyIncomeMismatchMessage = '';
+  }
+
+  onSectionUpdateStart(): void {
+    this.busy = true;
+    this.error = null;
+  }
+
+  onSectionUpdateDone(): void {
+    this.busy = false;
+    this.refresh();
+  }
+
+  onSectionUpdateFailed(message: string): void {
+    this.busy = false;
+    this.error = message;
   }
 
   addEmployment(payload: EmploymentCreatePayload) {
@@ -323,6 +424,49 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
           this.error = e?.error?.error ?? 'Failed to add employment';
         }
       });
+  }
+
+  /** Opens confirm popup; actual remove runs on confirm. */
+  requestRemove(id: string): void {
+    this.pendingRemoveId = id;
+    this.showRemoveConfirm = true;
+  }
+
+  onConfirmRemove(): void {
+    const id = this.pendingRemoveId;
+    this.pendingRemoveId = null;
+    this.showRemoveConfirm = false;
+    if (!id) return;
+    switch (this.currentStepKey) {
+      case 'employment':
+        this.removeEmployment(id);
+        break;
+      case 'monthlyIncome':
+        this.removeMonthlyIncome(id);
+        break;
+      case 'monthlyDeductions':
+        this.removeMonthlyDeduction(id);
+        break;
+      case 'monthlyHouseholdExpenses':
+        this.removeHouseholdExpense(id);
+        break;
+      case 'assets':
+        this.removeAsset(id);
+        break;
+      case 'liabilities':
+        this.removeLiability(id);
+        break;
+    }
+  }
+
+  onCancelRemove(): void {
+    this.pendingRemoveId = null;
+    this.showRemoveConfirm = false;
+  }
+
+  removeConfirmTitle(): string {
+    const t = this.steps.find((s) => s.key === this.currentStepKey)?.title ?? 'item';
+    return `Remove ${t}?`;
   }
 
   removeEmployment(id: string) {
@@ -386,6 +530,35 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       });
   }
 
+  updateMonthlyIncome(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid monthly income data';
+      return;
+    }
+
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = this.api
+      .patchMonthlyIncome(payload.id, body, this.userId || undefined)
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => {
+          this.error = e?.error?.error ?? 'Failed to update monthly income';
+        }
+      });
+  }
+
   addMonthlyDeduction(payload: MonthlyLineCreatePayload) {
     this.setNoneForStep('monthlyDeductions', false);
 
@@ -428,6 +601,35 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       });
   }
 
+  updateMonthlyDeduction(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid monthly deduction data';
+      return;
+    }
+
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = this.api
+      .patchMonthlyDeductions(payload.id, body, this.userId || undefined)
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => {
+          this.error = e?.error?.error ?? 'Failed to update monthly deduction';
+        }
+      });
+  }
+
   addHouseholdExpense(payload: MonthlyLineCreatePayload) {
     this.setNoneForStep('monthlyHouseholdExpenses', false);
 
@@ -466,6 +668,35 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove household expense';
+        }
+      });
+  }
+
+  updateHouseholdExpense(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid household expense data';
+      return;
+    }
+
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = this.api
+      .patchMonthlyHouseholdExpenses(payload.id, body, this.userId || undefined)
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => {
+          this.error = e?.error?.error ?? 'Failed to update household expense';
         }
       });
   }

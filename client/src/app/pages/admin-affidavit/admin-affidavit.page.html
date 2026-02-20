@@ -1,6 +1,10 @@
 <div>
   <h1>Admin affidavit</h1>
 
+  <nav *ngIf="selectedUserId && selectedCaseId" class="mt12">
+    <a [routerLink]="['/affidavit']" [queryParams]="{ userId: selectedUserId, caseId: selectedCaseId }" class="link">Summary</a>
+  </nav>
+
   <p *ngIf="error" class="error">{{ error }}</p>
 
   <section *ngIf="selectedUserId && selectedCaseId" class="panel mt16">
@@ -91,6 +95,6 @@
   </section>
 
   <section *ngIf="selectedUserId && selectedCaseId" class="mt16">
-    <app-affidavit-edit-page [userId]="selectedUserId" [caseId]="selectedCaseId"></app-affidavit-edit-page>
+    <app-affidavit-edit-page [userId]="selectedUserId" [caseId]="selectedCaseId" [hideNav]="true"></app-affidavit-edit-page>
   </section>
 </div>

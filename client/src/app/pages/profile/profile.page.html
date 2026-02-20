@@ -1,11 +1,11 @@
-<main class="page">
-  <h1>Profile</h1>
+<main class="page" [class.profileEmbedded]="editingUserId">
+  <h1 *ngIf="!editingUserId">Profile</h1>
 
   <p *ngIf="editingUserId" class="mt10">
     Editing user: <strong>{{ uname }}</strong>
   </p>
 
-  <nav class="mt16">
+  <nav *ngIf="!editingUserId" class="mt16">
     <a routerLink="/my-cases" class="link">My cases</a>
     <span class="sep">|</span>
     <a [routerLink]="['/affidavit']" [queryParams]="navQueryParams()" class="link">Affidavit</a>
@@ -13,7 +13,7 @@
     <a (click)="logout()" class="link">Logout</a>
   </nav>
 
-  <section class="panel mt16">
+  <section class="panel mt16" [class.mt0]="editingUserId">
     <h2 class="panelTitle">Your information</h2>
 
     <form (ngSubmit)="onSubmit()" class="gridForm">

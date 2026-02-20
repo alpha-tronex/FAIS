@@ -1,14 +1,1 @@
-[
-  {
-    "id": 1,
-    "name": "Husband"
-  },
-  {
-    "id": 2,
-    "name": "Wife"
-  },
-  {
-    "id": 3,
-    "name": "Both"
-  }
-]
+[{"id":1,"name":"Petitioner"},{"id":2,"name":"Respondent"},{"id":3,"name":"Both"}]

@@ -1,11 +1,11 @@
-<main class="page">
-  <h1>Edit affidavit data</h1>
+<main class="page" [class.pageNoPadding]="hideNav">
+  <h1 *ngIf="!hideNav">Edit affidavit data</h1>
 
-  <p *ngIf="userId" class="mt12">
+  <p *ngIf="userId && !hideNav" class="mt12">
     Editing on behalf of userId: <strong>{{ userId }}</strong>
   </p>
 
-  <nav class="mt16">
+  <nav *ngIf="!hideNav" class="mt16">
     <a (click)="goBack()" class="link">Back to summary</a>
     <span class="sep">|</span>
     <a [routerLink]="['/profile']" [queryParams]="caseId ? { caseId } : {}" class="link">Profile</a>
@@ -35,9 +35,11 @@
 
     <ol class="mt12">
       <li *ngFor="let s of steps; let i = index">
-        <strong *ngIf="i === currentStepIndex">{{ s.title }}</strong>
-        <span *ngIf="i !== currentStepIndex">{{ s.title }}</span>
-        <span *ngIf="isStepComplete(s.key)"> — Done</span>
+        <button type="button" class="link stepLink" (click)="goToStep(i)" [class.stepLinkCurrent]="i === currentStepIndex">
+          <strong *ngIf="i === currentStepIndex">{{ s.title }}</strong>
+          <span *ngIf="i !== currentStepIndex">{{ s.title }}</span>
+        </button>
+        <span *ngIf="isStepComplete(s.key)" class="stepDone" aria-label="Done"> ✔</span>
       </li>
     </ol>
   </section>
@@ -48,8 +50,12 @@
       [busy]="busy"
       [payFrequencies]="payFrequencies"
       [rows]="employment"
+      [userId]="userId"
       (create)="addEmployment($event)"
-      (remove)="removeEmployment($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
       (refresh)="refresh()"
     ></app-affidavit-employment-section>
 
@@ -59,8 +65,13 @@
       [busy]="busy"
       [types]="incomeTypes"
       [rows]="monthlyIncome"
+      patchType="monthlyIncome"
+      [userId]="userId"
       (create)="addMonthlyIncome($event)"
-      (remove)="removeMonthlyIncome($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
     ></app-affidavit-monthly-lines-section>
 
     <app-affidavit-monthly-lines-section
@@ -69,8 +80,13 @@
       [busy]="busy"
       [types]="deductionTypes"
       [rows]="monthlyDeductions"
+      patchType="monthlyDeductions"
+      [userId]="userId"
       (create)="addMonthlyDeduction($event)"
-      (remove)="removeMonthlyDeduction($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
     ></app-affidavit-monthly-lines-section>
 
     <app-affidavit-monthly-lines-section
@@ -79,8 +95,13 @@
       [busy]="busy"
       [types]="householdExpenseTypes"
       [rows]="monthlyHouseholdExpenses"
+      patchType="monthlyHouseholdExpenses"
+      [userId]="userId"
       (create)="addHouseholdExpense($event)"
-      (remove)="removeHouseholdExpense($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
     ></app-affidavit-monthly-lines-section>
 
     <app-affidavit-assets-section
@@ -89,8 +110,12 @@
       [assetsTypes]="assetsTypes"
       [nonMaritalTypes]="nonMaritalTypes"
       [rows]="assets"
+      [userId]="userId"
       (create)="addAsset($event)"
-      (remove)="removeAsset($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
     ></app-affidavit-assets-section>
 
     <app-affidavit-liabilities-section
@@ -99,8 +124,12 @@
       [liabilitiesTypes]="liabilitiesTypes"
       [nonMaritalTypes]="nonMaritalTypes"
       [rows]="liabilities"
+      [userId]="userId"
       (create)="addLiability($event)"
-      (remove)="removeLiability($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
     ></app-affidavit-liabilities-section>
   </section>
 
@@ -128,4 +157,25 @@
       <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
     </div>
   </section>
+
+  <app-confirm-popup
+    [open]="showRemoveConfirm"
+    [title]="removeConfirmTitle()"
+    message="This cannot be undone."
+    confirmText="Remove"
+    cancelText="Cancel"
+    [danger]="true"
+    (confirm)="onConfirmRemove()"
+    (cancel)="onCancelRemove()"
+  />
+
+  <app-confirm-popup
+    [open]="showMonthlyIncomeMismatchConfirm"
+    title="Possible data mismatch"
+    [message]="monthlyIncomeMismatchMessage"
+    confirmText="Continue anyway"
+    cancelText="Stay and fix"
+    (confirm)="onConfirmMonthlyIncomeMismatchContinue()"
+    (cancel)="onCancelMonthlyIncomeMismatch()"
+  />
 </main>

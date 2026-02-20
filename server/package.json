@@ -11,7 +11,8 @@
     "migrate:seed:lookups": "tsx src/migrate/seed-lookups.ts",
     "migrate:seed:admin": "tsx src/migrate/seed-admin-user.ts",
     "migrate:reset:clean": "tsx src/migrate/reset-clean-fais.ts",
-    "migrate:role:admin-4-to-5": "tsx src/migrate/role-admin-4-to-5.ts"
+    "migrate:role:admin-4-to-5": "tsx src/migrate/role-admin-4-to-5.ts",
+    "migrate:non-marital-names": "tsx src/migrate/update-non-marital-types-names.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -54,3 +54,14 @@
   justify-content: center;
   align-items: center;
 }
+
+/* When profile is embedded in admin/users (editing another user), hide page chrome and align flush left */
+.page.profileEmbedded {
+  margin-left: 0;
+  padding-left: 0;
+  max-width: none;
+}
+
+.mt0 {
+  margin-top: 0;
+}

@@ -1,7 +1,7 @@
 <section class="panel">
   <h2 class="panelTitle">Liabilities</h2>
 
-  <form (ngSubmit)="submit(); ensureDefaults()" class="gridForm">
+  <form (ngSubmit)="submit()" class="gridForm">
     <label>
       Type
       <select name="liabilityTypeId" [(ngModel)]="liabilityTypeId" class="input" (click)="ensureDefaults()">
@@ -36,7 +36,11 @@
     </label>
 
     <div class="rowActions">
-      <button type="submit" [disabled]="busy" class="submit">Add</button>
+      <button *ngIf="!editingId" type="submit" [disabled]="busy" class="submit">Add</button>
+      <ng-container *ngIf="editingId">
+        <button type="button" (click)="cancelEdit()" [disabled]="busy">Cancel</button>
+        <button type="button" (click)="doUpdate($event)" [disabled]="busy" class="submit">Update</button>
+      </ng-container>
     </div>
   </form>
 
@@ -54,7 +58,10 @@
         <td class="td">{{ typeLabel(liabilitiesTypes, l.liabilitiesTypeId) }}</td>
         <td class="td">{{ l.description }}</td>
         <td class="td">{{ l.amountOwed | number:'1.2-2' }}</td>
-        <td class="td"><button type="button" (click)="remove.emit(l.id)" [disabled]="busy" class="mini">Remove</button></td>
+        <td class="td">
+          <button type="button" (click)="startEdit(l)" [disabled]="busy || editingId !== null" class="mini">Edit</button>
+          <button type="button" (click)="remove.emit(l.id)" [disabled]="busy" class="mini">Remove</button>
+        </td>
       </tr>
     </tbody>
   </table>

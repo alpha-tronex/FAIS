@@ -67,9 +67,11 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (users) => {
-          this.users = users;
-          if (!this.selectedUserId && users.length > 0) {
-            this.selectedUserId = users[0]!.id;
+          this.users = users.filter((u) => u.roleTypeId === 1);
+          if (!this.selectedUserId && this.users.length > 0) {
+            this.selectedUserId = this.users[0]!.id;
+          } else if (this.selectedUserId && !this.users.some((u) => u.id === this.selectedUserId)) {
+            this.selectedUserId = this.users[0]?.id ?? null;
           }
           this.selectedCaseId = null;
           void this.loadCasesForSelectedUser();

@@ -23,6 +23,7 @@ import { AffidavitEmploymentSectionComponent } from './pages/affidavit-edit/sect
 import { AffidavitMonthlyLinesSectionComponent } from './pages/affidavit-edit/sections/affidavit-monthly-lines-section.component';
 import { AffidavitAssetsSectionComponent } from './pages/affidavit-edit/sections/affidavit-assets-section.component';
 import { AffidavitLiabilitiesSectionComponent } from './pages/affidavit-edit/sections/affidavit-liabilities-section.component';
+import { ConfirmPopupComponent } from './shared/confirm-popup/confirm-popup.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { AffidavitLiabilitiesSectionComponent } from './pages/affidavit-edit/sec
     AffidavitAssetsSectionComponent,
     AffidavitLiabilitiesSectionComponent,
     AdminPage,
-    AdminAffidavitPage
+    AdminAffidavitPage,
+    ConfirmPopupComponent
   ],
   imports: [BrowserModule, FormsModule, RouterModule.forRoot(routes)],
   providers: [

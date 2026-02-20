@@ -12,7 +12,6 @@ import {
   insertAffidavitRow,
   deleteAffidavitRow,
   patchAffidavitRow,
-  sumMonthlyIncomeForUser,
   listEmploymentRowsForUser
 } from '../lib/affidavit-store.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
@@ -133,6 +132,7 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
     grossAnnualIncomeFromMonthlyIncome: number;
     threshold: number;
     form: 'short' | 'long';
+    monthlyIncomeBreakdown: { typeId: number | null; typeName: string; amount: number; ifOther: string | null }[];
   }> {
     // Threshold basis: derive gross annual from Employment pay rate/frequency.
     const employmentRows = await listEmploymentRowsForUser(userObjectId);
@@ -145,9 +145,30 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
       return sum + payRate * mult;
     }, 0);
 
-    // Also compute MonthlyIncome totals (useful for display/diagnostics and as a fallback).
-    const grossMonthlyIncome = await sumMonthlyIncomeForUser(userObjectId);
+    // Monthly income: total and per-row breakdown for display.
+    const monthlyIncomeRows = await listAffidavitRows('monthlyincome', userScopedFilter(userObjectId));
+    const grossMonthlyIncome = monthlyIncomeRows.reduce((sum: number, r: any) => sum + Number(r?.amount ?? 0), 0);
     const grossAnnualIncomeFromMonthlyIncome = grossMonthlyIncome * 12;
+
+    const incomeTypeRows = await mongoose.connection
+      .collection('lookup_monthly_income_types')
+      .find({})
+      .project({ id: 1, name: 1 })
+      .toArray();
+    const typeNameById = new Map<number, string>();
+    for (const row of incomeTypeRows as any[]) {
+      const id = asFiniteNumber(row?.id);
+      if (id != null && id > 0) typeNameById.set(id, String(row?.name ?? '').trim());
+    }
+    const monthlyIncomeBreakdown = monthlyIncomeRows.map((r: any) => {
+      const typeId = asFiniteNumber(r?.typeId) ?? null;
+      return {
+        typeId,
+        typeName: (typeId != null ? typeNameById.get(typeId) : null) ?? `Type ${typeId ?? '?'}`,
+        amount: Number(r?.amount ?? 0),
+        ifOther: r?.ifOther ?? null
+      };
+    });
 
     const grossAnnualIncome = employmentAnnual;
     const threshold = 50000;
@@ -159,7 +180,8 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
       grossMonthlyIncomeFromMonthlyIncome: grossMonthlyIncome,
       grossAnnualIncomeFromMonthlyIncome,
       threshold,
-      form
+      form,
+      monthlyIncomeBreakdown
     };
   }
 

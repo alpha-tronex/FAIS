@@ -100,7 +100,7 @@
             {{ c.respondent ? ((c.respondent.lastName || '') + ', ' + (c.respondent.firstName || '')) : '' }}
           </td>
           <td class="td">
-            <button type="button" (click)="editCase(c.id)" [disabled]="busy" class="link">Edit</button>
+            <button type="button" (click)="editCase(c.id)" [disabled]="busy" class="submit">Edit</button>
           </td>
         </tr>
       </tbody>

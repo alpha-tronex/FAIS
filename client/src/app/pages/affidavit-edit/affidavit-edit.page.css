@@ -1,0 +1,29 @@
+/* When embedded in admin/affidavit (hideNav=true), remove page padding */
+.page.pageNoPadding {
+  padding: 0;
+}
+
+.stepLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.stepLink:hover {
+  color: var(--accent);
+}
+
+.stepLinkCurrent {
+  font-weight: bold;
+}
+
+.stepDone {
+  color: #16a34a;
+  margin-left: 0.25em;
+  font-weight: bold;
+}
