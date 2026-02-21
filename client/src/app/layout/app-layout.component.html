@@ -1,0 +1,9 @@
+<header *ngIf="showChrome" class="layoutHeader">
+  <app-header></app-header>
+</header>
+<div class="layoutMain">
+  <router-outlet></router-outlet>
+</div>
+<footer *ngIf="showChrome" class="layoutFooter">
+  <app-footer></app-footer>
+</footer>

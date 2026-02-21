@@ -24,10 +24,16 @@ import { AffidavitMonthlyLinesSectionComponent } from './pages/affidavit-edit/se
 import { AffidavitAssetsSectionComponent } from './pages/affidavit-edit/sections/affidavit-assets-section.component';
 import { AffidavitLiabilitiesSectionComponent } from './pages/affidavit-edit/sections/affidavit-liabilities-section.component';
 import { ConfirmPopupComponent } from './shared/confirm-popup/confirm-popup.component';
+import { AppLayoutComponent } from './layout/app-layout.component';
+import { HeaderComponent } from './layout/header/header.component';
+import { FooterComponent } from './layout/footer/footer.component';
 
 @NgModule({
   declarations: [
     App,
+    AppLayoutComponent,
+    HeaderComponent,
+    FooterComponent,
     LoginPage,
     RegisterPage,
     ResetPage,

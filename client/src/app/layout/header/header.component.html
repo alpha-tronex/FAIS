@@ -1,0 +1,23 @@
+<div class="headerBar">
+  <span class="welcome">Welcome{{ userDisplayName ? ', ' + userDisplayName : '' }}</span>
+  <nav class="nav" [attr.aria-label]="showAdminNav ? 'Admin' : 'Main'">
+    <ng-container *ngIf="showAdminNav">
+      <a routerLink="/admin/users" class="navLink" routerLinkActive="navLinkActive" [routerLinkActiveOptions]="{ exact: true }">Users</a>
+      <span class="sep">|</span>
+      <a routerLink="/admin/cases" class="navLink" routerLinkActive="navLinkActive">Cases</a>
+      <span class="sep">|</span>
+      <a routerLink="/admin/affidavit" class="navLink" routerLinkActive="navLinkActive">Affidavit</a>
+    </ng-container>
+    <ng-container *ngIf="!showAdminNav">
+      <a routerLink="/my-cases" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive" [routerLinkActiveOptions]="{ exact: true }">My cases</a>
+      <span class="sep">|</span>
+      <a [routerLink]="['/affidavit']" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive">Affidavit</a>
+      <span class="sep">|</span>
+      <a [routerLink]="['/affidavit/edit']" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive">Edit data</a>
+      <span class="sep">|</span>
+      <a [routerLink]="['/profile']" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive">Profile</a>
+    </ng-container>
+    <span class="sep">|</span>
+    <button type="button" class="navBtn link" (click)="logout()">Logout</button>
+  </nav>
+</div>

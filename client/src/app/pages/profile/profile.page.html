@@ -5,14 +5,6 @@
     Editing user: <strong>{{ uname }}</strong>
   </p>
 
-  <nav *ngIf="!editingUserId" class="mt16">
-    <a routerLink="/my-cases" class="link">My cases</a>
-    <span class="sep">|</span>
-    <a [routerLink]="['/affidavit']" [queryParams]="navQueryParams()" class="link">Affidavit</a>
-    <span class="sep">|</span>
-    <a (click)="logout()" class="link">Logout</a>
-  </nav>
-
   <section class="panel mt16" [class.mt0]="editingUserId">
     <h2 class="panelTitle">Your information</h2>
 

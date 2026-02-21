@@ -50,6 +50,7 @@
         <th class="th">Type</th>
         <th class="th">Description</th>
         <th class="th">Value</th>
+        <th class="th">Party</th>
         <th class="th"></th>
       </tr>
     </thead>
@@ -58,6 +59,7 @@
         <td class="td">{{ typeLabel(assetsTypes, a.assetsTypeId) }}</td>
         <td class="td">{{ a.description }}</td>
         <td class="td">{{ a.marketValue | number:'1.2-2' }}</td>
+        <td class="td">{{ typeLabel(nonMaritalTypes, a.nonMaritalTypeId) || '—' }}</td>
         <td class="td">
           <button type="button" (click)="startEdit(a)" [disabled]="busy || editingId !== null" class="mini">Edit</button>
           <button type="button" (click)="remove.emit(a.id)" [disabled]="busy" class="mini">Remove</button>

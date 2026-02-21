@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, finalize, forkJoin, from } from 'rxjs';
+import { Subscription, finalize, forkJoin, from, map, of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitDataService, AssetRow, EmploymentRow, LiabilityRow, MonthlyLineRow } from '../../services/affidavit-data.service';
 import { LookupsService, LookupItem } from '../../services/lookups.service';
@@ -70,6 +70,10 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   /** When set, user clicked Next on Monthly income but employment vs type-1 salary mismatch. */
   showMonthlyIncomeMismatchConfirm = false;
   monthlyIncomeMismatchMessage = '';
+
+  /** When set, user checked "I have nothing to report" but step has data; confirm before clearing. */
+  showNoneConfirm = false;
+  pendingNoneStepKey: (typeof this.steps)[number]['key'] | null = null;
 
   subscription: Subscription | null = null;
 
@@ -164,6 +168,119 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
         this.syncCurrentStepKey();
       }, 0);
     }
+  }
+
+  /** True if the step has at least one row of data. */
+  stepHasData(stepKey: (typeof this.steps)[number]['key']): boolean {
+    switch (stepKey) {
+      case 'employment':
+        return this.employment.length > 0;
+      case 'monthlyIncome':
+        return this.monthlyIncome.length > 0;
+      case 'monthlyDeductions':
+        return this.monthlyDeductions.length > 0;
+      case 'monthlyHouseholdExpenses':
+        return this.monthlyHouseholdExpenses.length > 0;
+      case 'assets':
+        return this.assets.length > 0;
+      case 'liabilities':
+        return this.liabilities.length > 0;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Called when the "I have nothing to report" checkbox changes.
+   * If checking and step has data, show confirm; otherwise update state directly.
+   */
+  onNoneCheckboxChange(value: boolean): void {
+    const stepKey = this.currentStepKey;
+    if (!value) {
+      this.setNoneForStep(stepKey, false);
+      return;
+    }
+    if (!this.stepHasData(stepKey)) {
+      this.setNoneForStep(stepKey, true);
+      return;
+    }
+    this.pendingNoneStepKey = stepKey;
+    this.showNoneConfirm = true;
+  }
+
+  noneConfirmTitle(): string {
+    const key = this.pendingNoneStepKey ?? this.currentStepKey;
+    const stepTitle = this.steps.find((s) => s.key === key)?.title ?? 'this section';
+    return `Clear all ${stepTitle} data?`;
+  }
+
+  noneConfirmMessage(): string {
+    const key = this.pendingNoneStepKey ?? this.currentStepKey;
+    const stepTitle = this.steps.find((s) => s.key === key)?.title ?? 'this section';
+    return `You have data in ${stepTitle}. Checking "I have nothing to report" will remove all of it. This cannot be undone.`;
+  }
+
+  onConfirmNoneReport(): void {
+    const stepKey = this.pendingNoneStepKey;
+    this.showNoneConfirm = false;
+    this.pendingNoneStepKey = null;
+    if (!stepKey) return;
+
+    this.busy = true;
+    this.error = null;
+    this.subscription?.unsubscribe();
+
+    const uid = this.userId || undefined;
+
+    const deleteAll$ =
+      stepKey === 'employment'
+        ? this.employment.length === 0
+          ? of(undefined)
+          : forkJoin(this.employment.map((e) => from(this.api.deleteEmployment(e.id, uid)))).pipe(map(() => undefined))
+        : stepKey === 'monthlyIncome'
+          ? this.monthlyIncome.length === 0
+            ? of(undefined)
+            : forkJoin(this.monthlyIncome.map((r) => from(this.api.deleteMonthlyIncome(r.id, uid)))).pipe(map(() => undefined))
+          : stepKey === 'monthlyDeductions'
+            ? this.monthlyDeductions.length === 0
+              ? of(undefined)
+              : forkJoin(this.monthlyDeductions.map((r) => from(this.api.deleteMonthlyDeductions(r.id, uid)))).pipe(map(() => undefined))
+            : stepKey === 'monthlyHouseholdExpenses'
+              ? this.monthlyHouseholdExpenses.length === 0
+                ? of(undefined)
+                : forkJoin(this.monthlyHouseholdExpenses.map((r) => from(this.api.deleteMonthlyHouseholdExpenses(r.id, uid)))).pipe(
+                    map(() => undefined)
+                  )
+              : stepKey === 'assets'
+                ? this.assets.length === 0
+                  ? of(undefined)
+                  : forkJoin(this.assets.map((a) => from(this.api.deleteAsset(a.id, uid)))).pipe(map(() => undefined))
+                : stepKey === 'liabilities'
+                  ? this.liabilities.length === 0
+                    ? of(undefined)
+                    : forkJoin(this.liabilities.map((l) => from(this.api.deleteLiability(l.id, uid)))).pipe(map(() => undefined))
+                  : of(undefined);
+
+    this.subscription = deleteAll$
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.setNoneForStep(stepKey, true);
+          this.refresh();
+        },
+        error: (e: any) => {
+          this.error = e?.error?.error ?? `Failed to clear ${stepKey} data`;
+        }
+      });
+  }
+
+  onCancelNoneReport(): void {
+    this.showNoneConfirm = false;
+    this.pendingNoneStepKey = null;
   }
 
   noneLabel(stepKey: (typeof this.steps)[number]['key']): string {

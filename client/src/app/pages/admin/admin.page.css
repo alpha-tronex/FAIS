@@ -1,3 +1,8 @@
 .sep {
   margin: 0 8px;
 }
+
+.linkActive {
+  font-weight: 600;
+  color: var(--text);
+}

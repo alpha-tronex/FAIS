@@ -1,0 +1,60 @@
+.headerBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding: 12px 16px;
+  max-width: var(--pageMaxWidth);
+  margin: 0 auto;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 80%, var(--border));
+}
+
+.welcome {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 4px;
+}
+
+.navLink {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font: inherit;
+  padding: 4px 0;
+}
+
+.navLink:hover,
+.navLink.navLinkActive {
+  color: var(--text);
+}
+
+.navBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.navBtn:hover {
+  color: var(--text);
+}
+
+.headerBar .sep {
+  margin: 0 6px;
+  color: var(--muted);
+}

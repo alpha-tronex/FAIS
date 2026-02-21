@@ -5,14 +5,6 @@
     Editing on behalf of userId: <strong>{{ userId }}</strong>
   </p>
 
-  <nav *ngIf="!hideNav" class="mt16">
-    <a (click)="goBack()" class="link">Back to summary</a>
-    <span class="sep">|</span>
-    <a [routerLink]="['/profile']" [queryParams]="caseId ? { caseId } : {}" class="link">Profile</a>
-    <span class="sep">|</span>
-    <a (click)="logout()" class="link">Logout</a>
-  </nav>
-
   <p *ngIf="error" class="error">{{ error }}</p>
 
   <section class="panel mt16">
@@ -27,7 +19,7 @@
         type="checkbox"
         name="noneToReport"
         [ngModel]="currentNoneSelected"
-        (ngModelChange)="setNoneForStep(currentStepKey, $event)"
+        (ngModelChange)="onNoneCheckboxChange($event)"
         [disabled]="busy"
       />
       {{ noneLabel(currentStepKey) }}
@@ -177,5 +169,16 @@
     cancelText="Stay and fix"
     (confirm)="onConfirmMonthlyIncomeMismatchContinue()"
     (cancel)="onCancelMonthlyIncomeMismatch()"
+  />
+
+  <app-confirm-popup
+    [open]="showNoneConfirm"
+    [title]="noneConfirmTitle()"
+    [message]="noneConfirmMessage()"
+    confirmText="Clear data"
+    cancelText="Cancel"
+    [danger]="true"
+    (confirm)="onConfirmNoneReport()"
+    (cancel)="onCancelNoneReport()"
   />
 </main>
