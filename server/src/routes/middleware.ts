@@ -1,5 +1,6 @@
 import type express from 'express';
 import jwt from 'jsonwebtoken';
+import { sendErrorWithMessage } from './error.js';
 
 export type AuthPayload = {
   sub: string;
@@ -24,21 +25,21 @@ function getBearerToken(req: express.Request): string | null {
 export function createAuthMiddlewares(jwtSecret: string): AuthMiddlewares {
   function requireAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
     const token = getBearerToken(req);
-    if (!token) return res.status(401).json({ error: 'Missing token' });
+    if (!token) return sendErrorWithMessage(res, 'Missing token', 401);
 
     try {
       const payload = jwt.verify(token, jwtSecret) as AuthPayload;
       (req as any).auth = payload;
       next();
     } catch {
-      return res.status(401).json({ error: 'Invalid token' });
+      return sendErrorWithMessage(res, 'Invalid token', 401);
     }
   }
 
   function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
     const auth = (req as any).auth as AuthPayload | undefined;
     if (auth?.roleTypeId === 5) return next();
-    return res.status(403).json({ error: 'Forbidden' });
+    return sendErrorWithMessage(res, 'Forbidden', 403);
   }
 
   // Under the simplified role model, the only elevated role is Administrator (5).

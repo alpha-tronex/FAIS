@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { z } from 'zod';
 import { CaseModel, User } from '../models.js';
 import { toUserSummaryDTO } from '../mappers/user.mapper.js';
+import { sendError } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 
 const caseCreateSchema = z.object({
@@ -187,8 +188,8 @@ export function createCasesRouter(
       respondentId = parseOptionalObjectId(parsed.data.respondentId, 'respondentId');
       petitionerAttId = parseOptionalObjectId(parsed.data.petitionerAttId, 'petitionerAttId');
       respondentAttId = parseOptionalObjectId(parsed.data.respondentAttId, 'respondentAttId');
-    } catch (e: any) {
-      return res.status(400).json({ error: e?.message ?? 'Invalid participant id' });
+    } catch (e) {
+      sendError(res, e, 400);
     }
 
     const created = await CaseModel.create({

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type LookupItem = {
   id: number;
@@ -11,7 +12,7 @@ export type LookupItem = {
 
 @Injectable({ providedIn: 'root' })
 export class LookupsService {
-  private readonly apiBase = 'http://localhost:3001';
+  private readonly apiBase = environment.apiUrl;
 
   constructor(private readonly http: HttpClient) {}
 

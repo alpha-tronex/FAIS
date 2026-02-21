@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { getMustResetPassword, getToken, setMustResetPassword, setToken } from '../core/auth.interceptor';
 
 export type LoginResponse = {
@@ -77,7 +78,7 @@ type JwtPayload = {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiBase = 'http://localhost:3001';
+  private readonly apiBase = environment.apiUrl;
 
   constructor(private readonly http: HttpClient) {}
 
