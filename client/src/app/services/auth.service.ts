@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, Observable, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { getMustResetPassword, getToken, setMustResetPassword, setToken } from '../core/auth.interceptor';
 
 export type LoginResponse = {
@@ -148,15 +148,6 @@ export class AuthService {
   isStaffOrAdmin(): boolean {
     // Simplified model: only Administrator has elevated permissions.
     return this.hasRole(5);
-  }
-
-  login$(uname: string, password: string): Observable<LoginResponse>  {
-    return this.http.post<LoginResponse>(`${this.apiBase}/auth/login`, { uname, password }).pipe(
-      tap((res) => {
-        setToken(res.token);
-        setMustResetPassword(Boolean(res.mustResetPassword));
-      })
-    );
   }
 
   async login(uname: string, password: string): Promise<LoginResponse> {

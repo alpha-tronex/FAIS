@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription, finalize } from 'rxjs';
+import { Subscription, finalize, from } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitService } from '../../services/affidavit.service';
 import { CasesService, CaseListItem } from '../../services/cases.service';
@@ -58,8 +58,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     this.error = null;
 
     this.subscription?.unsubscribe();
-    this.subscription = this.usersApi
-      .list()
+    this.subscription = from(this.usersApi.list())
       .pipe(
         finalize(() => {
           this.busy = false;

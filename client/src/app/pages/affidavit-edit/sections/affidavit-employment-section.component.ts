@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { from } from 'rxjs';
 import { AffidavitDataService } from '../../../services/affidavit-data.service';
 import { LookupItem } from '../../../services/lookups.service';
 import { EmploymentRow } from '../../../services/affidavit-data.service';
@@ -92,8 +93,8 @@ export class AffidavitEmploymentSectionComponent {
     if (!Number.isFinite(payFrequencyTypeId) || payFrequencyTypeId < 1) return;
 
     this.updateStart.emit();
-    this.api
-      .patchEmployment(
+    from(
+      this.api.patchEmployment(
         this.editingId,
         {
           name: this.empName.trim(),
@@ -105,7 +106,7 @@ export class AffidavitEmploymentSectionComponent {
         },
         this.userId || undefined
       )
-      .subscribe({
+    ).subscribe({
         next: () => {
           this.updateDone.emit();
           setTimeout(() => this.cancelEdit(), 0);

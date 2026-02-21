@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { from } from 'rxjs';
 import { AffidavitDataService } from '../../../services/affidavit-data.service';
 import { LookupItem } from '../../../services/lookups.service';
 import { MonthlyLineRow } from '../../../services/affidavit-data.service';
@@ -89,13 +90,13 @@ export class AffidavitMonthlyLinesSectionComponent {
 
     if (this.patchType) {
       this.updateStart.emit();
-      const obs =
+      const promise =
         this.patchType === 'monthlyIncome'
           ? this.api.patchMonthlyIncome(id, body, this.userId || undefined)
           : this.patchType === 'monthlyDeductions'
             ? this.api.patchMonthlyDeductions(id, body, this.userId || undefined)
             : this.api.patchMonthlyHouseholdExpenses(id, body, this.userId || undefined);
-      obs.subscribe({
+      from(promise).subscribe({
         next: () => {
           this.updateDone.emit();
           setTimeout(() => this.cancelEdit(), 0);

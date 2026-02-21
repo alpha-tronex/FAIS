@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 import { AuthService, type MeResponse, type UpdateMeRequest } from '../../services/auth.service';
 import { LookupsService, LookupItem } from '../../services/lookups.service';
 import { RoleTypesService, type RoleTypeItem } from '../../services/user-types.service';
@@ -83,7 +82,7 @@ export class ProfilePage implements OnInit {
         await this.loadRoleTypes();
       }
 			const me = this.editingUserId
-				? await firstValueFrom(this.usersApi.get(this.editingUserId))
+				? await this.usersApi.get(this.editingUserId)
 				: await this.auth.me();
 			this.applyMe(me as unknown as MeResponse);
     } catch (e: any) {
@@ -159,7 +158,7 @@ export class ProfilePage implements OnInit {
     this.busy = true;
     try {
 				const res = this.editingUserId
-					? await firstValueFrom(this.usersApi.getSsn(this.editingUserId))
+					? await this.usersApi.getSsn(this.editingUserId)
 					: await this.auth.mySsn();
       this.ssnFull = res.ssn;
       if (res.ssnLast4) this.ssnLast4 = res.ssnLast4;
@@ -219,12 +218,10 @@ export class ProfilePage implements OnInit {
       };
 
       const updated = this.editingUserId
-				? await firstValueFrom(
-						this.usersApi.update(this.editingUserId, {
-							...meReq,
-							roleTypeId: Number(this.roleTypeId) || undefined
-						})
-					)
+				? await this.usersApi.update(this.editingUserId, {
+						...meReq,
+						roleTypeId: Number(this.roleTypeId) || undefined
+					})
 				: await this.auth.updateMe(meReq);
 			this.applyMe(updated as unknown as MeResponse);
       this.profileSaved = true;
@@ -265,7 +262,7 @@ export class ProfilePage implements OnInit {
       }
 
       const updated = this.editingUserId
-				? await firstValueFrom(this.usersApi.updateSsn(this.editingUserId, { ssn, confirmSsn }))
+				? await this.usersApi.updateSsn(this.editingUserId, { ssn, confirmSsn })
 				: await this.auth.updateMySsn({ ssn, confirmSsn });
 			this.applyMe(updated as unknown as MeResponse);
     } catch (e: any) {

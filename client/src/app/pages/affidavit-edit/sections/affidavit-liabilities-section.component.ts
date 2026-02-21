@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { from } from 'rxjs';
 import { AffidavitDataService } from '../../../services/affidavit-data.service';
 import { LookupItem } from '../../../services/lookups.service';
 import { LiabilityRow } from '../../../services/affidavit-data.service';
@@ -77,8 +78,8 @@ export class AffidavitLiabilitiesSectionComponent {
     if (!Number.isFinite(liabilitiesTypeId) || liabilitiesTypeId < 1) return;
 
     this.updateStart.emit();
-    this.api
-      .patchLiability(
+    from(
+      this.api.patchLiability(
         this.editingId,
         {
           liabilitiesTypeId,
@@ -89,7 +90,7 @@ export class AffidavitLiabilitiesSectionComponent {
         },
         this.userId || undefined
       )
-      .subscribe({
+    ).subscribe({
         next: () => {
           this.updateDone.emit();
           setTimeout(() => this.cancelEdit(), 0);

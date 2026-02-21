@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 export type EmploymentRow = {
   id: string;
@@ -62,7 +62,7 @@ export class AffidavitDataService {
     return await firstValueFrom(this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/employment/${id}${this.qp(userId)}`));
   }
 
-  patchEmployment(
+  async patchEmployment(
     id: string,
     req: Partial<{
       name: string;
@@ -73,8 +73,8 @@ export class AffidavitDataService {
       retired: boolean;
     }>,
     userId?: string
-  ): Observable<{ ok: boolean }> {
-    return this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/employment/${id}${this.qp(userId)}`, req);
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/employment/${id}${this.qp(userId)}`, req));
   }
 
   async listMonthlyIncome(userId?: string): Promise<MonthlyLineRow[]> {
@@ -89,23 +89,17 @@ export class AffidavitDataService {
     return await firstValueFrom(this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-income/${id}${this.qp(userId)}`));
   }
 
-  patchMonthlyIncome(
-    id: string,
-    req: { typeId?: number; amount?: number; ifOther?: string | null },
-    userId?: string
-  ): Observable<{ ok: boolean }> {
-    return this.http.patch<{ ok: boolean }>(
-      `${this.apiBase}/affidavit/monthly-income/${id}${this.qp(userId)}`,
-      req
-    );
-  }
-
-  async patchMonthlyIncomeAsync(
+  async patchMonthlyIncome(
     id: string,
     req: { typeId?: number; amount?: number; ifOther?: string | null },
     userId?: string
   ): Promise<{ ok: boolean }> {
-    return await firstValueFrom(this.patchMonthlyIncome(id, req, userId));
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-income/${id}${this.qp(userId)}`,
+        req
+      )
+    );
   }
 
   async listMonthlyDeductions(userId?: string): Promise<MonthlyLineRow[]> {
@@ -120,14 +114,16 @@ export class AffidavitDataService {
     return await firstValueFrom(this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-deductions/${id}${this.qp(userId)}`));
   }
 
-  patchMonthlyDeductions(
+  async patchMonthlyDeductions(
     id: string,
     req: { typeId?: number; amount?: number; ifOther?: string | null },
     userId?: string
-  ): Observable<{ ok: boolean }> {
-    return this.http.patch<{ ok: boolean }>(
-      `${this.apiBase}/affidavit/monthly-deductions/${id}${this.qp(userId)}`,
-      req
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-deductions/${id}${this.qp(userId)}`,
+        req
+      )
     );
   }
 
@@ -147,14 +143,16 @@ export class AffidavitDataService {
     );
   }
 
-  patchMonthlyHouseholdExpenses(
+  async patchMonthlyHouseholdExpenses(
     id: string,
     req: { typeId?: number; amount?: number; ifOther?: string | null },
     userId?: string
-  ): Observable<{ ok: boolean }> {
-    return this.http.patch<{ ok: boolean }>(
-      `${this.apiBase}/affidavit/monthly-household-expenses/${id}${this.qp(userId)}`,
-      req
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-household-expenses/${id}${this.qp(userId)}`,
+        req
+      )
     );
   }
 
@@ -173,7 +171,7 @@ export class AffidavitDataService {
     return await firstValueFrom(this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/assets/${id}${this.qp(userId)}`));
   }
 
-  patchAsset(
+  async patchAsset(
     id: string,
     req: Partial<{
       assetsTypeId: number;
@@ -183,8 +181,8 @@ export class AffidavitDataService {
       judgeAward: boolean;
     }>,
     userId?: string
-  ): Observable<{ ok: boolean }> {
-    return this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/assets/${id}${this.qp(userId)}`, req);
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/assets/${id}${this.qp(userId)}`, req));
   }
 
   async listLiabilities(userId?: string): Promise<LiabilityRow[]> {
@@ -202,7 +200,7 @@ export class AffidavitDataService {
     return await firstValueFrom(this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/liabilities/${id}${this.qp(userId)}`));
   }
 
-  patchLiability(
+  async patchLiability(
     id: string,
     req: Partial<{
       liabilitiesTypeId: number;
@@ -212,7 +210,7 @@ export class AffidavitDataService {
       userOwes: boolean;
     }>,
     userId?: string
-  ): Observable<{ ok: boolean }> {
-    return this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/liabilities/${id}${this.qp(userId)}`, req);
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/liabilities/${id}${this.qp(userId)}`, req));
   }
 }

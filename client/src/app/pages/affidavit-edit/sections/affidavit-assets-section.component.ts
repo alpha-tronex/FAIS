@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { from } from 'rxjs';
 import { AffidavitDataService } from '../../../services/affidavit-data.service';
 import { LookupItem } from '../../../services/lookups.service';
 import { AssetRow } from '../../../services/affidavit-data.service';
@@ -85,8 +86,8 @@ export class AffidavitAssetsSectionComponent implements OnChanges {
     if (!Number.isFinite(typeId) || typeId < 1) return;
 
     this.updateStart.emit();
-    this.api
-      .patchAsset(
+    from(
+      this.api.patchAsset(
         this.editingId,
         {
           assetsTypeId: typeId,
@@ -97,7 +98,7 @@ export class AffidavitAssetsSectionComponent implements OnChanges {
         },
         this.userId || undefined
       )
-      .subscribe({
+    ).subscribe({
         next: () => {
           this.updateDone.emit();
           setTimeout(() => this.cancelEdit(), 0);

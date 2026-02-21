@@ -20,26 +20,25 @@ export class LoginPage {
     private readonly router: Router
   ) {}
 
-  onSubmit() {
+  async onSubmit() {
     if (this.busy) return;
 
     this.busy = true;
     this.error = null;
 
-    this.auth.login$(this.uname.trim(), this.password).subscribe({
-      next: (res) => {
-        if (res.mustResetPassword) {
-          this.router.navigateByUrl('/register');
-        } else if (res.user?.roleTypeId === 5) {
-          this.router.navigateByUrl('/admin');
-        } else {
-          this.router.navigateByUrl('/my-cases');
-        }
-      },
-      error: (e) => {
-        this.error = e?.error?.error ?? 'Login failed';
-        this.busy = false;
+    try {
+      const res = await this.auth.login(this.uname.trim(), this.password);
+      if (res.mustResetPassword) {
+        this.router.navigateByUrl('/register');
+      } else if (res.user?.roleTypeId === 5) {
+        this.router.navigateByUrl('/admin');
+      } else {
+        this.router.navigateByUrl('/my-cases');
       }
-    });
+    } catch (e: unknown) {
+      this.error = (e as { error?: { error?: string } })?.error?.error ?? 'Login failed';
+    } finally {
+      this.busy = false;
+    }
   }
 }

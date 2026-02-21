@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 export type UserListItem = {
   id: string;
@@ -61,27 +61,27 @@ export class UsersService {
 
   constructor(private readonly http: HttpClient) {}
 
-  list(): Observable<UserListItem[]> {
-    return this.http.get<UserListItem[]>(`${this.apiBase}/users`);
+  async list(): Promise<UserListItem[]> {
+    return await firstValueFrom(this.http.get<UserListItem[]>(`${this.apiBase}/users`));
   }
 
-  get(id: string): Observable<UserListItem> {
-    return this.http.get<UserListItem>(`${this.apiBase}/users/${id}`);
+  async get(id: string): Promise<UserListItem> {
+    return await firstValueFrom(this.http.get<UserListItem>(`${this.apiBase}/users/${id}`));
   }
 
-  create(req: CreateUserRequest): Observable<CreateUserResponse> {
-    return this.http.post<CreateUserResponse>(`${this.apiBase}/users`, req);
+  async create(req: CreateUserRequest): Promise<CreateUserResponse> {
+    return await firstValueFrom(this.http.post<CreateUserResponse>(`${this.apiBase}/users`, req));
   }
 
-  update(id: string, req: UpdateUserRequest): Observable<UserListItem> {
-    return this.http.patch<UserListItem>(`${this.apiBase}/users/${id}`, req);
+  async update(id: string, req: UpdateUserRequest): Promise<UserListItem> {
+    return await firstValueFrom(this.http.patch<UserListItem>(`${this.apiBase}/users/${id}`, req));
   }
 
-  getSsn(id: string): Observable<UserSsnResponse> {
-    return this.http.get<UserSsnResponse>(`${this.apiBase}/users/${id}/ssn`);
+  async getSsn(id: string): Promise<UserSsnResponse> {
+    return await firstValueFrom(this.http.get<UserSsnResponse>(`${this.apiBase}/users/${id}/ssn`));
   }
 
-  updateSsn(id: string, req: UpdateUserSsnRequest): Observable<UserListItem> {
-    return this.http.patch<UserListItem>(`${this.apiBase}/users/${id}/ssn`, req);
+  async updateSsn(id: string, req: UpdateUserSsnRequest): Promise<UserListItem> {
+    return await firstValueFrom(this.http.patch<UserListItem>(`${this.apiBase}/users/${id}/ssn`, req));
   }
 }

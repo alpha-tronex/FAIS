@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription, finalize, switchMap } from 'rxjs';
+import { Subscription, finalize, from, switchMap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { RoleTypesService, type RoleTypeItem } from '../../services/user-types.service';
 import { UsersService, type UpdateUserRequest, UserListItem } from '../../services/users.service';
@@ -64,8 +64,7 @@ export class UsersPage implements OnInit, OnDestroy {
         // role types are used for display only; keep page usable if unavailable
       });
 
-    this.subscription = this.usersApi
-      .list()
+    this.subscription = from(this.usersApi.list())
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -113,10 +112,9 @@ export class UsersPage implements OnInit, OnDestroy {
       lastName: this.lastName.trim() || undefined
     };
 
-    this.subscription = this.usersApi
-      .create(req)
+    this.subscription = from(this.usersApi.create(req))
       .pipe(
-        switchMap((res) => {
+        switchMap(() => {
           this.success = 'User created.';
           this.uname = '';
           this.email = '';
@@ -124,7 +122,7 @@ export class UsersPage implements OnInit, OnDestroy {
           this.showPassword = false;
           this.firstName = '';
           this.lastName = '';
-          return this.usersApi.list();
+          return from(this.usersApi.list());
         }),
         finalize(() => {
           this.busy = false;
@@ -182,8 +180,7 @@ export class UsersPage implements OnInit, OnDestroy {
       roleTypeId: undefined
     };
 
-    this.subscription = this.usersApi
-      .update(this.editingUserId, req)
+    this.subscription = from(this.usersApi.update(this.editingUserId, req))
       .pipe(
         switchMap(() => {
           this.success = 'User saved.';
@@ -192,7 +189,7 @@ export class UsersPage implements OnInit, OnDestroy {
           this.email = '';
           this.firstName = '';
           this.lastName = '';
-          return this.usersApi.list();
+          return from(this.usersApi.list());
         }),
         finalize(() => {
           this.busy = false;

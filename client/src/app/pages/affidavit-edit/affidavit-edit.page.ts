@@ -661,8 +661,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     }
 
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = this.api
-      .patchMonthlyIncome(payload.id, body, this.userId || undefined)
+    this.subscription = from(
+      this.api.patchMonthlyIncome(payload.id, body, this.userId || undefined)
+    )
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -732,8 +733,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     }
 
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = this.api
-      .patchMonthlyDeductions(payload.id, body, this.userId || undefined)
+    this.subscription = from(
+      this.api.patchMonthlyDeductions(payload.id, body, this.userId || undefined)
+    )
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -803,8 +805,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     }
 
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = this.api
-      .patchMonthlyHouseholdExpenses(payload.id, body, this.userId || undefined)
+    this.subscription = from(
+      this.api.patchMonthlyHouseholdExpenses(payload.id, body, this.userId || undefined)
+    )
       .pipe(
         finalize(() => {
           this.busy = false;

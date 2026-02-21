@@ -103,7 +103,7 @@ export class CasesPage implements OnInit, OnDestroy {
       console.log('this.cases', this.cases);
 
     return forkJoin({
-      users: this.usersApi.list(),
+      users: from(this.usersApi.list()),
       cases: from(this.casesApi.list()),
       circuits: from(this.lookups.list('circuits')),
       counties: from(this.lookups.list('counties')),
