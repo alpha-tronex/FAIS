@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI: string = process.env.MONGODB_URI ?? '';
 if (!MONGODB_URI) {
   throw new Error('Missing MONGODB_URI');
 }
