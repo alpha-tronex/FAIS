@@ -14,6 +14,7 @@ export type CaseListItem = {
   circuitId?: number;
   countyId?: number;
   numChildren?: number;
+  childSupportWorksheetFiled?: boolean;
   formTypeId?: number;
   createdAt: string | null;
 };
@@ -25,6 +26,7 @@ export type CaseDetail = {
   circuitId?: number;
   countyId?: number;
   numChildren?: number;
+  childSupportWorksheetFiled?: boolean;
   formTypeId?: number;
   petitionerId: string | null;
   respondentId: string | null;
@@ -37,6 +39,8 @@ export type CreateCaseRequest = {
   division: string;
   circuitId: number;
   countyId: number;
+  numChildren?: number;
+  childSupportWorksheetFiled?: boolean;
   petitionerId?: string;
   respondentId?: string;
   petitionerAttId?: string;

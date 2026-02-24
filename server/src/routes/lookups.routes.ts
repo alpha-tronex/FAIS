@@ -40,6 +40,12 @@ export function createLookupsRouter(auth: Pick<AuthMiddlewares, 'requireAuth'>):
       'monthly-income-types': 'lookup_monthly_income_types',
       'monthly-deduction-types': 'lookup_monthly_deduction_types',
       'monthly-household-expense-types': 'lookup_monthly_household_expense_types',
+      'monthly-automobile-expense-types': 'lookup_monthly_automobile_expense_types',
+      'monthly-children-expense-types': 'lookup_monthly_children_expense_types',
+      'monthly-children-other-expense-types': 'lookup_monthly_children_other_expense_types',
+      'monthly-creditors-expense-types': 'lookup_monthly_creditors_expense_types',
+      'monthly-insurance-expense-types': 'lookup_monthly_insurance_expense_types',
+      'monthly-other-expense-types': 'lookup_monthly_other_expense_types',
       'assets-types': 'lookup_assets_types',
       'liabilities-types': 'lookup_liabilities_types',
       'non-marital-types': 'lookup_non_marital_types'

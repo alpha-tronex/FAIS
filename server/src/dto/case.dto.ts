@@ -7,6 +7,7 @@ export type CaseListItemDTO = {
   circuitId?: number;
   countyId?: number;
   numChildren?: number;
+  childSupportWorksheetFiled?: boolean;
   formTypeId?: number;
   petitioner: UserSummaryDTO | null;
   respondent: UserSummaryDTO | null;
@@ -22,6 +23,7 @@ export type CaseDTO = {
   circuitId?: number;
   countyId?: number;
   numChildren?: number;
+  childSupportWorksheetFiled?: boolean;
   formTypeId?: number;
   petitionerId: string | null;
   respondentId: string | null;

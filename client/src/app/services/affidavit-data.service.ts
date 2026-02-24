@@ -38,6 +38,22 @@ export type LiabilityRow = {
   userOwes: boolean;
 };
 
+export type ContingentAssetRow = {
+  id: string;
+  description: string;
+  possibleValue: number;
+  nonMaritalTypeId: number | null;
+  judgeAward: boolean;
+};
+
+export type ContingentLiabilityRow = {
+  id: string;
+  description: string;
+  possibleAmountOwed: number;
+  nonMaritalTypeId: number | null;
+  userOwes: boolean;
+};
+
 @Injectable({ providedIn: 'root' })
 export class AffidavitDataService {
   private readonly apiBase = environment.apiUrl;
@@ -157,6 +173,189 @@ export class AffidavitDataService {
     );
   }
 
+  async listMonthlyAutomobileExpenses(userId?: string): Promise<MonthlyLineRow[]> {
+    return await firstValueFrom(this.http.get<MonthlyLineRow[]>(`${this.apiBase}/affidavit/monthly-automobile-expenses${this.qp(userId)}`));
+  }
+
+  async createMonthlyAutomobileExpenses(req: { typeId: number; amount: number; ifOther?: string }, userId?: string): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/monthly-automobile-expenses${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteMonthlyAutomobileExpenses(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-automobile-expenses/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchMonthlyAutomobileExpenses(
+    id: string,
+    req: { typeId?: number; amount?: number; ifOther?: string | null },
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-automobile-expenses/${id}${this.qp(userId)}`,
+        req
+      )
+    );
+  }
+
+  async listMonthlyChildrenExpenses(userId?: string): Promise<MonthlyLineRow[]> {
+    return await firstValueFrom(this.http.get<MonthlyLineRow[]>(`${this.apiBase}/affidavit/monthly-children-expenses${this.qp(userId)}`));
+  }
+
+  async createMonthlyChildrenExpenses(req: { typeId: number; amount: number; ifOther?: string }, userId?: string): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/monthly-children-expenses${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteMonthlyChildrenExpenses(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-children-expenses/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchMonthlyChildrenExpenses(
+    id: string,
+    req: { typeId?: number; amount?: number; ifOther?: string | null },
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-children-expenses/${id}${this.qp(userId)}`,
+        req
+      )
+    );
+  }
+
+  async listMonthlyChildrenOtherExpenses(userId?: string): Promise<MonthlyLineRow[]> {
+    return await firstValueFrom(
+      this.http.get<MonthlyLineRow[]>(`${this.apiBase}/affidavit/monthly-children-other-expenses${this.qp(userId)}`)
+    );
+  }
+
+  async createMonthlyChildrenOtherExpenses(
+    req: { typeId: number; amount: number; ifOther?: string },
+    userId?: string
+  ): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/monthly-children-other-expenses${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteMonthlyChildrenOtherExpenses(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-children-other-expenses/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchMonthlyChildrenOtherExpenses(
+    id: string,
+    req: { typeId?: number; amount?: number; ifOther?: string | null },
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-children-other-expenses/${id}${this.qp(userId)}`,
+        req
+      )
+    );
+  }
+
+  async listMonthlyCreditorsExpenses(userId?: string): Promise<MonthlyLineRow[]> {
+    return await firstValueFrom(this.http.get<MonthlyLineRow[]>(`${this.apiBase}/affidavit/monthly-creditors-expenses${this.qp(userId)}`));
+  }
+
+  async createMonthlyCreditorsExpenses(req: { typeId: number; amount: number; ifOther?: string }, userId?: string): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/monthly-creditors-expenses${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteMonthlyCreditorsExpenses(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-creditors-expenses/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchMonthlyCreditorsExpenses(
+    id: string,
+    req: { typeId?: number; amount?: number; ifOther?: string | null },
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-creditors-expenses/${id}${this.qp(userId)}`,
+        req
+      )
+    );
+  }
+
+  async listMonthlyInsuranceExpenses(userId?: string): Promise<MonthlyLineRow[]> {
+    return await firstValueFrom(
+      this.http.get<MonthlyLineRow[]>(`${this.apiBase}/affidavit/monthly-insurance-expenses${this.qp(userId)}`)
+    );
+  }
+
+  async createMonthlyInsuranceExpenses(req: { typeId: number; amount: number; ifOther?: string }, userId?: string): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/monthly-insurance-expenses${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteMonthlyInsuranceExpenses(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-insurance-expenses/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchMonthlyInsuranceExpenses(
+    id: string,
+    req: { typeId?: number; amount?: number; ifOther?: string | null },
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-insurance-expenses/${id}${this.qp(userId)}`,
+        req
+      )
+    );
+  }
+
+  async listMonthlyOtherExpenses(userId?: string): Promise<MonthlyLineRow[]> {
+    return await firstValueFrom(
+      this.http.get<MonthlyLineRow[]>(`${this.apiBase}/affidavit/monthly-other-expenses${this.qp(userId)}`)
+    );
+  }
+
+  async createMonthlyOtherExpenses(req: { typeId: number; amount: number; ifOther?: string }, userId?: string): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/monthly-other-expenses${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteMonthlyOtherExpenses(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/monthly-other-expenses/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchMonthlyOtherExpenses(
+    id: string,
+    req: { typeId?: number; amount?: number; ifOther?: string | null },
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/monthly-other-expenses/${id}${this.qp(userId)}`,
+        req
+      )
+    );
+  }
+
   async listAssets(userId?: string): Promise<AssetRow[]> {
     return await firstValueFrom(this.http.get<AssetRow[]>(`${this.apiBase}/affidavit/assets${this.qp(userId)}`));
   }
@@ -213,5 +412,90 @@ export class AffidavitDataService {
     userId?: string
   ): Promise<{ ok: boolean }> {
     return await firstValueFrom(this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/liabilities/${id}${this.qp(userId)}`, req));
+  }
+
+  async listContingentAssets(userId?: string): Promise<ContingentAssetRow[]> {
+    return await firstValueFrom(
+      this.http.get<ContingentAssetRow[]>(`${this.apiBase}/affidavit/contingent-assets${this.qp(userId)}`)
+    );
+  }
+
+  async createContingentAsset(
+    req: {
+      description: string;
+      possibleValue: number;
+      nonMaritalTypeId?: number | null;
+      judgeAward?: boolean;
+    },
+    userId?: string
+  ): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/contingent-assets${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteContingentAsset(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/contingent-assets/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchContingentAsset(
+    id: string,
+    req: Partial<{
+      description: string;
+      possibleValue: number;
+      nonMaritalTypeId?: number | null;
+      judgeAward?: boolean;
+    }>,
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(`${this.apiBase}/affidavit/contingent-assets/${id}${this.qp(userId)}`, req)
+    );
+  }
+
+  async listContingentLiabilities(userId?: string): Promise<ContingentLiabilityRow[]> {
+    return await firstValueFrom(
+      this.http.get<ContingentLiabilityRow[]>(`${this.apiBase}/affidavit/contingent-liabilities${this.qp(userId)}`)
+    );
+  }
+
+  async createContingentLiability(
+    req: {
+      description: string;
+      possibleAmountOwed: number;
+      nonMaritalTypeId?: number | null;
+      userOwes?: boolean;
+    },
+    userId?: string
+  ): Promise<{ id: string }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string }>(`${this.apiBase}/affidavit/contingent-liabilities${this.qp(userId)}`, req)
+    );
+  }
+
+  async deleteContingentLiability(id: string, userId?: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.delete<{ ok: boolean }>(`${this.apiBase}/affidavit/contingent-liabilities/${id}${this.qp(userId)}`)
+    );
+  }
+
+  async patchContingentLiability(
+    id: string,
+    req: Partial<{
+      description: string;
+      possibleAmountOwed: number;
+      nonMaritalTypeId?: number | null;
+      userOwes?: boolean;
+    }>,
+    userId?: string
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(
+        `${this.apiBase}/affidavit/contingent-liabilities/${id}${this.qp(userId)}`,
+        req
+      )
+    );
   }
 }

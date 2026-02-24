@@ -26,6 +26,8 @@ export type CreateUserRequest = {
   password: string;
   firstName?: string;
   lastName?: string;
+  /** When true, server sends invitation email so the user can log in and change password. */
+  sendInviteEmail?: boolean;
 };
 
 export type CreateUserResponse = {

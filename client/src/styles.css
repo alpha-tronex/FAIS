@@ -39,8 +39,8 @@
 	--tdPaddingY: 7px;
 	--tdPaddingX: 10px;
 
-	--bg: #ffffff;
-	--surface: #fbfdff;
+	--bg: #f5f5f4;
+	--surface: #fafaf8;
 	--text: #0b1220;
 	--muted: #475569;
 	--border: #dbe2ea;
@@ -49,7 +49,7 @@
 	--danger: #dc2626;
 	--focus: color-mix(in srgb, var(--accent) 25%, transparent);
 	--panelBorderWidth: 1px;
-	--tableHeaderBg: #ffffff;
+	--tableHeaderBg: #fafaf8;
 }
 
 /* Option A - Clean Gov/Admin */
@@ -58,8 +58,8 @@ html[data-theme='a'] {
 	--pageMaxWidth: 1024px;
 	--pageMarginY: 36px;
 
-	--bg: #f7f8fa;
-	--surface: #ffffff;
+	--bg: #f2f2f1;
+	--surface: #fafaf9;
 	--text: #111827;
 	--muted: #6b7280;
 	--border: #e5e7eb;
@@ -69,7 +69,7 @@ html[data-theme='a'] {
 	--focus: color-mix(in srgb, var(--accent) 25%, transparent);
 	--panelBorderWidth: 1px;
 	--tableBorderWidth: 1px;
-	--tableHeaderBg: #fafbfc;
+	--tableHeaderBg: #f8f8f7;
 }
 
 /* Option B - Compact Data Grid */
@@ -85,8 +85,8 @@ html[data-theme='b'] {
 	--controlFontSize: 0.9rem;
 	--buttonFontWeight: 600;
 
-	--bg: #ffffff;
-	--surface: #fbfdff;
+	--bg: #f5f5f4;
+	--surface: #fafaf8;
 	--text: #0b1220;
 	--muted: #475569;
 	--border: #dbe2ea;
@@ -96,7 +96,7 @@ html[data-theme='b'] {
 	--focus: color-mix(in srgb, var(--accent) 25%, transparent);
 	--panelBorderWidth: 1px;
 	--tableBorderWidth: 1px;
-	--tableHeaderBg: #ffffff;
+	--tableHeaderBg: #fafaf8;
 }
 
 /* Option C - High Contrast */
@@ -105,8 +105,8 @@ html[data-theme='c'] {
 	--pageMaxWidth: 980px;
 	--pageMarginY: 28px;
 
-	--bg: #ffffff;
-	--surface: #ffffff;
+	--bg: #f0f0ef;
+	--surface: #f5f5f4;
 	--text: #000000;
 	--muted: #1f2937;
 	--border: #111827;
@@ -116,7 +116,7 @@ html[data-theme='c'] {
 	--focus: #ffbf47;
 	--panelBorderWidth: 2px;
 	--tableBorderWidth: 2px;
-	--tableHeaderBg: #f3f4f6;
+	--tableHeaderBg: #f5f5f4;
 }
 
 html,
@@ -190,7 +190,7 @@ h2 {
 	height: var(--controlHeight);
 	padding: var(--controlPaddingY) var(--controlPaddingX);
 	border: var(--panelBorderWidth) solid var(--border);
-	background: #fff;
+	background: var(--surface);
 	border-radius: 8px;
 	color: var(--text);
 	font-size: var(--controlFontSize);
@@ -211,7 +211,7 @@ h2 {
 button {
 	min-height: var(--controlHeight);
 	border: var(--panelBorderWidth) solid var(--border);
-	background: #fff;
+	background: var(--surface);
 	color: var(--text);
 	padding: var(--controlPaddingY) var(--controlPaddingX);
 	border-radius: 10px;
@@ -232,7 +232,7 @@ button[disabled] {
 
 .submit {
 	border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
-	background: color-mix(in srgb, var(--accent) 10%, #fff);
+	background: color-mix(in srgb, var(--accent) 10%, var(--surface));
 }
 
 html[data-theme='c'] .submit {
@@ -270,7 +270,7 @@ html[data-theme='c'] .submit {
 }
 
 tbody tr:hover .td {
-	background: #fbfdff;
+	background: var(--surface);
 }
 
 html[data-theme='b'] .table {
@@ -279,7 +279,7 @@ html[data-theme='b'] .table {
 }
 
 html[data-theme='b'] tbody tr:hover {
-	background: #f8fbff;
+	background: var(--surface);
 }
 
 .mt10 {

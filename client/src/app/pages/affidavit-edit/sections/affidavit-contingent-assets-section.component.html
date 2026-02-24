@@ -1,22 +1,15 @@
 <section class="panel">
-  <h2 class="panelTitle">Assets</h2>
+  <h2 class="panelTitle">Contingent assets</h2>
 
   <form (ngSubmit)="submit()" class="gridForm">
-    <label>
-      Type
-      <select name="assetTypeId" [(ngModel)]="assetTypeId" class="input" (click)="ensureDefaults()">
-        <option *ngFor="let t of assetsTypes" [ngValue]="t.id">{{ t.name }} ({{ t.id }})</option>
-      </select>
-    </label>
-
     <label>
       Description
       <input name="description" [(ngModel)]="description" class="input" />
     </label>
 
     <label>
-      Market value
-      <input name="marketValue" [(ngModel)]="marketValue" inputmode="decimal" class="input" />
+      Possible value
+      <input name="possibleValue" [(ngModel)]="possibleValue" inputmode="decimal" class="input" />
     </label>
 
     <label>
@@ -47,24 +40,22 @@
   <table *ngIf="rows.length > 0" class="table mt12">
     <thead>
       <tr>
-        <th class="th">Type</th>
         <th class="th">Description</th>
-        <th class="th">Value</th>
+        <th class="th">Possible value</th>
         <th class="th">Party</th>
         <th class="th">Judge award?</th>
         <th class="th"></th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let a of rows">
-        <td class="td">{{ typeLabel(assetsTypes, a.assetsTypeId) }}</td>
-        <td class="td">{{ a.description }}</td>
-        <td class="td">{{ a.marketValue | number:'1.2-2' }}</td>
-        <td class="td">{{ typeLabel(nonMaritalTypes, a.nonMaritalTypeId) || '—' }}</td>
-        <td class="td">{{ a.judgeAward ? 'Yes' : 'No' }}</td>
+      <tr *ngFor="let r of rows">
+        <td class="td">{{ r.description }}</td>
+        <td class="td">{{ r.possibleValue | number:'1.2-2' }}</td>
+        <td class="td">{{ typeLabel(nonMaritalTypes, r.nonMaritalTypeId) || '—' }}</td>
+        <td class="td">{{ r.judgeAward ? 'Yes' : 'No' }}</td>
         <td class="td">
-          <button type="button" (click)="startEdit(a)" [disabled]="busy || editingId !== null" class="mini">Edit</button>
-          <button type="button" (click)="remove.emit(a.id)" [disabled]="busy" class="mini">Remove</button>
+          <button type="button" (click)="startEdit(r)" [disabled]="busy || editingId !== null" class="mini">Edit</button>
+          <button type="button" (click)="remove.emit(r.id)" [disabled]="busy" class="mini">Remove</button>
         </td>
       </tr>
     </tbody>

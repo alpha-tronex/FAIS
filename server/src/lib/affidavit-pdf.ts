@@ -1,11 +1,14 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import fs from 'node:fs/promises';
 import mongoose from 'mongoose';
 import { PDFDocument } from 'pdf-lib';
 
 export type PdfTemplateKey = 'short' | 'long';
 
-const PDF_TEMPLATES_DIR = path.join(process.cwd(), 'private', 'forms');
+// Resolve relative to this file so template is found whether server runs from repo root or server dir
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PDF_TEMPLATES_DIR = path.join(__dirname, '..', '..', 'private', 'forms');
 
 export function templatePath(key: PdfTemplateKey): string {
   const filename = key === 'short' ? 'fl-financial-affidavit-short.pdf' : 'fl-financial-affidavit-long.pdf';

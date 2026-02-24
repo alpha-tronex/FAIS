@@ -51,6 +51,7 @@
         <th class="th">Description</th>
         <th class="th">Owed</th>
         <th class="th">Party</th>
+        <th class="th">User owes?</th>
         <th class="th"></th>
       </tr>
     </thead>
@@ -60,6 +61,7 @@
         <td class="td">{{ l.description }}</td>
         <td class="td">{{ l.amountOwed | number:'1.2-2' }}</td>
         <td class="td">{{ typeLabel(nonMaritalTypes, l.nonMaritalTypeId) || '—' }}</td>
+        <td class="td">{{ l.userOwes ? 'Yes' : 'No' }}</td>
         <td class="td">
           <button type="button" (click)="startEdit(l)" [disabled]="busy || editingId !== null" class="mini">Edit</button>
           <button type="button" (click)="remove.emit(l.id)" [disabled]="busy" class="mini">Remove</button>

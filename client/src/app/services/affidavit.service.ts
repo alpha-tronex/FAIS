@@ -35,23 +35,21 @@ export class AffidavitService {
     );
   }
 
-  async generatePdf(form: 'auto' | 'short' | 'long' = 'auto', userId?: string): Promise<Blob> {
-    return await firstValueFrom(
-      this.http.get(`${this.apiBase}/affidavit/pdf`, {
-        params: { ...(userId ? { userId } : {}), form },
-        responseType: 'blob'
-      })
-    );
-  }
-
-  async generateOfficialPdf(
+  /**
+   * Generate PDF. Server returns official Florida form for admins, HTML/Playwright PDF for regular users.
+   */
+  async generatePdf(
     form: 'auto' | 'short' | 'long' = 'auto',
     userId?: string,
     caseId?: string
   ): Promise<Blob> {
     return await firstValueFrom(
-      this.http.get(`${this.apiBase}/affidavit/pdf-template`, {
-        params: { ...(userId ? { userId } : {}), ...(caseId ? { caseId } : {}), form },
+      this.http.get(`${this.apiBase}/affidavit/pdf`, {
+        params: {
+          form,
+          ...(userId ? { userId } : {}),
+          ...(caseId ? { caseId } : {})
+        },
         responseType: 'blob'
       })
     );

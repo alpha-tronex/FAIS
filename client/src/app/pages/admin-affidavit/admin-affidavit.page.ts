@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription, finalize, from } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitService } from '../../services/affidavit.service';
 import { CasesService, CaseListItem } from '../../services/cases.service';
@@ -19,12 +20,16 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
   cases: CaseListItem[] = [];
   selectedCaseId: string | null = null;
 
+  /** Official PDF form: 'auto' (use income-based), 'short', or 'long' */
+  officialPdfForm: 'auto' | 'short' | 'long' = 'short';
+
   busy = false;
   casesBusy = false;
   pdfBusy = false;
   error: string | null = null;
 
   subscription: Subscription | null = null;
+  private routerSubscription: Subscription | null = null;
 
   constructor(
     private readonly auth: AuthService,
@@ -32,10 +37,21 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     private readonly affidavitApi: AffidavitService,
     private readonly casesApi: CasesService,
     private readonly fileSave: FileSaveService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
+
+    this.routerSubscription = this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((e) => {
+        if (e.urlAfterRedirects?.includes('admin/affidavit')) {
+          window.scrollTo(0, 0);
+        }
+      });
+
     if (!this.auth.isLoggedIn()) {
       void this.router.navigateByUrl('/login');
       return;
@@ -51,6 +67,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.routerSubscription?.unsubscribe();
   }
 
   refresh() {
@@ -67,12 +84,19 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
       .subscribe({
         next: (users) => {
           this.users = users.filter((u) => u.roleTypeId === 1);
-          if (!this.selectedUserId && this.users.length > 0) {
-            this.selectedUserId = this.users[0]!.id;
-          } else if (this.selectedUserId && !this.users.some((u) => u.id === this.selectedUserId)) {
-            this.selectedUserId = this.users[0]?.id ?? null;
+          const qpUserId = this.route.snapshot.queryParamMap.get('userId');
+          const qpCaseId = this.route.snapshot.queryParamMap.get('caseId');
+          if (qpUserId && qpCaseId && this.users.some((u) => u.id === qpUserId)) {
+            this.selectedUserId = qpUserId;
+            this.selectedCaseId = qpCaseId;
+          } else {
+            if (!this.selectedUserId && this.users.length > 0) {
+              this.selectedUserId = this.users[0]!.id;
+            } else if (this.selectedUserId && !this.users.some((u) => u.id === this.selectedUserId)) {
+              this.selectedUserId = this.users[0]?.id ?? null;
+            }
+            this.selectedCaseId = null;
           }
-          this.selectedCaseId = null;
           void this.loadCasesForSelectedUser();
         },
         error: (e: any) => {
@@ -171,7 +195,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     this.error = null;
 
     try {
-      const blob = await this.affidavitApi.generateOfficialPdf('auto', this.selectedUserId, this.selectedCaseId);
+      const blob = await this.affidavitApi.generatePdf(this.officialPdfForm, this.selectedUserId, this.selectedCaseId);
       await this.fileSave.savePdf(blob, this.buildDownloadFilename());
     } catch (e: any) {
       this.error = e?.error?.error ?? 'Failed to generate PDF';

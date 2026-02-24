@@ -12,7 +12,9 @@ const userCreateSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(200),
   firstName: z.string().max(100).optional(),
-  lastName: z.string().max(100).optional()
+  lastName: z.string().max(100).optional(),
+  /** When true, send invitation email so the user can log in and change password. Omit/false = create without email (e.g. respondent/respondent attorney). */
+  sendInviteEmail: z.boolean().optional()
 });
 
 const userUpdateSchema = z.object({
@@ -38,6 +40,16 @@ const userSsnUpdateSchema = z
     path: ['confirmSsn']
   });
 
+/** Turn zod validation errors into a single user-friendly message. */
+function formatValidationMessage(flattened: { formErrors: string[]; fieldErrors: Record<string, string[]> }): string {
+  const form = flattened.formErrors.filter(Boolean);
+  const field = Object.entries(flattened.fieldErrors)
+    .map(([k, v]) => (v && v[0]) ? `${k}: ${v[0]}` : k)
+    .filter(Boolean);
+  const first = form[0] ?? field[0];
+  return first ?? 'Please check the form and try again.';
+}
+
 export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'requireAdmin'>): express.Router {
   const router = express.Router();
 
@@ -53,7 +65,10 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
   router.post('/users', auth.requireAuth, auth.requireAdmin, async (req, res) => {
     const authPayload = (req as any).auth as AuthPayload;
     const parsed = userCreateSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: 'Invalid payload', details: parsed.error.flatten() });
+    if (!parsed.success) {
+      const flattened = parsed.error.flatten();
+      return res.status(400).json({ error: formatValidationMessage(flattened), details: flattened });
+    }
 
     const existingUname = await User.findOne({ uname: parsed.data.uname }).lean();
     if (existingUname) return res.status(409).json({ error: 'Username already exists' });
@@ -74,17 +89,19 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
 			updatedBy: authPayload?.sub
     });
 
-    const appUrl = (process.env.APP_BASE_URL?.trim() || 'http://localhost:4200').replace(/\/+$/, '');
-    try {
-      await sendInviteEmail({
-        to: parsed.data.email,
-        uname: parsed.data.uname,
-        password: parsed.data.password,
-        appUrl
-      });
-    } catch (e) {
-      // Don't fail user creation if email sending is misconfigured.
-      console.warn('[invite-email] Failed to send invite email:', e);
+    if (parsed.data.sendInviteEmail === true) {
+      const appUrl = (process.env.APP_BASE_URL?.trim() || 'http://localhost:4200').replace(/\/+$/, '');
+      try {
+        await sendInviteEmail({
+          to: parsed.data.email,
+          uname: parsed.data.uname,
+          password: parsed.data.password,
+          appUrl
+        });
+      } catch (e) {
+        // Don't fail user creation if email sending is misconfigured.
+        console.warn('[invite-email] Failed to send invite email:', e);
+      }
     }
 
     res.status(201).json({
@@ -146,7 +163,10 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
   router.patch('/users/:id/ssn', auth.requireAuth, auth.requireAdmin, async (req, res) => {
     const authPayload = (req as any).auth as AuthPayload;
     const parsed = userSsnUpdateSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: 'Invalid payload' });
+    if (!parsed.success) {
+      const flattened = parsed.error.flatten();
+      return res.status(400).json({ error: formatValidationMessage(flattened), details: flattened });
+    }
 
     const user = await User.findOne({ _id: req.params.id, passwordHash: { $exists: true } }).lean<UserDoc>();
     if (!user) return res.status(404).json({ error: 'Not found' });
@@ -202,7 +222,10 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
   router.patch('/users/:id', auth.requireAuth, auth.requireAdmin, async (req, res) => {
     const authPayload = (req as any).auth as AuthPayload;
     const parsed = userUpdateSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: 'Invalid payload' });
+    if (!parsed.success) {
+      const flattened = parsed.error.flatten();
+      return res.status(400).json({ error: formatValidationMessage(flattened), details: flattened });
+    }
 
     if (parsed.data.email) {
       const existingEmail = await User.findOne({ email: parsed.data.email, _id: { $ne: req.params.id } }).lean();

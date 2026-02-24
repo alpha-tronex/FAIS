@@ -26,6 +26,12 @@ const LOOKUP_SEEDS: LookupSeedSpec[] = [
   { collectionName: 'lookup_monthly_income_types', jsonFilename: 'monthly-income-types.json' },
   { collectionName: 'lookup_monthly_deduction_types', jsonFilename: 'monthly-deduction-types.json' },
   { collectionName: 'lookup_monthly_household_expense_types', jsonFilename: 'monthly-household-expense-types.json' },
+  { collectionName: 'lookup_monthly_automobile_expense_types', jsonFilename: 'monthly-automobile-expense-types.json' },
+  { collectionName: 'lookup_monthly_children_expense_types', jsonFilename: 'monthly-children-expense-types.json' },
+  { collectionName: 'lookup_monthly_children_other_expense_types', jsonFilename: 'monthly-children-other-expense-types.json' },
+  { collectionName: 'lookup_monthly_creditors_expense_types', jsonFilename: 'monthly-creditors-expense-types.json' },
+  { collectionName: 'lookup_monthly_insurance_expense_types', jsonFilename: 'monthly-insurance-expense-types.json' },
+  { collectionName: 'lookup_monthly_other_expense_types', jsonFilename: 'monthly-other-expense-types.json' },
   { collectionName: 'lookup_assets_types', jsonFilename: 'assets-types.json' },
   { collectionName: 'lookup_liabilities_types', jsonFilename: 'liabilities-types.json' },
   { collectionName: 'lookup_non_marital_types', jsonFilename: 'non-marital-types.json' }

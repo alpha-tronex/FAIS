@@ -106,4 +106,14 @@
     (confirm)="cancelEdit()"
     (cancel)="showCancelConfirm = false"
   />
+
+  <app-confirm-popup
+    [open]="showSendEmailConfirm"
+    title="Send invitation email?"
+    message="Do you want to send an invitation email to this user so they can log in, finish registration, and change their password? You may prefer not to send the email for respondent attorneys or respondents who should not use this app."
+    confirmText="Send email"
+    cancelText="Create without email"
+    (confirm)="createUserWithInviteChoice(true)"
+    (cancel)="createUserWithInviteChoice(false)"
+  />
 </div>

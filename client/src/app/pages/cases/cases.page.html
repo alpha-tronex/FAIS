@@ -4,7 +4,7 @@
   <p *ngIf="error" class="error" role="alert" aria-live="polite">{{ error }}</p>
 
   <section *ngIf="canCreate" class="panel">
-    <h2 class="panelTitle">Create case</h2>
+    <h2 class="panelTitle">{{ editingCaseId ? 'Edit case' : 'Create case' }}</h2>
 
     <form (ngSubmit)="create()" class="gridForm">
       <label>
@@ -30,6 +30,20 @@
         Division
         <select name="division" [(ngModel)]="division" required class="input">
           <option *ngFor="let d of divisions" [ngValue]="d.name">{{ d.name }}</option>
+        </select>
+      </label>
+
+      <label>
+        Number of children
+        <input name="numChildren" type="number" min="0" [(ngModel)]="numChildren" class="input" inputmode="numeric" />
+      </label>
+
+      <label>
+        Will a Child Support Guidelines Worksheet be filed?
+        <select name="childSupportWorksheetFiled" [(ngModel)]="childSupportWorksheetFiled" class="input">
+          <option [ngValue]="null">(not specified)</option>
+          <option [ngValue]="true">Yes</option>
+          <option [ngValue]="false">No</option>
         </select>
       </label>
 
@@ -66,7 +80,8 @@
       </label>
 
       <div class="rowActions">
-        <button type="submit" [disabled]="busy" class="submit">Create</button>
+        <button type="submit" [disabled]="busy" class="submit">{{ editingCaseId ? 'Update' : 'Create' }}</button>
+        <button *ngIf="editingCaseId" type="button" (click)="onCancelEdit()" [disabled]="busy">Cancel</button>
         <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
       </div>
     </form>

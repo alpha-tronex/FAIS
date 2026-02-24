@@ -30,6 +30,8 @@ export class UsersPage implements OnInit, OnDestroy {
   editingUserId: string | null = null;
 
   showCancelConfirm = false;
+  /** When true, show "Send invitation email?" confirm popup before creating user. */
+  showSendEmailConfirm = false;
   subscription: Subscription | null = null;
 
   constructor(
@@ -100,6 +102,35 @@ export class UsersPage implements OnInit, OnDestroy {
       return;
     }
 
+    this.error = null;
+    const validationError = this.validateCreateForm();
+    if (validationError) {
+      this.error = validationError;
+      return;
+    }
+
+    // When creating (not editing), ask admin whether to send invitation email before calling API.
+    this.showSendEmailConfirm = true;
+  }
+
+  /** Returns an error message if create form is invalid, otherwise null. */
+  private validateCreateForm(): string | null {
+    const u = this.uname.trim();
+    const e = this.email.trim();
+    const p = this.password;
+    if (!u) return 'Username is required.';
+    if (!e) return 'Email is required.';
+    const emailSimple = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailSimple.test(e)) return 'Please enter a valid email address.';
+    if (!p) return 'Password is required.';
+    if (p.length < 8) return 'Password must be at least 8 characters.';
+    return null;
+  }
+
+  /** Called after admin chooses in the send-email popup. Creates user with or without invite email. */
+  createUserWithInviteChoice(sendInviteEmail: boolean) {
+    this.showSendEmailConfirm = false;
+
     this.busy = true;
     this.error = null;
     this.success = null;
@@ -109,13 +140,14 @@ export class UsersPage implements OnInit, OnDestroy {
       email: this.email.trim(),
       password: this.password,
       firstName: this.firstName.trim() || undefined,
-      lastName: this.lastName.trim() || undefined
+      lastName: this.lastName.trim() || undefined,
+      sendInviteEmail
     };
 
     this.subscription = from(this.usersApi.create(req))
       .pipe(
         switchMap(() => {
-          this.success = 'User created.';
+          this.success = sendInviteEmail ? 'User created. Invitation email sent.' : 'User created.';
           this.uname = '';
           this.email = '';
           this.password = '';
@@ -133,7 +165,8 @@ export class UsersPage implements OnInit, OnDestroy {
           this.users = users;
         },
         error: (e: any) => {
-          this.error = e?.error?.error ?? 'Failed to create user';
+          const msg = e?.error?.error;
+          this.error = typeof msg === 'string' && msg.length > 0 ? msg : 'Failed to create user. Please check the form and try again.';
           this.success = null;
           if (e?.status === 401) {
             this.auth.logout();

@@ -23,6 +23,8 @@ import { AffidavitEmploymentSectionComponent } from './pages/affidavit-edit/sect
 import { AffidavitMonthlyLinesSectionComponent } from './pages/affidavit-edit/sections/affidavit-monthly-lines-section.component';
 import { AffidavitAssetsSectionComponent } from './pages/affidavit-edit/sections/affidavit-assets-section.component';
 import { AffidavitLiabilitiesSectionComponent } from './pages/affidavit-edit/sections/affidavit-liabilities-section.component';
+import { AffidavitContingentAssetsSectionComponent } from './pages/affidavit-edit/sections/affidavit-contingent-assets-section.component';
+import { AffidavitContingentLiabilitiesSectionComponent } from './pages/affidavit-edit/sections/affidavit-contingent-liabilities-section.component';
 import { ConfirmPopupComponent } from './shared/confirm-popup/confirm-popup.component';
 import { AppLayoutComponent } from './layout/app-layout.component';
 import { HeaderComponent } from './layout/header/header.component';
@@ -47,6 +49,8 @@ import { FooterComponent } from './layout/footer/footer.component';
     AffidavitMonthlyLinesSectionComponent,
     AffidavitAssetsSectionComponent,
     AffidavitLiabilitiesSectionComponent,
+    AffidavitContingentAssetsSectionComponent,
+    AffidavitContingentLiabilitiesSectionComponent,
     AdminPage,
     AdminAffidavitPage,
     ConfirmPopupComponent

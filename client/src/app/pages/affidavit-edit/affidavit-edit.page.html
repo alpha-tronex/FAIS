@@ -96,6 +96,96 @@
       (remove)="requestRemove($event)"
     ></app-affidavit-monthly-lines-section>
 
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyAutomobileExpenses'"
+      title="Monthly automobile expenses"
+      [busy]="busy"
+      [types]="automobileExpenseTypes"
+      [rows]="monthlyAutomobileExpenses"
+      patchType="monthlyAutomobileExpenses"
+      [userId]="userId"
+      (create)="addMonthlyAutomobileExpense($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyChildrenExpenses'"
+      title="Monthly children expenses"
+      [busy]="busy"
+      [types]="childrenExpenseTypes"
+      [rows]="monthlyChildrenExpenses"
+      patchType="monthlyChildrenExpenses"
+      [userId]="userId"
+      (create)="addMonthlyChildrenExpense($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyChildrenOtherExpenses'"
+      title="Monthly children other expenses"
+      [busy]="busy"
+      [types]="childrenOtherExpenseTypes"
+      [rows]="monthlyChildrenOtherExpenses"
+      patchType="monthlyChildrenOtherExpenses"
+      [userId]="userId"
+      (create)="addMonthlyChildrenOtherExpense($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyCreditorsExpenses'"
+      title="Monthly creditors expenses"
+      [busy]="busy"
+      [types]="creditorsExpenseTypes"
+      [rows]="monthlyCreditorsExpenses"
+      patchType="monthlyCreditorsExpenses"
+      [userId]="userId"
+      (create)="addMonthlyCreditorsExpense($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyInsuranceExpenses'"
+      title="Monthly insurance expenses"
+      [busy]="busy"
+      [types]="insuranceExpenseTypes"
+      [rows]="monthlyInsuranceExpenses"
+      patchType="monthlyInsuranceExpenses"
+      [userId]="userId"
+      (create)="addMonthlyInsuranceExpense($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-monthly-lines-section>
+
+    <app-affidavit-monthly-lines-section
+      *ngIf="steps[currentStepIndex]?.key === 'monthlyOtherExpenses'"
+      title="Monthly other expenses"
+      [busy]="busy"
+      [types]="otherExpenseTypes"
+      [rows]="monthlyOtherExpenses"
+      patchType="monthlyOtherExpenses"
+      [userId]="userId"
+      (create)="addMonthlyOtherExpense($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-monthly-lines-section>
+
     <app-affidavit-assets-section
       *ngIf="steps[currentStepIndex]?.key === 'assets'"
       [busy]="busy"
@@ -123,6 +213,32 @@
       (updateFailed)="onSectionUpdateFailed($event)"
       (remove)="requestRemove($event)"
     ></app-affidavit-liabilities-section>
+
+    <app-affidavit-contingent-assets-section
+      *ngIf="steps[currentStepIndex]?.key === 'contingentAssets'"
+      [busy]="busy"
+      [nonMaritalTypes]="nonMaritalTypes"
+      [rows]="contingentAssets"
+      [userId]="userId"
+      (create)="addContingentAsset($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-contingent-assets-section>
+
+    <app-affidavit-contingent-liabilities-section
+      *ngIf="steps[currentStepIndex]?.key === 'contingentLiabilities'"
+      [busy]="busy"
+      [nonMaritalTypes]="nonMaritalTypes"
+      [rows]="contingentLiabilities"
+      [userId]="userId"
+      (create)="addContingentLiability($event)"
+      (updateStart)="onSectionUpdateStart()"
+      (updateDone)="onSectionUpdateDone()"
+      (updateFailed)="onSectionUpdateFailed($event)"
+      (remove)="requestRemove($event)"
+    ></app-affidavit-contingent-liabilities-section>
   </section>
 
   <section class="mt16">

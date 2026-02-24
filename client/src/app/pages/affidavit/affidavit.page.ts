@@ -106,7 +106,8 @@ export class AffidavitPage implements OnInit, OnDestroy {
     this.error = null;
 
     try {
-      const blob = await this.affidavitApi.generateOfficialPdf('auto', this.userId || undefined, this.caseId || undefined);
+      const form = this.summary?.form ?? 'auto';
+      const blob = await this.affidavitApi.generatePdf(form, this.userId || undefined, this.caseId || undefined);
       const fileName = `financial-affidavit-${this.summary?.form ?? 'auto'}.pdf`;
       await this.fileSave.savePdf(blob, fileName);
     } catch (e: any) {

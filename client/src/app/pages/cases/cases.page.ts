@@ -37,6 +37,8 @@ export class CasesPage implements OnInit, OnDestroy {
   division = '';
   circuitId: number | null = null;
   countyId: number | null = null;
+  numChildren: number | null = null;
+  childSupportWorksheetFiled: boolean | null = null;
   petitionerId = '';
   respondentId = '';
   petitionerAttId = '';
@@ -133,6 +135,8 @@ export class CasesPage implements OnInit, OnDestroy {
   private resetForm() {
     this.caseNumber = '';
     this.division = '';
+    this.numChildren = null;
+    this.childSupportWorksheetFiled = null;
     this.petitionerId = '';
     this.respondentId = '';
     this.petitionerAttId = '';
@@ -193,6 +197,10 @@ export class CasesPage implements OnInit, OnDestroy {
     this.applyCountyFilter();
   }
 
+  onCancelEdit() {
+    this.resetForm();
+  }
+
   create() {
     if (!this.canCreate) {
       this.error = 'Forbidden';
@@ -224,6 +232,8 @@ export class CasesPage implements OnInit, OnDestroy {
       division: this.division.trim(),
       circuitId: this.circuitId,
       countyId: this.countyId,
+      numChildren: this.numChildren ?? undefined,
+      childSupportWorksheetFiled: this.childSupportWorksheetFiled ?? undefined,
       petitionerId: this.petitionerId || undefined,
       respondentId: this.respondentId || undefined,
       petitionerAttId: this.petitionerAttId || undefined,
@@ -295,6 +305,8 @@ export class CasesPage implements OnInit, OnDestroy {
           this.caseNumber = c.caseNumber ?? '';
           this.division = c.division ?? '';
           this.circuitId = c.circuitId ?? null;
+          this.numChildren = c.numChildren ?? null;
+          this.childSupportWorksheetFiled = c.childSupportWorksheetFiled ?? null;
 
           this.applyCountyFilter();
           if (typeof c.countyId === 'number' && this.counties.some((x) => x.id === c.countyId)) {

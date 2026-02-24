@@ -11,7 +11,8 @@ const caseCreateSchema = z.object({
   division: z.string().min(1).max(50),
   circuitId: z.number().int().min(1),
   countyId: z.number().int().min(1),
-  numChildren: z.number().int().optional(),
+  numChildren: z.number().int().min(0).optional(),
+  childSupportWorksheetFiled: z.boolean().optional(),
   formTypeId: z.number().int().optional(),
   petitionerId: z.string().optional(),
   respondentId: z.string().optional(),
@@ -126,6 +127,7 @@ export function createCasesRouter(
         circuitId: c.circuitId,
         countyId: c.countyId,
         numChildren: c.numChildren,
+        childSupportWorksheetFiled: c.childSupportWorksheetFiled,
         formTypeId: c.formTypeId,
         petitioner: (() => {
           const id = c.petitionerId?._id?.toString?.() ?? c.petitionerId?.toString?.();
@@ -198,6 +200,7 @@ export function createCasesRouter(
       circuitId: parsed.data.circuitId,
       countyId: parsed.data.countyId,
       numChildren: parsed.data.numChildren,
+      childSupportWorksheetFiled: parsed.data.childSupportWorksheetFiled,
       formTypeId: parsed.data.formTypeId,
       petitionerId,
       respondentId,
@@ -223,6 +226,7 @@ export function createCasesRouter(
       circuitId: c.circuitId,
       countyId: c.countyId,
       numChildren: c.numChildren,
+      childSupportWorksheetFiled: c.childSupportWorksheetFiled,
       formTypeId: c.formTypeId,
       petitionerId: (c.petitionerId?._id?.toString?.() ?? c.petitionerId?.toString?.()) ?? null,
       respondentId: (c.respondentId?._id?.toString?.() ?? c.respondentId?.toString?.()) ?? null,

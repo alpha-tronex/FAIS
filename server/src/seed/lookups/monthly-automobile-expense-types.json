@@ -1,0 +1,11 @@
+[
+  {"id":1,"name":"Monthly gasoline and oil"},
+  {"id":2,"name":"Monthly repairs"},
+  {"id":3,"name":"Monthly auto tags and emission testing"},
+  {"id":4,"name":"Monthly insurance"},
+  {"id":5,"name":"Monthly payments (lease or financing)"},
+  {"id":6,"name":"Monthly rental/replacements"},
+  {"id":7,"name":"Monthly alternative transportation (bus, rail, car pool, etc.)"},
+  {"id":8,"name":"Monthly tolls and parking"},
+  {"id":9,"name":"Other automobile expense"}
+]

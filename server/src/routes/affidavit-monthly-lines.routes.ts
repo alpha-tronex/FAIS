@@ -35,7 +35,13 @@ function buildMonthlyLineListMapper() {
 const COLLECTIONS = [
   { path: 'monthly-income', collectionName: 'monthlyincome' },
   { path: 'monthly-deductions', collectionName: 'monthlydeductions' },
-  { path: 'monthly-household-expenses', collectionName: 'monthlyhouseholdexpense' }
+  { path: 'monthly-household-expenses', collectionName: 'monthlyhouseholdexpense' },
+  { path: 'monthly-automobile-expenses', collectionName: 'monthlyautomobileexpense' },
+  { path: 'monthly-children-expenses', collectionName: 'monthlychildrenexpense' },
+  { path: 'monthly-children-other-expenses', collectionName: 'monthlychildrenotherrelationshipexpense' },
+  { path: 'monthly-creditors-expenses', collectionName: 'monthlycreditorexpense' },
+  { path: 'monthly-insurance-expenses', collectionName: 'monthlyinsuranceexpense' },
+  { path: 'monthly-other-expenses', collectionName: 'monthlyotherexpense' }
 ] as const;
 
 export function registerAffidavitMonthlyLinesRoutes(

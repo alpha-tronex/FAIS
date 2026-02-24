@@ -7,6 +7,7 @@ export const caseSchema = new mongoose.Schema(
     circuitId: { type: Number },
     countyId: { type: Number },
     numChildren: { type: Number },
+    childSupportWorksheetFiled: { type: Boolean },
     formTypeId: { type: Number },
 
     petitionerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

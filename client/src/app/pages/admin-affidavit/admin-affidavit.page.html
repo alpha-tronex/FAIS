@@ -1,10 +1,6 @@
 <div>
   <h1>Admin affidavit</h1>
 
-  <nav *ngIf="selectedUserId && selectedCaseId" class="mt12">
-    <a [routerLink]="['/affidavit']" [queryParams]="{ userId: selectedUserId, caseId: selectedCaseId }" class="link">Summary</a>
-  </nav>
-
   <p *ngIf="error" class="error">{{ error }}</p>
 
   <section *ngIf="selectedUserId && selectedCaseId" class="panel mt16">
@@ -17,6 +13,14 @@
     </p>
 
     <div class="rowActions mt12">
+      <label class="mr12">
+        Form
+        <select name="officialPdfForm" [(ngModel)]="officialPdfForm" class="input ml4" [disabled]="pdfBusy">
+          <option value="short">Short form</option>
+          <option value="long">Long form</option>
+          <option value="auto">Auto (by income)</option>
+        </select>
+      </label>
       <button type="button" (click)="clearCaseSelection()" [disabled]="pdfBusy">Change selection</button>
       <button type="button" (click)="generatePdf()" [disabled]="pdfBusy">Generate PDF</button>
       <span *ngIf="pdfBusy">Generating…</span>
@@ -40,6 +44,14 @@
     </label>
 
     <div class="rowActions mt12">
+      <label class="mr12">
+        Form
+        <select name="officialPdfForm2" [(ngModel)]="officialPdfForm" class="input ml4" [disabled]="busy || pdfBusy">
+          <option value="short">Short form</option>
+          <option value="long">Long form</option>
+          <option value="auto">Auto (by income)</option>
+        </select>
+      </label>
       <button type="button" (click)="refresh()" [disabled]="busy">Refresh users</button>
       <button
         type="button"

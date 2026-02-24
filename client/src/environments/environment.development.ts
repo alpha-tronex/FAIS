@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
   theme: 'b' as const,
-  apiUrl: 'http://localhost:3001'
+  /** Same-origin /api; dev server proxy forwards to backend (3001) */
+  apiUrl: '/api'
 };

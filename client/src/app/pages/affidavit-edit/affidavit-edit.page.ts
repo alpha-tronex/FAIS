@@ -2,11 +2,13 @@ import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, forkJoin, from, map, of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { AffidavitDataService, AssetRow, EmploymentRow, LiabilityRow, MonthlyLineRow } from '../../services/affidavit-data.service';
+import { AffidavitDataService, AssetRow, ContingentAssetRow, ContingentLiabilityRow, EmploymentRow, LiabilityRow, MonthlyLineRow } from '../../services/affidavit-data.service';
 import { LookupsService, LookupItem } from '../../services/lookups.service';
 import { AssetCreatePayload } from './sections/affidavit-assets-section.component';
 import { EmploymentCreatePayload } from './sections/affidavit-employment-section.component';
 import { LiabilityCreatePayload } from './sections/affidavit-liabilities-section.component';
+import { ContingentAssetCreatePayload } from './sections/affidavit-contingent-assets-section.component';
+import { ContingentLiabilityCreatePayload } from './sections/affidavit-contingent-liabilities-section.component';
 import { MonthlyLineCreatePayload, MonthlyLineUpdatePayload } from './sections/affidavit-monthly-lines-section.component';
 
 @Component({
@@ -25,8 +27,16 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     { key: 'monthlyIncome', title: 'Monthly income' },
     { key: 'monthlyDeductions', title: 'Monthly deductions' },
     { key: 'monthlyHouseholdExpenses', title: 'Monthly household expenses' },
+    { key: 'monthlyAutomobileExpenses', title: 'Monthly automobile expenses' },
+    { key: 'monthlyChildrenExpenses', title: 'Monthly children expenses' },
+    { key: 'monthlyChildrenOtherExpenses', title: 'Monthly children other expenses' },
+    { key: 'monthlyCreditorsExpenses', title: 'Monthly creditors expenses' },
+    { key: 'monthlyInsuranceExpenses', title: 'Monthly insurance expenses' },
+    { key: 'monthlyOtherExpenses', title: 'Monthly other expenses' },
     { key: 'assets', title: 'Assets' },
-    { key: 'liabilities', title: 'Liabilities' }
+    { key: 'liabilities', title: 'Liabilities' },
+    { key: 'contingentAssets', title: 'Contingent assets' },
+    { key: 'contingentLiabilities', title: 'Contingent liabilities' }
   ] as const;
 
   currentStepIndex = 0;
@@ -39,8 +49,16 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     monthlyIncome: false,
     monthlyDeductions: false,
     monthlyHouseholdExpenses: false,
+    monthlyAutomobileExpenses: false,
+    monthlyChildrenExpenses: false,
+    monthlyChildrenOtherExpenses: false,
+    monthlyCreditorsExpenses: false,
+    monthlyInsuranceExpenses: false,
+    monthlyOtherExpenses: false,
     assets: false,
-    liabilities: false
+    liabilities: false,
+    contingentAssets: false,
+    contingentLiabilities: false
   };
 
   // Lookups
@@ -48,6 +66,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   incomeTypes: LookupItem[] = [];
   deductionTypes: LookupItem[] = [];
   householdExpenseTypes: LookupItem[] = [];
+  automobileExpenseTypes: LookupItem[] = [];
+  childrenExpenseTypes: LookupItem[] = [];
+  childrenOtherExpenseTypes: LookupItem[] = [];
+  creditorsExpenseTypes: LookupItem[] = [];
+  insuranceExpenseTypes: LookupItem[] = [];
+  otherExpenseTypes: LookupItem[] = [];
   assetsTypes: LookupItem[] = [];
   liabilitiesTypes: LookupItem[] = [];
   nonMaritalTypes: LookupItem[] = [];
@@ -57,8 +81,16 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   monthlyIncome: MonthlyLineRow[] = [];
   monthlyDeductions: MonthlyLineRow[] = [];
   monthlyHouseholdExpenses: MonthlyLineRow[] = [];
+  monthlyAutomobileExpenses: MonthlyLineRow[] = [];
+  monthlyChildrenExpenses: MonthlyLineRow[] = [];
+  monthlyChildrenOtherExpenses: MonthlyLineRow[] = [];
+  monthlyCreditorsExpenses: MonthlyLineRow[] = [];
+  monthlyInsuranceExpenses: MonthlyLineRow[] = [];
+  monthlyOtherExpenses: MonthlyLineRow[] = [];
   assets: AssetRow[] = [];
   liabilities: LiabilityRow[] = [];
+  contingentAssets: ContingentAssetRow[] = [];
+  contingentLiabilities: ContingentLiabilityRow[] = [];
 
   busy = false;
   error: string | null = null;
@@ -181,10 +213,26 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
         return this.monthlyDeductions.length > 0;
       case 'monthlyHouseholdExpenses':
         return this.monthlyHouseholdExpenses.length > 0;
+      case 'monthlyAutomobileExpenses':
+        return this.monthlyAutomobileExpenses.length > 0;
+      case 'monthlyChildrenExpenses':
+        return this.monthlyChildrenExpenses.length > 0;
+      case 'monthlyChildrenOtherExpenses':
+        return this.monthlyChildrenOtherExpenses.length > 0;
+      case 'monthlyCreditorsExpenses':
+        return this.monthlyCreditorsExpenses.length > 0;
+      case 'monthlyInsuranceExpenses':
+        return this.monthlyInsuranceExpenses.length > 0;
+      case 'monthlyOtherExpenses':
+        return this.monthlyOtherExpenses.length > 0;
       case 'assets':
         return this.assets.length > 0;
       case 'liabilities':
         return this.liabilities.length > 0;
+      case 'contingentAssets':
+        return this.contingentAssets.length > 0;
+      case 'contingentLiabilities':
+        return this.contingentLiabilities.length > 0;
       default:
         return false;
     }
@@ -251,15 +299,63 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
                 : forkJoin(this.monthlyHouseholdExpenses.map((r) => from(this.api.deleteMonthlyHouseholdExpenses(r.id, uid)))).pipe(
                     map(() => undefined)
                   )
-              : stepKey === 'assets'
-                ? this.assets.length === 0
+              : stepKey === 'monthlyAutomobileExpenses'
+                ? this.monthlyAutomobileExpenses.length === 0
                   ? of(undefined)
-                  : forkJoin(this.assets.map((a) => from(this.api.deleteAsset(a.id, uid)))).pipe(map(() => undefined))
-                : stepKey === 'liabilities'
-                  ? this.liabilities.length === 0
+                  : forkJoin(this.monthlyAutomobileExpenses.map((r) => from(this.api.deleteMonthlyAutomobileExpenses(r.id, uid)))).pipe(
+                      map(() => undefined)
+                    )
+                : stepKey === 'monthlyChildrenExpenses'
+                  ? this.monthlyChildrenExpenses.length === 0
                     ? of(undefined)
-                    : forkJoin(this.liabilities.map((l) => from(this.api.deleteLiability(l.id, uid)))).pipe(map(() => undefined))
-                  : of(undefined);
+                    : forkJoin(this.monthlyChildrenExpenses.map((r) => from(this.api.deleteMonthlyChildrenExpenses(r.id, uid)))).pipe(
+                        map(() => undefined)
+                      )
+                  : stepKey === 'monthlyChildrenOtherExpenses'
+                    ? this.monthlyChildrenOtherExpenses.length === 0
+                      ? of(undefined)
+                      : forkJoin(
+                          this.monthlyChildrenOtherExpenses.map((r) => from(this.api.deleteMonthlyChildrenOtherExpenses(r.id, uid)))
+                        ).pipe(map(() => undefined))
+                    : stepKey === 'monthlyCreditorsExpenses'
+                      ? this.monthlyCreditorsExpenses.length === 0
+                        ? of(undefined)
+                        : forkJoin(this.monthlyCreditorsExpenses.map((r) => from(this.api.deleteMonthlyCreditorsExpenses(r.id, uid)))).pipe(
+                            map(() => undefined)
+                          )
+                      : stepKey === 'monthlyInsuranceExpenses'
+                        ? this.monthlyInsuranceExpenses.length === 0
+                          ? of(undefined)
+                          : forkJoin(this.monthlyInsuranceExpenses.map((r) => from(this.api.deleteMonthlyInsuranceExpenses(r.id, uid)))).pipe(
+                              map(() => undefined)
+                            )
+                        : stepKey === 'monthlyOtherExpenses'
+                          ? this.monthlyOtherExpenses.length === 0
+                            ? of(undefined)
+                            : forkJoin(this.monthlyOtherExpenses.map((r) => from(this.api.deleteMonthlyOtherExpenses(r.id, uid)))).pipe(
+                                map(() => undefined)
+                              )
+                          : stepKey === 'assets'
+                        ? this.assets.length === 0
+                          ? of(undefined)
+                          : forkJoin(this.assets.map((a) => from(this.api.deleteAsset(a.id, uid)))).pipe(map(() => undefined))
+                        : stepKey === 'liabilities'
+                          ? this.liabilities.length === 0
+                            ? of(undefined)
+                            : forkJoin(this.liabilities.map((l) => from(this.api.deleteLiability(l.id, uid)))).pipe(map(() => undefined))
+                          : stepKey === 'contingentAssets'
+                            ? this.contingentAssets.length === 0
+                              ? of(undefined)
+                              : forkJoin(this.contingentAssets.map((a) => from(this.api.deleteContingentAsset(a.id, uid)))).pipe(
+                                  map(() => undefined)
+                                )
+                            : stepKey === 'contingentLiabilities'
+                              ? this.contingentLiabilities.length === 0
+                                ? of(undefined)
+                                : forkJoin(this.contingentLiabilities.map((l) => from(this.api.deleteContingentLiability(l.id, uid)))).pipe(
+                                    map(() => undefined)
+                                  )
+                              : of(undefined);
 
     this.subscription = deleteAll$
       .pipe(
@@ -287,8 +383,24 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     switch (stepKey) {
       case 'employment':
         return 'I have no employment to report';
+      case 'monthlyAutomobileExpenses':
+        return 'I have no monthly automobile expenses to report';
+      case 'monthlyChildrenExpenses':
+        return 'I have no monthly children expenses to report';
+      case 'monthlyChildrenOtherExpenses':
+        return 'I have no monthly children other expenses to report';
+      case 'monthlyCreditorsExpenses':
+        return 'I have no monthly creditors expenses to report';
+      case 'monthlyInsuranceExpenses':
+        return 'I have no monthly insurance expenses to report';
+      case 'monthlyOtherExpenses':
+        return 'I have no monthly other expenses to report';
       case 'liabilities':
         return 'I have no liabilities to report';
+      case 'contingentAssets':
+        return 'I have no contingent assets to report';
+      case 'contingentLiabilities':
+        return 'I have no contingent liabilities to report';
       case 'assets':
         return 'I have no assets to report';
       default:
@@ -306,6 +418,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       incomeTypes: from(this.lookups.list('monthly-income-types')),
       deductionTypes: from(this.lookups.list('monthly-deduction-types')),
       householdExpenseTypes: from(this.lookups.list('monthly-household-expense-types')),
+      automobileExpenseTypes: from(this.lookups.list('monthly-automobile-expense-types')),
+      childrenExpenseTypes: from(this.lookups.list('monthly-children-expense-types')),
+      childrenOtherExpenseTypes: from(this.lookups.list('monthly-children-other-expense-types')),
+      creditorsExpenseTypes: from(this.lookups.list('monthly-creditors-expense-types')),
+      insuranceExpenseTypes: from(this.lookups.list('monthly-insurance-expense-types')),
+      otherExpenseTypes: from(this.lookups.list('monthly-other-expense-types')),
       assetsTypes: from(this.lookups.list('assets-types')),
       liabilitiesTypes: from(this.lookups.list('liabilities-types')),
       nonMaritalTypes: from(this.lookups.list('non-marital-types')),
@@ -314,8 +432,16 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       monthlyIncome: from(this.api.listMonthlyIncome(userId)),
       monthlyDeductions: from(this.api.listMonthlyDeductions(userId)),
       monthlyHouseholdExpenses: from(this.api.listMonthlyHouseholdExpenses(userId)),
+      monthlyAutomobileExpenses: from(this.api.listMonthlyAutomobileExpenses(userId)),
+      monthlyChildrenExpenses: from(this.api.listMonthlyChildrenExpenses(userId)),
+      monthlyChildrenOtherExpenses: from(this.api.listMonthlyChildrenOtherExpenses(userId)),
+      monthlyCreditorsExpenses: from(this.api.listMonthlyCreditorsExpenses(userId)),
+      monthlyInsuranceExpenses: from(this.api.listMonthlyInsuranceExpenses(userId)),
+      monthlyOtherExpenses: from(this.api.listMonthlyOtherExpenses(userId)),
       assets: from(this.api.listAssets(userId)),
-      liabilities: from(this.api.listLiabilities(userId))
+      liabilities: from(this.api.listLiabilities(userId)),
+      contingentAssets: from(this.api.listContingentAssets(userId)),
+      contingentLiabilities: from(this.api.listContingentLiabilities(userId))
     });
   }
 
@@ -337,6 +463,12 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
           this.incomeTypes = r.incomeTypes;
           this.deductionTypes = r.deductionTypes;
           this.householdExpenseTypes = r.householdExpenseTypes;
+          this.automobileExpenseTypes = r.automobileExpenseTypes;
+          this.childrenExpenseTypes = r.childrenExpenseTypes;
+          this.childrenOtherExpenseTypes = r.childrenOtherExpenseTypes;
+          this.creditorsExpenseTypes = r.creditorsExpenseTypes;
+          this.insuranceExpenseTypes = r.insuranceExpenseTypes;
+          this.otherExpenseTypes = r.otherExpenseTypes;
           this.assetsTypes = r.assetsTypes;
           this.liabilitiesTypes = r.liabilitiesTypes;
           this.nonMaritalTypes = r.nonMaritalTypes;
@@ -345,8 +477,16 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
           this.monthlyIncome = r.monthlyIncome;
           this.monthlyDeductions = r.monthlyDeductions;
           this.monthlyHouseholdExpenses = r.monthlyHouseholdExpenses;
+          this.monthlyAutomobileExpenses = r.monthlyAutomobileExpenses;
+          this.monthlyChildrenExpenses = r.monthlyChildrenExpenses;
+          this.monthlyChildrenOtherExpenses = r.monthlyChildrenOtherExpenses;
+          this.monthlyCreditorsExpenses = r.monthlyCreditorsExpenses;
+          this.monthlyInsuranceExpenses = r.monthlyInsuranceExpenses;
+          this.monthlyOtherExpenses = r.monthlyOtherExpenses;
           this.assets = r.assets;
           this.liabilities = r.liabilities;
+          this.contingentAssets = r.contingentAssets;
+          this.contingentLiabilities = r.contingentLiabilities;
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load affidavit data';
@@ -369,7 +509,11 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     if (this.userId) queryParams['userId'] = this.userId;
     if (this.caseId) queryParams['caseId'] = this.caseId;
 
-    void this.router.navigate(['/affidavit'], { queryParams });
+    if (this.hideNav) {
+      void this.router.navigate(['/admin', 'affidavit'], { queryParams });
+    } else {
+      void this.router.navigate(['/affidavit'], { queryParams });
+    }
   }
 
   finish() {
@@ -395,10 +539,26 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
         return this.monthlyDeductions.length > 0 || this.noneSelected.monthlyDeductions;
       case 'monthlyHouseholdExpenses':
         return this.monthlyHouseholdExpenses.length > 0 || this.noneSelected.monthlyHouseholdExpenses;
+      case 'monthlyAutomobileExpenses':
+        return this.monthlyAutomobileExpenses.length > 0 || this.noneSelected.monthlyAutomobileExpenses;
+      case 'monthlyChildrenExpenses':
+        return this.monthlyChildrenExpenses.length > 0 || this.noneSelected.monthlyChildrenExpenses;
+      case 'monthlyChildrenOtherExpenses':
+        return this.monthlyChildrenOtherExpenses.length > 0 || this.noneSelected.monthlyChildrenOtherExpenses;
+      case 'monthlyCreditorsExpenses':
+        return this.monthlyCreditorsExpenses.length > 0 || this.noneSelected.monthlyCreditorsExpenses;
+      case 'monthlyInsuranceExpenses':
+        return this.monthlyInsuranceExpenses.length > 0 || this.noneSelected.monthlyInsuranceExpenses;
+      case 'monthlyOtherExpenses':
+        return this.monthlyOtherExpenses.length > 0 || this.noneSelected.monthlyOtherExpenses;
       case 'assets':
         return this.assets.length > 0 || this.noneSelected.assets;
       case 'liabilities':
         return this.liabilities.length > 0 || this.noneSelected.liabilities;
+      case 'contingentAssets':
+        return this.contingentAssets.length > 0 || this.noneSelected.contingentAssets;
+      case 'contingentLiabilities':
+        return this.contingentLiabilities.length > 0 || this.noneSelected.contingentLiabilities;
       default:
         return false;
     }
@@ -567,11 +727,38 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       case 'monthlyHouseholdExpenses':
         this.removeHouseholdExpense(id);
         break;
+      case 'monthlyAutomobileExpenses':
+        this.removeMonthlyAutomobileExpense(id);
+        break;
+      case 'monthlyChildrenExpenses':
+        this.removeMonthlyChildrenExpense(id);
+        break;
+      case 'monthlyChildrenOtherExpenses':
+        this.removeMonthlyChildrenOtherExpense(id);
+        break;
+      case 'monthlyCreditorsExpenses':
+        this.removeMonthlyCreditorsExpense(id);
+        break;
+      case 'monthlyInsuranceExpenses':
+        this.removeMonthlyInsuranceExpense(id);
+        break;
+      case 'monthlyOtherExpenses':
+        this.removeMonthlyOtherExpense(id);
+        break;
       case 'assets':
         this.removeAsset(id);
         break;
       case 'liabilities':
         this.removeLiability(id);
+        break;
+      case 'contingentAssets':
+        this.removeContingentAsset(id);
+        break;
+      case 'contingentLiabilities':
+        this.removeContingentLiability(id);
+        break;
+      default:
+        // Exhaustiveness: all step keys handled above
         break;
     }
   }
@@ -821,6 +1008,276 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       });
   }
 
+  addMonthlyAutomobileExpense(payload: MonthlyLineCreatePayload) {
+    this.setNoneForStep('monthlyAutomobileExpenses', false);
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.createMonthlyAutomobileExpenses(payload, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to add automobile expense')
+      });
+  }
+
+  removeMonthlyAutomobileExpense(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.deleteMonthlyAutomobileExpenses(id, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to remove automobile expense')
+      });
+  }
+
+  updateMonthlyAutomobileExpense(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid automobile expense data';
+      return;
+    }
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = from(this.api.patchMonthlyAutomobileExpenses(payload.id, body, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to update automobile expense')
+      });
+  }
+
+  addMonthlyChildrenExpense(payload: MonthlyLineCreatePayload) {
+    this.setNoneForStep('monthlyChildrenExpenses', false);
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.createMonthlyChildrenExpenses(payload, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to add children expense')
+      });
+  }
+
+  removeMonthlyChildrenExpense(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.deleteMonthlyChildrenExpenses(id, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to remove children expense')
+      });
+  }
+
+  updateMonthlyChildrenExpense(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid children expense data';
+      return;
+    }
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = from(this.api.patchMonthlyChildrenExpenses(payload.id, body, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to update children expense')
+      });
+  }
+
+  addMonthlyChildrenOtherExpense(payload: MonthlyLineCreatePayload) {
+    this.setNoneForStep('monthlyChildrenOtherExpenses', false);
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.createMonthlyChildrenOtherExpenses(payload, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to add children other expense')
+      });
+  }
+
+  removeMonthlyChildrenOtherExpense(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.deleteMonthlyChildrenOtherExpenses(id, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to remove children other expense')
+      });
+  }
+
+  updateMonthlyChildrenOtherExpense(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid children other expense data';
+      return;
+    }
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = from(this.api.patchMonthlyChildrenOtherExpenses(payload.id, body, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to update children other expense')
+      });
+  }
+
+  addMonthlyCreditorsExpense(payload: MonthlyLineCreatePayload) {
+    this.setNoneForStep('monthlyCreditorsExpenses', false);
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.createMonthlyCreditorsExpenses(payload, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to add creditors expense')
+      });
+  }
+
+  removeMonthlyCreditorsExpense(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.deleteMonthlyCreditorsExpenses(id, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to remove creditors expense')
+      });
+  }
+
+  updateMonthlyCreditorsExpense(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid creditors expense data';
+      return;
+    }
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = from(this.api.patchMonthlyCreditorsExpenses(payload.id, body, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to update creditors expense')
+      });
+  }
+
+  addMonthlyInsuranceExpense(payload: MonthlyLineCreatePayload) {
+    this.setNoneForStep('monthlyInsuranceExpenses', false);
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.createMonthlyInsuranceExpenses(payload, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to add insurance expense')
+      });
+  }
+
+  removeMonthlyInsuranceExpense(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.deleteMonthlyInsuranceExpenses(id, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to remove insurance expense')
+      });
+  }
+
+  updateMonthlyInsuranceExpense(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid insurance expense data';
+      return;
+    }
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = from(this.api.patchMonthlyInsuranceExpenses(payload.id, body, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to update insurance expense')
+      });
+  }
+
+  addMonthlyOtherExpense(payload: MonthlyLineCreatePayload) {
+    this.setNoneForStep('monthlyOtherExpenses', false);
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.createMonthlyOtherExpenses(payload, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to add other expense')
+      });
+  }
+
+  removeMonthlyOtherExpense(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    this.subscription = from(this.api.deleteMonthlyOtherExpenses(id, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to remove other expense')
+      });
+  }
+
+  updateMonthlyOtherExpense(payload: MonthlyLineUpdatePayload) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+    const typeId = Number(payload.typeId);
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(typeId) || !Number.isFinite(amount)) {
+      this.busy = false;
+      this.error = 'Invalid other expense data';
+      return;
+    }
+    const body = { typeId, amount, ifOther: payload.ifOther ?? null };
+    this.subscription = from(this.api.patchMonthlyOtherExpenses(payload.id, body, this.userId || undefined))
+      .pipe(finalize(() => (this.busy = false)))
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => (this.error = e?.error?.error ?? 'Failed to update other expense')
+      });
+  }
+
   addAsset(payload: AssetCreatePayload) {
     this.setNoneForStep('assets', false);
 
@@ -901,6 +1358,90 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
         next: () => this.refresh(),
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to remove liability';
+        }
+      });
+  }
+
+  addContingentAsset(payload: ContingentAssetCreatePayload) {
+    this.setNoneForStep('contingentAssets', false);
+
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+
+    this.subscription = from(
+      this.api.createContingentAsset(payload, this.userId || undefined)
+    )
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => {
+          this.error = e?.error?.error ?? 'Failed to add contingent asset';
+        }
+      });
+  }
+
+  removeContingentAsset(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+
+    this.subscription = from(this.api.deleteContingentAsset(id, this.userId || undefined))
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => {
+          this.error = e?.error?.error ?? 'Failed to remove contingent asset';
+        }
+      });
+  }
+
+  addContingentLiability(payload: ContingentLiabilityCreatePayload) {
+    this.setNoneForStep('contingentLiabilities', false);
+
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+
+    this.subscription = from(
+      this.api.createContingentLiability(payload, this.userId || undefined)
+    )
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => {
+          this.error = e?.error?.error ?? 'Failed to add contingent liability';
+        }
+      });
+  }
+
+  removeContingentLiability(id: string) {
+    this.subscription?.unsubscribe();
+    this.busy = true;
+    this.error = null;
+
+    this.subscription = from(this.api.deleteContingentLiability(id, this.userId || undefined))
+      .pipe(
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: () => this.refresh(),
+        error: (e: any) => {
+          this.error = e?.error?.error ?? 'Failed to remove contingent liability';
         }
       });
   }

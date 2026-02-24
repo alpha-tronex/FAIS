@@ -28,7 +28,17 @@ export class AffidavitMonthlyLinesSectionComponent {
   @Input() types: LookupItem[] = [];
   @Input() rows: MonthlyLineRow[] = [];
   /** When set, section performs PATCH itself and emits updateDone/updateFailed. */
-  @Input() patchType: 'monthlyIncome' | 'monthlyDeductions' | 'monthlyHouseholdExpenses' | null = null;
+  @Input() patchType:
+    | 'monthlyIncome'
+    | 'monthlyDeductions'
+    | 'monthlyHouseholdExpenses'
+    | 'monthlyAutomobileExpenses'
+    | 'monthlyChildrenExpenses'
+    | 'monthlyChildrenOtherExpenses'
+    | 'monthlyCreditorsExpenses'
+    | 'monthlyInsuranceExpenses'
+    | 'monthlyOtherExpenses'
+    | null = null;
   @Input() userId: string | null = null;
 
   @Output() create = new EventEmitter<MonthlyLineCreatePayload>();
@@ -48,7 +58,8 @@ export class AffidavitMonthlyLinesSectionComponent {
 
   ensureDefaults() {
     if (this.typeId == null && this.types.length > 0) {
-      this.typeId = this.types[0]!.id;
+      const first = this.types[0];
+      if (first) this.typeId = first.id;
     }
   }
 
@@ -90,12 +101,38 @@ export class AffidavitMonthlyLinesSectionComponent {
 
     if (this.patchType) {
       this.updateStart.emit();
-      const promise =
-        this.patchType === 'monthlyIncome'
-          ? this.api.patchMonthlyIncome(id, body, this.userId || undefined)
-          : this.patchType === 'monthlyDeductions'
-            ? this.api.patchMonthlyDeductions(id, body, this.userId || undefined)
-            : this.api.patchMonthlyHouseholdExpenses(id, body, this.userId || undefined);
+      let promise: Promise<{ ok: boolean }>;
+      switch (this.patchType) {
+        case 'monthlyIncome':
+          promise = this.api.patchMonthlyIncome(id, body, this.userId || undefined);
+          break;
+        case 'monthlyDeductions':
+          promise = this.api.patchMonthlyDeductions(id, body, this.userId || undefined);
+          break;
+        case 'monthlyHouseholdExpenses':
+          promise = this.api.patchMonthlyHouseholdExpenses(id, body, this.userId || undefined);
+          break;
+        case 'monthlyAutomobileExpenses':
+          promise = this.api.patchMonthlyAutomobileExpenses(id, body, this.userId || undefined);
+          break;
+        case 'monthlyChildrenExpenses':
+          promise = this.api.patchMonthlyChildrenExpenses(id, body, this.userId || undefined);
+          break;
+        case 'monthlyChildrenOtherExpenses':
+          promise = this.api.patchMonthlyChildrenOtherExpenses(id, body, this.userId || undefined);
+          break;
+        case 'monthlyCreditorsExpenses':
+          promise = this.api.patchMonthlyCreditorsExpenses(id, body, this.userId || undefined);
+          break;
+        case 'monthlyInsuranceExpenses':
+          promise = this.api.patchMonthlyInsuranceExpenses(id, body, this.userId || undefined);
+          break;
+        case 'monthlyOtherExpenses':
+          promise = this.api.patchMonthlyOtherExpenses(id, body, this.userId || undefined);
+          break;
+        default:
+          promise = Promise.reject(new Error('Unknown patchType')) as Promise<{ ok: boolean }>;
+      }
       from(promise).subscribe({
         next: () => {
           this.updateDone.emit();
