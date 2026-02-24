@@ -66,16 +66,13 @@ app.use(
 
 const { requireAuth, requireAdmin, requireStaffOrAdmin } = createAuthMiddlewares(jwtSecret);
 
-// Mount all API routes under /api for a single proxy prefix and clear separation from app routes.
-const apiRouter = express.Router();
-apiRouter.use(createHealthRouter());
-apiRouter.use(createRoleTypesRouter({ requireAuth }));
-apiRouter.use(createAuthRouter({ jwtSecret, requireAuth }));
-apiRouter.use(createUsersRouter({ requireAuth, requireAdmin }));
-apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
-apiRouter.use(createLookupsRouter({ requireAuth }));
-apiRouter.use(createAffidavitRouter({ requireAuth }));
-app.use('/api', apiRouter);
+app.use(createHealthRouter());
+app.use(createRoleTypesRouter({ requireAuth }));
+app.use(createAuthRouter({ jwtSecret, requireAuth }));
+app.use(createUsersRouter({ requireAuth, requireAdmin }));
+app.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
+app.use(createLookupsRouter({ requireAuth }));
+app.use(createAffidavitRouter({ requireAuth }));
 
 async function main() {
   await mongoose.connect(mongoUri);
