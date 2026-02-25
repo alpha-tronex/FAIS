@@ -1,6 +1,14 @@
 <main class="page" [class.pageNoPadding]="hideNav">
   <h1 *ngIf="!hideNav">Edit affidavit data</h1>
 
+  <p *ngIf="!hideNav" class="mt12">
+    <a routerLink="/my-cases" class="link">Back to My cases</a>
+  </p>
+
+  <p *ngIf="petitionerDisplayName && !hideNav" class="mt12">
+    <strong>Petitioner:</strong> {{ petitionerDisplayName }}
+  </p>
+
   <p *ngIf="userId && !hideNav" class="mt12">
     Editing on behalf of userId: <strong>{{ userId }}</strong>
   </p>

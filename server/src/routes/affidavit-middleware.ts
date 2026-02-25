@@ -8,6 +8,9 @@ function isRespondentOrRespondentAttorney(roleTypeId: number): boolean {
   return roleTypeId === 2 || roleTypeId === 4;
 }
 
+/** Role 3 = Petitioner Attorney. With caseId they edit/view the petitioner's (client's) affidavit. */
+const PETITIONER_ATTORNEY_ROLE = 3;
+
 export async function resolveAffidavitTarget(req: express.Request): Promise<{
   auth: AuthPayload;
   targetUserObjectId: string;
@@ -46,6 +49,23 @@ export async function resolveAffidavitTarget(req: express.Request): Promise<{
     const petitionerId = caseDoc.petitionerId?._id?.toString?.() ?? caseDoc.petitionerId?.toString?.();
     const isOnCase = auth.sub === respondentId || auth.sub === respondentAttId;
     if (!isOnCase || !petitionerId) {
+      throw Object.assign(new Error('Forbidden'), { status: 403 });
+    }
+    return { auth, targetUserObjectId: petitionerId };
+  }
+
+  if (auth.roleTypeId === PETITIONER_ATTORNEY_ROLE && requestedCaseId) {
+    if (!mongoose.isValidObjectId(requestedCaseId)) {
+      throw Object.assign(new Error('Invalid caseId'), { status: 400 });
+    }
+    const caseDoc = await CaseModel.findById(requestedCaseId).lean<any>();
+    if (!caseDoc) {
+      throw Object.assign(new Error('Case not found'), { status: 404 });
+    }
+    const petitionerAttId = caseDoc.petitionerAttId?._id?.toString?.() ?? caseDoc.petitionerAttId?.toString?.();
+    const petitionerId = caseDoc.petitionerId?._id?.toString?.() ?? caseDoc.petitionerId?.toString?.();
+    const isPetitionerAttorneyOnCase = auth.sub === petitionerAttId;
+    if (!isPetitionerAttorneyOnCase || !petitionerId) {
       throw Object.assign(new Error('Forbidden'), { status: 403 });
     }
     return { auth, targetUserObjectId: petitionerId };

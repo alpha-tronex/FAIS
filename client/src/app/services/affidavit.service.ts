@@ -19,6 +19,8 @@ export type AffidavitSummary = {
   threshold: number;
   form: 'short' | 'long';
   monthlyIncomeBreakdown?: MonthlyIncomeBreakdownRow[];
+  /** Full name of the person whose affidavit this is (petitioner when viewing as respondent/attorney). */
+  targetUserDisplayName?: string;
 };
 
 @Injectable({ providedIn: 'root' })

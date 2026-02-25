@@ -63,6 +63,11 @@ export class AffidavitPage implements OnInit, OnDestroy {
     return this.auth.hasRole(2, 4);
   }
 
+  /** True when back link should go to My cases (non-admin or respondent). */
+  get showBackToMyCases(): boolean {
+    return this.isRespondentViewer || !this.auth.isAdmin();
+  }
+
   navQueryParams(): Record<string, string> {
     const qp: Record<string, string> = {};
     if (this.userId) qp['userId'] = this.userId;

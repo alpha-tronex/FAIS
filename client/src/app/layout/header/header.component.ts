@@ -45,6 +45,11 @@ export class HeaderComponent implements OnInit {
     return this.auth.hasRole(2, 4);
   }
 
+  /** Query params for Profile link: none (profile is own page; do not carry caseId/userId from affidavit). */
+  get profileQueryParams(): Record<string, string> {
+    return {};
+  }
+
   /** Current route query params to preserve in nav links (caseId, userId). */
   get navQueryParams(): Record<string, string> {
     const q = this.router.parseUrl(this.router.url).queryParams;

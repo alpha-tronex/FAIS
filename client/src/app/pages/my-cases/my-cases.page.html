@@ -17,7 +17,7 @@
           <th class="th">Petitioner</th>
           <th class="th">Respondent</th>
           <th class="th">Created</th>
-          <th class="th">{{ isRespondentViewer ? 'View' : 'Select' }}</th>
+          <th class="th">Actions</th>
         </tr>
       </thead>
 
@@ -33,7 +33,10 @@
           </td>
           <td class="td">{{ c.createdAt | date:'short' }}</td>
           <td class="td">
-            <button type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">{{ isRespondentViewer ? 'View affidavit' : 'Select' }}</button>
+            <span class="caseActions">
+              <button *ngIf="!isRespondentViewer" type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">Select</button>
+              <button type="button" (click)="viewSummary(c.id)" [disabled]="busy" class="submit">Summary</button>
+            </span>
           </td>
         </tr>
       </tbody>

@@ -12,6 +12,7 @@ import { fillOfficialAffidavitPdf } from '../lib/affidavit-official-pdf.js';
 import { resolveAffidavitTarget } from './affidavit-middleware.js';
 import { sendError } from './error.js';
 import type { AuthMiddlewares } from './middleware.js';
+import { User } from '../models.js';
 import { createAffidavitEmploymentRouter } from './affidavit-employment.routes.js';
 import { registerAffidavitMonthlyLinesRoutes } from './affidavit-monthly-lines.routes.js';
 import { createAffidavitAssetsRouter } from './affidavit-assets.routes.js';
@@ -38,7 +39,13 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
     try {
       const { targetUserObjectId } = await resolveAffidavitTarget(req);
       const summary = await computeAffidavitSummary(targetUserObjectId);
-      res.json(summary);
+      const targetUser = await User.findById(targetUserObjectId).select({ firstName: 1, lastName: 1, uname: 1 }).lean();
+      const targetUserDisplayName = targetUser
+        ? (targetUser.lastName?.trim() || targetUser.firstName?.trim()
+          ? [targetUser.lastName?.trim(), targetUser.firstName?.trim()].filter(Boolean).join(', ')
+          : (targetUser as { uname?: string }).uname ?? '')
+        : '';
+      res.json({ ...summary, targetUserDisplayName });
     } catch (e) {
       sendError(res, e);
     }

@@ -73,6 +73,10 @@ export class MyCasesPage implements OnInit, OnDestroy {
   }
 
   selectCase(caseId: string) {
+    void this.router.navigate(['/affidavit/edit'], { queryParams: { caseId } });
+  }
+
+  viewSummary(caseId: string) {
     void this.router.navigate(['/affidavit'], { queryParams: { caseId } });
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "mean-fais",
+  "name": "fais",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "server:dev": "npm --prefix server run dev",
     "server:build": "npm --prefix server run build",
     "server:start": "npm --prefix server run start",
-    "client:dev": "npm --prefix client start",
+    "client:start": "npm --prefix client start",
     "client:build": "npm --prefix client run build"
   },
   "devDependencies": {

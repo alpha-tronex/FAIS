@@ -6,12 +6,14 @@
 
   <section class="mt16">
     <div class="rowActions">
-      <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
+      <a *ngIf="showBackToMyCases" routerLink="/my-cases" class="link">Back to My cases</a>
+      <a *ngIf="!showBackToMyCases" routerLink="/admin" class="link">Back to Admin</a>
       <span *ngIf="busy">Loading…</span>
     </div>
 
     <div *ngIf="summary" class="panel mt12">
       <h2 class="panelTitle">Summary</h2>
+      <p *ngIf="summary.targetUserDisplayName" class="mt8"><strong>Petitioner:</strong> {{ summary.targetUserDisplayName }}</p>
       <p>
         Gross annual income: <strong>{{ summary.grossAnnualIncome | number:'1.2-2' }}</strong>
       </p>

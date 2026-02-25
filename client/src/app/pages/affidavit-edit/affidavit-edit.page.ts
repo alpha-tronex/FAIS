@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, forkJoin, from, map, of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitDataService, AssetRow, ContingentAssetRow, ContingentLiabilityRow, EmploymentRow, LiabilityRow, MonthlyLineRow } from '../../services/affidavit-data.service';
+import { CasesService } from '../../services/cases.service';
 import { LookupsService, LookupItem } from '../../services/lookups.service';
 import { AssetCreatePayload } from './sections/affidavit-assets-section.component';
 import { EmploymentCreatePayload } from './sections/affidavit-employment-section.component';
@@ -21,6 +22,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   @Input() userId: string | null = null;
   @Input() caseId: string | null = null;
   @Input() hideNav = false;
+
+  /** Full name of the petitioner when editing in case context (from case list). */
+  petitionerDisplayName: string | null = null;
 
   steps = [
     { key: 'employment', title: 'Employment' },
@@ -112,6 +116,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   constructor(
     private readonly auth: AuthService,
     private readonly api: AffidavitDataService,
+    private readonly casesApi: CasesService,
     private readonly lookups: LookupsService,
     private readonly route: ActivatedRoute,
     private readonly router: Router
@@ -138,10 +143,34 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    this.loadPetitionerDisplayName();
+
     this.syncCurrentStepKey();
     this.loadNoneSelections();
 
     this.refresh();
+  }
+
+  private loadPetitionerDisplayName(): void {
+    if (!this.caseId) {
+      this.petitionerDisplayName = null;
+      return;
+    }
+    from(this.casesApi.list()).subscribe({
+      next: (cases) => {
+        const c = cases.find((x) => x.id === this.caseId);
+        if (c?.petitioner) {
+          const p = c.petitioner;
+          const name = [p.lastName?.trim(), p.firstName?.trim()].filter(Boolean).join(', ');
+          this.petitionerDisplayName = name || p.uname || null;
+        } else {
+          this.petitionerDisplayName = null;
+        }
+      },
+      error: () => {
+        this.petitionerDisplayName = null;
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -157,7 +186,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     }
 
     if (changes['caseId'] && !changes['caseId'].firstChange) {
-      // View will update automatically with Zone.js
+      this.loadPetitionerDisplayName();
     }
   }
 
@@ -412,7 +441,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private loadAll(userId?: string) {
+  private loadAll(userId?: string, caseId?: string) {
     return forkJoin({
       payFrequencies: from(this.lookups.list('pay-frequency-types')),
       incomeTypes: from(this.lookups.list('monthly-income-types')),
@@ -428,20 +457,20 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       liabilitiesTypes: from(this.lookups.list('liabilities-types')),
       nonMaritalTypes: from(this.lookups.list('non-marital-types')),
 
-      employment: from(this.api.listEmployment(userId)),
-      monthlyIncome: from(this.api.listMonthlyIncome(userId)),
-      monthlyDeductions: from(this.api.listMonthlyDeductions(userId)),
-      monthlyHouseholdExpenses: from(this.api.listMonthlyHouseholdExpenses(userId)),
-      monthlyAutomobileExpenses: from(this.api.listMonthlyAutomobileExpenses(userId)),
-      monthlyChildrenExpenses: from(this.api.listMonthlyChildrenExpenses(userId)),
-      monthlyChildrenOtherExpenses: from(this.api.listMonthlyChildrenOtherExpenses(userId)),
-      monthlyCreditorsExpenses: from(this.api.listMonthlyCreditorsExpenses(userId)),
-      monthlyInsuranceExpenses: from(this.api.listMonthlyInsuranceExpenses(userId)),
-      monthlyOtherExpenses: from(this.api.listMonthlyOtherExpenses(userId)),
-      assets: from(this.api.listAssets(userId)),
-      liabilities: from(this.api.listLiabilities(userId)),
-      contingentAssets: from(this.api.listContingentAssets(userId)),
-      contingentLiabilities: from(this.api.listContingentLiabilities(userId))
+      employment: from(this.api.listEmployment(userId, caseId)),
+      monthlyIncome: from(this.api.listMonthlyIncome(userId, caseId)),
+      monthlyDeductions: from(this.api.listMonthlyDeductions(userId, caseId)),
+      monthlyHouseholdExpenses: from(this.api.listMonthlyHouseholdExpenses(userId, caseId)),
+      monthlyAutomobileExpenses: from(this.api.listMonthlyAutomobileExpenses(userId, caseId)),
+      monthlyChildrenExpenses: from(this.api.listMonthlyChildrenExpenses(userId, caseId)),
+      monthlyChildrenOtherExpenses: from(this.api.listMonthlyChildrenOtherExpenses(userId, caseId)),
+      monthlyCreditorsExpenses: from(this.api.listMonthlyCreditorsExpenses(userId, caseId)),
+      monthlyInsuranceExpenses: from(this.api.listMonthlyInsuranceExpenses(userId, caseId)),
+      monthlyOtherExpenses: from(this.api.listMonthlyOtherExpenses(userId, caseId)),
+      assets: from(this.api.listAssets(userId, caseId)),
+      liabilities: from(this.api.listLiabilities(userId, caseId)),
+      contingentAssets: from(this.api.listContingentAssets(userId, caseId)),
+      contingentLiabilities: from(this.api.listContingentLiabilities(userId, caseId))
     });
   }
 
@@ -451,7 +480,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = this.loadAll(this.userId || undefined)
+    this.subscription = this.loadAll(this.userId || undefined, this.caseId || undefined)
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -512,7 +541,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     if (this.hideNav) {
       void this.router.navigate(['/admin', 'affidavit'], { queryParams });
     } else {
-      void this.router.navigate(['/affidavit'], { queryParams });
+      void this.router.navigateByUrl('/my-cases');
     }
   }
 
@@ -688,7 +717,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createEmployment(payload, this.userId || undefined)
+      this.api.createEmployment(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -778,7 +807,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteEmployment(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteEmployment(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -800,7 +829,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createMonthlyIncome(payload, this.userId || undefined)
+      this.api.createMonthlyIncome(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -820,7 +849,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteMonthlyIncome(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyIncome(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -849,7 +878,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
     this.subscription = from(
-      this.api.patchMonthlyIncome(payload.id, body, this.userId || undefined)
+      this.api.patchMonthlyIncome(payload.id, body, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -872,7 +901,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createMonthlyDeductions(payload, this.userId || undefined)
+      this.api.createMonthlyDeductions(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -892,7 +921,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteMonthlyDeductions(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyDeductions(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -921,7 +950,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
     this.subscription = from(
-      this.api.patchMonthlyDeductions(payload.id, body, this.userId || undefined)
+      this.api.patchMonthlyDeductions(payload.id, body, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -944,7 +973,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createMonthlyHouseholdExpenses(payload, this.userId || undefined)
+      this.api.createMonthlyHouseholdExpenses(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -964,7 +993,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteMonthlyHouseholdExpenses(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyHouseholdExpenses(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -993,7 +1022,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
     this.subscription = from(
-      this.api.patchMonthlyHouseholdExpenses(payload.id, body, this.userId || undefined)
+      this.api.patchMonthlyHouseholdExpenses(payload.id, body, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -1013,7 +1042,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.createMonthlyAutomobileExpenses(payload, this.userId || undefined))
+    this.subscription = from(this.api.createMonthlyAutomobileExpenses(payload, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1025,7 +1054,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.deleteMonthlyAutomobileExpenses(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyAutomobileExpenses(id, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1045,7 +1074,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       return;
     }
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = from(this.api.patchMonthlyAutomobileExpenses(payload.id, body, this.userId || undefined))
+    this.subscription = from(this.api.patchMonthlyAutomobileExpenses(payload.id, body, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1058,7 +1087,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.createMonthlyChildrenExpenses(payload, this.userId || undefined))
+    this.subscription = from(this.api.createMonthlyChildrenExpenses(payload, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1070,7 +1099,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.deleteMonthlyChildrenExpenses(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyChildrenExpenses(id, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1090,7 +1119,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       return;
     }
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = from(this.api.patchMonthlyChildrenExpenses(payload.id, body, this.userId || undefined))
+    this.subscription = from(this.api.patchMonthlyChildrenExpenses(payload.id, body, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1103,7 +1132,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.createMonthlyChildrenOtherExpenses(payload, this.userId || undefined))
+    this.subscription = from(this.api.createMonthlyChildrenOtherExpenses(payload, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1115,7 +1144,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.deleteMonthlyChildrenOtherExpenses(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyChildrenOtherExpenses(id, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1135,7 +1164,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       return;
     }
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = from(this.api.patchMonthlyChildrenOtherExpenses(payload.id, body, this.userId || undefined))
+    this.subscription = from(this.api.patchMonthlyChildrenOtherExpenses(payload.id, body, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1148,7 +1177,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.createMonthlyCreditorsExpenses(payload, this.userId || undefined))
+    this.subscription = from(this.api.createMonthlyCreditorsExpenses(payload, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1160,7 +1189,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.deleteMonthlyCreditorsExpenses(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyCreditorsExpenses(id, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1180,7 +1209,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       return;
     }
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = from(this.api.patchMonthlyCreditorsExpenses(payload.id, body, this.userId || undefined))
+    this.subscription = from(this.api.patchMonthlyCreditorsExpenses(payload.id, body, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1193,7 +1222,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.createMonthlyInsuranceExpenses(payload, this.userId || undefined))
+    this.subscription = from(this.api.createMonthlyInsuranceExpenses(payload, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1205,7 +1234,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.deleteMonthlyInsuranceExpenses(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyInsuranceExpenses(id, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1225,7 +1254,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       return;
     }
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = from(this.api.patchMonthlyInsuranceExpenses(payload.id, body, this.userId || undefined))
+    this.subscription = from(this.api.patchMonthlyInsuranceExpenses(payload.id, body, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1238,7 +1267,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.createMonthlyOtherExpenses(payload, this.userId || undefined))
+    this.subscription = from(this.api.createMonthlyOtherExpenses(payload, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1250,7 +1279,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.subscription?.unsubscribe();
     this.busy = true;
     this.error = null;
-    this.subscription = from(this.api.deleteMonthlyOtherExpenses(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteMonthlyOtherExpenses(id, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1270,7 +1299,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       return;
     }
     const body = { typeId, amount, ifOther: payload.ifOther ?? null };
-    this.subscription = from(this.api.patchMonthlyOtherExpenses(payload.id, body, this.userId || undefined))
+    this.subscription = from(this.api.patchMonthlyOtherExpenses(payload.id, body, this.userId || undefined, this.caseId || undefined))
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: () => this.refresh(),
@@ -1286,7 +1315,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createAsset(payload, this.userId || undefined)
+      this.api.createAsset(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -1306,7 +1335,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteAsset(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteAsset(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -1328,7 +1357,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createLiability(payload, this.userId || undefined)
+      this.api.createLiability(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -1348,7 +1377,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteLiability(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteLiability(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -1370,7 +1399,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createContingentAsset(payload, this.userId || undefined)
+      this.api.createContingentAsset(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -1390,7 +1419,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteContingentAsset(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteContingentAsset(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -1412,7 +1441,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.error = null;
 
     this.subscription = from(
-      this.api.createContingentLiability(payload, this.userId || undefined)
+      this.api.createContingentLiability(payload, this.userId || undefined, this.caseId || undefined)
     )
       .pipe(
         finalize(() => {
@@ -1432,7 +1461,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.api.deleteContingentLiability(id, this.userId || undefined))
+    this.subscription = from(this.api.deleteContingentLiability(id, this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;

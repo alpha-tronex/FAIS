@@ -10,12 +10,8 @@
     </ng-container>
     <ng-container *ngIf="!showAdminNav">
       <a routerLink="/my-cases" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive" [routerLinkActiveOptions]="{ exact: true }">My cases</a>
-      <span class="sep" *ngIf="!isRespondentViewer">|</span>
-      <a *ngIf="!isRespondentViewer" [routerLink]="['/affidavit']" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive">Affidavit</a>
-      <span class="sep" *ngIf="!isRespondentViewer">|</span>
-      <a *ngIf="!isRespondentViewer" [routerLink]="['/affidavit/edit']" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive">Edit data</a>
       <span class="sep">|</span>
-      <a [routerLink]="['/profile']" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive">Profile</a>
+      <a [routerLink]="['/profile']" [queryParams]="profileQueryParams" class="navLink" routerLinkActive="navLinkActive">Profile</a>
     </ng-container>
     <span class="sep">|</span>
     <button type="button" class="navBtn link" (click)="logout()">Logout</button>
