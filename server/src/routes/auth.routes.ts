@@ -52,10 +52,14 @@ const meSsnUpdateSchema = z
     path: ['confirmSsn']
   });
 
+/** Default JWT lifetime when JWT_EXPIRES_IN is not set (e.g. '15m', '1h'). */
+const DEFAULT_JWT_EXPIRES_IN = '15m';
+
 export function createAuthRouter(
-  deps: { jwtSecret: string } & Pick<AuthMiddlewares, 'requireAuth'>
+  deps: { jwtSecret: string; jwtExpiresIn?: string } & Pick<AuthMiddlewares, 'requireAuth'>
 ): express.Router {
   const router = express.Router();
+  const expiresIn = (deps.jwtExpiresIn ?? DEFAULT_JWT_EXPIRES_IN) as jwt.SignOptions['expiresIn'];
 
   router.post('/auth/login', async (req, res) => {
     const parsed = loginSchema.safeParse(req.body);
@@ -80,13 +84,31 @@ export function createAuthRouter(
     const token = jwt.sign(
       { sub: user._id.toString(), roleTypeId: user.roleTypeId, uname: user.uname },
       deps.jwtSecret,
-      { expiresIn: '15m' }
+      { expiresIn }
     );
 
     res.json({
       token,
       mustResetPassword: Boolean(user.mustResetPassword),
       user: { id: user._id.toString(), uname: user.uname, roleTypeId: user.roleTypeId }
+    });
+  });
+
+  /** Issue a new token when the current one is still valid (extends session / "stay logged in"). */
+  router.post('/auth/refresh', deps.requireAuth, async (req, res) => {
+    const auth = (req as any).auth as AuthPayload;
+    const user = await User.findById(auth.sub).select('mustResetPassword').lean();
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const token = jwt.sign(
+      { sub: auth.sub, roleTypeId: auth.roleTypeId, uname: auth.uname },
+      deps.jwtSecret,
+      { expiresIn }
+    );
+
+    res.json({
+      token,
+      mustResetPassword: Boolean(user.mustResetPassword)
     });
   });
 

@@ -7,6 +7,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { App } from './app';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth.interceptor';
+import { unauthInterceptor } from './core/unauth.interceptor';
 
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
@@ -28,6 +29,7 @@ import { AffidavitLiabilitiesSectionComponent } from './pages/affidavit-edit/sec
 import { AffidavitContingentAssetsSectionComponent } from './pages/affidavit-edit/sections/affidavit-contingent-assets-section.component';
 import { AffidavitContingentLiabilitiesSectionComponent } from './pages/affidavit-edit/sections/affidavit-contingent-liabilities-section.component';
 import { ConfirmPopupComponent } from './shared/confirm-popup/confirm-popup.component';
+import { SessionExpiryModalComponent } from './shared/session-expiry-modal/session-expiry-modal.component';
 import { AppLayoutComponent } from './layout/app-layout.component';
 import { HeaderComponent } from './layout/header/header.component';
 import { FooterComponent } from './layout/footer/footer.component';
@@ -57,12 +59,13 @@ import { FooterComponent } from './layout/footer/footer.component';
     AffidavitContingentLiabilitiesSectionComponent,
     AdminPage,
     AdminAffidavitPage,
-    ConfirmPopupComponent
+    ConfirmPopupComponent,
+    SessionExpiryModalComponent
   ],
   imports: [BrowserModule, FormsModule, RouterModule.forRoot(routes)],
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideHttpClient(withInterceptors([authInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor, unauthInterceptor]))
   ],
   bootstrap: [App]
 })

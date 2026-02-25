@@ -24,6 +24,9 @@ export class LoginPage implements OnInit {
 
   ngOnInit(): void {
     this.resetSuccess = this.route.snapshot.queryParamMap.get('reset') === 'success';
+    if (this.route.snapshot.queryParamMap.get('session') === 'expired') {
+      this.error = 'Your session expired. Please sign in again.';
+    }
   }
 
   async onSubmit() {

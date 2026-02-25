@@ -136,6 +136,40 @@ export class AuthService {
     }
   }
 
+  /**
+   * JWT exp claim (seconds since epoch), or null if no token / invalid.
+   * Used by session idle to show warning before expiry.
+   */
+  getTokenExpiryTime(): number | null {
+    const token = getToken();
+    if (!token) return null;
+
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    try {
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(base64Url.length / 4) * 4, '=');
+      const json = globalThis.atob(base64);
+      const payload = JSON.parse(json) as JwtPayload;
+      const exp = payload?.exp;
+      return typeof exp === 'number' && Number.isFinite(exp) ? exp : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Exchange current token for a new one (extends session). Fails if token is expired. */
+  async refreshToken(): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<{ token: string; mustResetPassword?: boolean }>(`${this.apiBase}/auth/refresh`, {})
+    );
+    setToken(res.token);
+    if (res.mustResetPassword !== undefined) {
+      setMustResetPassword(res.mustResetPassword);
+    }
+  }
+
   isAdmin(): boolean {
     return this.getRoleTypeIdFromToken() === 5;
   }

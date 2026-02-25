@@ -1,0 +1,25 @@
+@if ((sessionIdle.state$ | async); as state) {
+  @if (state.visible) {
+    <div
+      class="sessionOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="session-expiry-title"
+      aria-describedby="session-expiry-message"
+    >
+      <div class="sessionPanel">
+        <h2 id="session-expiry-title" class="panelTitle">Session expiring</h2>
+        <p id="session-expiry-message" class="sessionMessage">
+          Your session will expire in <strong>{{ formatCountdown(state.countdownSeconds) }}</strong>.
+          Stay logged in or you will be signed out.
+        </p>
+        <div class="rowActions sessionActions">
+          <button type="button" (click)="logOut()">Log out</button>
+          <button type="button" class="confirmButton" (click)="stayLoggedIn()">
+            Stay logged in
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

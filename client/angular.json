@@ -71,6 +71,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "session-test": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.session-test.ts"
+                }
+              ],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"
@@ -86,6 +97,9 @@
             },
             "development": {
               "buildTarget": "client:build:development"
+            },
+            "session-test": {
+              "buildTarget": "client:build:session-test"
             }
           },
           "defaultConfiguration": "development"

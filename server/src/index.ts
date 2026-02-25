@@ -37,6 +37,8 @@ if (!SSN_ENCRYPTION_KEY_B64) {
 
 const mongoUri: string = MONGODB_URI;
 const jwtSecret: string = JWT_SECRET;
+/** JWT lifetime for login/refresh tokens (e.g. '15m', '1h'). Default 15m. */
+const jwtExpiresIn = process.env.JWT_EXPIRES_IN?.trim() || '15m';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -68,7 +70,7 @@ const { requireAuth, requireAdmin, requireStaffOrAdmin } = createAuthMiddlewares
 
 app.use(createHealthRouter());
 app.use(createRoleTypesRouter({ requireAuth }));
-app.use(createAuthRouter({ jwtSecret, requireAuth }));
+app.use(createAuthRouter({ jwtSecret, jwtExpiresIn, requireAuth }));
 app.use(createUsersRouter({ requireAuth, requireAdmin }));
 app.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
 app.use(createLookupsRouter({ requireAuth }));
