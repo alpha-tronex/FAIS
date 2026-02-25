@@ -104,6 +104,17 @@
     </form>
   </section>
 
+  <section *ngIf="editingUserId" class="panel mt16">
+    <h2 class="panelTitle">Update password</h2>
+    <p class="muted">Send this user an email with a link to set a new password. The link expires in 1 hour.</p>
+    <div class="rowActions mt12">
+      <button type="button" (click)="sendPasswordResetEmail()" [disabled]="passwordResetBusy" class="submit">Send password reset email</button>
+      <span *ngIf="passwordResetBusy">Sending…</span>
+    </div>
+    <p *ngIf="passwordResetSent" class="success mt8" role="status">An email has been sent to the user to update their password.</p>
+    <p *ngIf="passwordResetError" class="error mt8" role="alert">{{ passwordResetError }}</p>
+  </section>
+
   <section class="panel mt16">
     <h2 class="panelTitle">Update SSN</h2>
 

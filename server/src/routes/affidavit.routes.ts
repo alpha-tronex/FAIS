@@ -192,9 +192,12 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
   });
 
   router.get('/affidavit/pdf-template', authMw.requireAuth, async (req, res) => {
-    const requestedForm = typeof req.query.form === 'string' ? req.query.form : 'auto';
     try {
       const { auth, targetUserObjectId } = await resolveAffidavitTarget(req);
+      if (auth.roleTypeId === 2 || auth.roleTypeId === 4) {
+        return res.status(403).json({ error: 'Official Florida form PDF is not available for respondents' });
+      }
+      const requestedForm = typeof req.query.form === 'string' ? req.query.form : 'auto';
       if (requestedForm !== 'auto' && requestedForm !== 'short' && requestedForm !== 'long') {
         return res.status(400).json({ error: 'Invalid form' });
       }

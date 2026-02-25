@@ -46,3 +46,42 @@
 .success {
 	color: var(--accent);
 }
+
+.thSortable {
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+}
+
+.thSortable:hover {
+	text-decoration: underline;
+}
+
+.sortIcon {
+	margin-left: 4px;
+	font-weight: 700;
+}
+
+.filterLabel {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.filterLabel .input {
+	width: auto;
+}
+
+.labelLine {
+	display: block;
+}
+
+.labelTooltip {
+	display: inline;
+	margin-left: 4px;
+	cursor: help;
+	color: var(--muted, #666);
+	font-size: 0.95em;
+	line-height: 1;
+	vertical-align: middle;
+}

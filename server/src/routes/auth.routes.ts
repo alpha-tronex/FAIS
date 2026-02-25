@@ -1,37 +1,32 @@
+import crypto from 'crypto';
 import express from 'express';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { User, type UserDoc } from '../models.js';
 import { toUserDTO } from '../mappers/user.mapper.js';
 import { computeSsnLast4, decryptSsn, encryptSsn } from '../security/ssn-crypto.js';
+import { sendPasswordResetEmail } from '../services/invite-email.service.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
+
+const PASSWORD_RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 const loginSchema = z.object({
   uname: z.string().min(1).max(25),
   password: z.string().min(1)
 });
 
-const registerSchema = z.object({
-  uname: z.string().min(1).max(25),
-  email: z.string().email(),
-  password: z.string().min(8),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  addressLine1: z.string().min(1).max(200),
-  addressLine2: z.string().max(200).optional(),
-  city: z.string().min(1).max(100),
-  state: z.string().min(1).max(50),
-  zipCode: z.string().min(1).max(20),
-  phone: z.string().min(1).max(50),
-  ssn: z.string().min(1).max(20),
-  // Ignored on create; server forces roleTypeId=1.
-  roleTypeId: z.number().int().optional(),
-  // Ignored on create; server forces mustResetPassword=false.
-  mustResetPassword: z.boolean().optional()
+const changePasswordSchema = z.object({
+  newPassword: z.string().min(8)
 });
 
-const changePasswordSchema = z.object({
+const forgotPasswordSchema = z.object({
+  email: z.string().email()
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1),
   newPassword: z.string().min(8)
 });
 
@@ -95,71 +90,72 @@ export function createAuthRouter(
     });
   });
 
-  // Self-registration: creates a standard user account (roleTypeId=1).
-  router.post('/auth/register', async (req, res) => {
-    const parsed = registerSchema.safeParse(req.body);
+  // Registration is by admin invitation only; new accounts are created via POST /users.
+  router.post('/auth/register', async (_req, res) => {
+    return res.status(403).json({
+      error: 'Registration is by invitation only. Contact your administrator for access.'
+    });
+  });
+
+  router.post('/auth/forgot-password', async (req, res) => {
+    const parsed = forgotPasswordSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: 'Invalid payload' });
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
-
-    const uname = parsed.data.uname.trim();
     const email = parsed.data.email.trim();
-    const firstName = parsed.data.firstName?.trim() || undefined;
-    const lastName = parsed.data.lastName?.trim() || undefined;
-    const addressLine1 = parsed.data.addressLine1.trim();
-    const addressLine2 = parsed.data.addressLine2?.trim() || undefined;
-    const city = parsed.data.city.trim();
-    const state = parsed.data.state.trim();
-    const zipCode = parsed.data.zipCode.trim();
-    const phone = parsed.data.phone.trim();
-    const ssn = parsed.data.ssn.trim();
-    let encryptedSsn: ReturnType<typeof encryptSsn>;
-    try {
-      encryptedSsn = encryptSsn(ssn);
-    } catch {
-      return res
-        .status(500)
-        .json({ error: 'Server not configured for SSN encryption (missing SSN_ENCRYPTION_KEY_B64)' });
+    const user = await User.findOne({
+      email: new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
+      passwordHash: { $exists: true }
+    }).lean<UserDoc>();
+    if (!user) {
+      res.json({ ok: true });
+      return;
     }
-
-    const existingUname = await User.findOne({ uname }).lean();
-    if (existingUname) return res.status(409).json({ error: 'Username already exists' });
-    const existingEmail = await User.findOne({ email }).lean();
-    if (existingEmail) return res.status(409).json({ error: 'Email already exists' });
-
-    const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-    const created = await User.create({
-      uname,
-      email,
-      firstName,
-      lastName,
-      addressLine1,
-      addressLine2,
-      city,
-      state,
-      zipCode,
-      phone,
-      ssnLast4: computeSsnLast4(ssn),
-      ...encryptedSsn,
-      roleTypeId: 1,
-      passwordHash,
-      mustResetPassword: false
-    });
-
-    // Self-registration: audit fields point to the created user.
-    await User.updateOne({ _id: created._id }, { $set: { createdBy: created._id, updatedBy: created._id } });
-
-    const token = jwt.sign(
-      { sub: created._id.toString(), roleTypeId: created.roleTypeId, uname: created.uname },
-      deps.jwtSecret,
-      { expiresIn: '15m' }
+    if (user.email && user.email.endsWith('@placeholder.local')) {
+      res.json({ ok: true });
+      return;
+    }
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + PASSWORD_RESET_TOKEN_EXPIRY_MS);
+    const userId = (user as UserDoc & { _id: mongoose.Types.ObjectId })._id;
+    await User.updateOne(
+      { _id: userId },
+      { $set: { passwordResetToken: token, passwordResetTokenExpiresAt: expiresAt } }
     );
+    const appUrl = (process.env.APP_BASE_URL?.trim() || 'http://localhost:4200').replace(/\/+$/, '');
+    try {
+      await sendPasswordResetEmail({ to: user.email, appUrl, resetToken: token });
+    } catch (e) {
+      console.warn('[forgot-password] Failed to send reset email:', e);
+    }
+    res.json({ ok: true });
+  });
 
-    res.status(201).json({
-      token,
-      mustResetPassword: false,
-      user: { id: created._id.toString(), uname: created.uname, roleTypeId: created.roleTypeId }
-    });
+  router.post('/auth/reset-password', async (req, res) => {
+    const parsed = resetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid request. Token and new password (min 8 characters) are required.' });
+    }
+    const { token, newPassword } = parsed.data;
+    const now = new Date();
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetTokenExpiresAt: { $gt: now },
+      passwordHash: { $exists: true }
+    }).lean<UserDoc>();
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired reset link. Please request a new password reset.' });
+    }
+    const userId = (user as UserDoc & { _id: mongoose.Types.ObjectId })._id;
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await User.updateOne(
+      { _id: userId },
+      {
+        $set: { passwordHash, mustResetPassword: false, updatedBy: userId },
+        $unset: { passwordResetToken: '', passwordResetTokenExpiresAt: '' }
+      }
+    );
+    res.json({ ok: true });
   });
 
   router.post('/auth/change-password', deps.requireAuth, async (req, res) => {

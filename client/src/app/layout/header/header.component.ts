@@ -40,6 +40,11 @@ export class HeaderComponent implements OnInit {
     return this.isAdmin && this.router.url.split('?')[0].startsWith('/admin');
   }
 
+  /** Respondent (2) or Respondent Attorney (4): view-only affidavit from My Cases, no Edit data. */
+  get isRespondentViewer(): boolean {
+    return this.auth.hasRole(2, 4);
+  }
+
   /** Current route query params to preserve in nav links (caseId, userId). */
   get navQueryParams(): Record<string, string> {
     const q = this.router.parseUrl(this.router.url).queryParams;

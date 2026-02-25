@@ -50,7 +50,17 @@ export class AffidavitPage implements OnInit, OnDestroy {
       this.caseId = qpCaseId;
     }
 
+    if (this.isRespondentViewer && !this.caseId) {
+      void this.router.navigateByUrl('/my-cases');
+      return;
+    }
+
     this.refresh();
+  }
+
+  /** Respondent (2) or Respondent Attorney (4): view-only petitioner's affidavit, HTML print only. */
+  get isRespondentViewer(): boolean {
+    return this.auth.hasRole(2, 4);
   }
 
   navQueryParams(): Record<string, string> {
@@ -70,7 +80,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.affidavitApi.summary(this.userId || undefined))
+    this.subscription = from(this.affidavitApi.summary(this.userId || undefined, this.caseId || undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -92,7 +102,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
   }
 
   goBack() {
-    void this.router.navigateByUrl(this.auth.isAdmin() ? '/admin' : '/my-cases');
+    void this.router.navigateByUrl(this.isRespondentViewer || !this.auth.isAdmin() ? '/my-cases' : '/admin');
   }
 
   logout() {
@@ -107,8 +117,14 @@ export class AffidavitPage implements OnInit, OnDestroy {
 
     try {
       const form = this.summary?.form ?? 'auto';
-      const blob = await this.affidavitApi.generatePdf(form, this.userId || undefined, this.caseId || undefined);
-      const fileName = `financial-affidavit-${this.summary?.form ?? 'auto'}.pdf`;
+      const blob = await this.affidavitApi.generatePdf(
+        form,
+        this.userId || undefined,
+        this.caseId || undefined
+      );
+      const fileName = this.isRespondentViewer
+        ? 'financial-affidavit-summary.pdf'
+        : `financial-affidavit-${this.summary?.form ?? 'auto'}.pdf`;
       await this.fileSave.savePdf(blob, fileName);
     } catch (e: any) {
       this.error = e?.error?.error ?? 'Failed to generate PDF';

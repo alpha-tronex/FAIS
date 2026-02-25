@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -8,17 +8,23 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.page.html',
   styleUrl: './login.page.css'
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   uname = '';
   password = '';
   showPassword = false;
   busy = false;
   error: string | null = null;
+  resetSuccess = false;
 
   constructor(
     private readonly auth: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {}
+
+  ngOnInit(): void {
+    this.resetSuccess = this.route.snapshot.queryParamMap.get('reset') === 'success';
+  }
 
   async onSubmit() {
     if (this.busy) return;

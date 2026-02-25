@@ -174,6 +174,20 @@ export class AuthService {
     setMustResetPassword(false);
   }
 
+  /** Request a password-reset email. Always returns; does not reveal whether email exists. */
+  async forgotPassword(email: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post(`${this.apiBase}/auth/forgot-password`, { email: email.trim() })
+    );
+  }
+
+  /** Set new password using the token from the reset email. */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post(`${this.apiBase}/auth/reset-password`, { token, newPassword })
+    );
+  }
+
   logout() {
     setToken(null);
     setMustResetPassword(null);

@@ -11,6 +11,8 @@ import { authInterceptor } from './core/auth.interceptor';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
 import { ResetPage } from './pages/reset/reset.page';
+import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
+import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
 import { UsersPage } from './pages/users/users.page';
 import { CasesPage } from './pages/cases/cases.page';
 import { MyCasesPage } from './pages/my-cases/my-cases.page';
@@ -39,6 +41,8 @@ import { FooterComponent } from './layout/footer/footer.component';
     LoginPage,
     RegisterPage,
     ResetPage,
+    ForgotPasswordPage,
+    ResetPasswordPage,
     UsersPage,
     CasesPage,
     MyCasesPage,

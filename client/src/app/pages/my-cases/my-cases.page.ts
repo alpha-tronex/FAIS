@@ -67,6 +67,11 @@ export class MyCasesPage implements OnInit, OnDestroy {
     void this.router.navigateByUrl('/login');
   }
 
+  /** Respondent (2) or Respondent Attorney (4): view petitioner's affidavit only. */
+  get isRespondentViewer(): boolean {
+    return this.auth.hasRole(2, 4);
+  }
+
   selectCase(caseId: string) {
     void this.router.navigate(['/affidavit'], { queryParams: { caseId } });
   }

@@ -21,12 +21,15 @@ export type UserListItem = {
 };
 
 export type CreateUserRequest = {
-  uname: string;
-  email: string;
-  password: string;
+  /** Required for full create (user can log in). Omit for minimal create (role 2 or 4 only). */
+  uname?: string;
+  email?: string;
+  password?: string;
   firstName?: string;
   lastName?: string;
-  /** When true, server sends invitation email so the user can log in and change password. */
+  /** Required. For minimal create use 2 or 4 (respondent / respondent attorney). */
+  roleTypeId?: number;
+  /** When true, server sends invitation email. Only used for full create. */
   sendInviteEmail?: boolean;
 };
 
@@ -86,5 +89,10 @@ export class UsersService {
 
   async updateSsn(id: string, req: UpdateUserSsnRequest): Promise<UserListItem> {
     return await firstValueFrom(this.http.patch<UserListItem>(`${this.apiBase}/users/${id}/ssn`, req));
+  }
+
+  /** Admin: send a password-reset email to this user so they can set a new password. */
+  async sendPasswordReset(id: string): Promise<void> {
+    await firstValueFrom(this.http.post<{ ok: boolean }>(`${this.apiBase}/users/${id}/send-password-reset`, {}));
   }
 }

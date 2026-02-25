@@ -1,5 +1,6 @@
 <main class="page">
-  <h1>Financial affidavit</h1>
+  <h1>{{ isRespondentViewer ? "Petitioner's financial affidavit" : 'Financial affidavit' }}</h1>
+  <p *ngIf="isRespondentViewer" class="muted">Summary view for the case you are a respondent on. You may print the HTML summary only.</p>
 
   <p *ngIf="error" class="error">{{ error }}</p>
 
@@ -54,13 +55,13 @@
         Threshold: <strong>{{ summary.threshold | number:'1.0-0' }}</strong>
       </p>
 
-      <p class="mt12">
+      <p *ngIf="!isRespondentViewer" class="mt12">
         Form to generate:
         <strong>{{ summary.form === 'short' ? 'Short form' : 'Long form' }}</strong>
       </p>
 
       <div class="rowActions mt12">
-        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy">Generate PDF</button>
+        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy">{{ isRespondentViewer ? 'Print (HTML)' : 'Generate PDF' }}</button>
         <span *ngIf="pdfBusy">Generating…</span>
       </div>
     </div>

@@ -46,6 +46,10 @@ export class ProfilePage implements OnInit {
   editingUserId: string | null = null;
   caseId: string | null = null;
 
+  passwordResetBusy = false;
+  passwordResetSent = false;
+  passwordResetError: string | null = null;
+
   constructor(
     private readonly auth: AuthService,
     private readonly lookups: LookupsService,
@@ -173,6 +177,21 @@ export class ProfilePage implements OnInit {
   logout() {
     this.auth.logout();
     void this.router.navigateByUrl('/login');
+  }
+
+  async sendPasswordResetEmail() {
+    if (!this.editingUserId) return;
+    this.passwordResetBusy = true;
+    this.passwordResetError = null;
+    this.passwordResetSent = false;
+    try {
+      await this.usersApi.sendPasswordReset(this.editingUserId);
+      this.passwordResetSent = true;
+    } catch (e: any) {
+      this.passwordResetError = e?.error?.error ?? 'Failed to send password reset email.';
+    } finally {
+      this.passwordResetBusy = false;
+    }
   }
 
   async onSubmit() {

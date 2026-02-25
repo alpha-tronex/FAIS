@@ -18,8 +18,12 @@ export const userSchema = new mongoose.Schema(
     ssnIvB64: { type: String },
     ssnAuthTagB64: { type: String },
     roleTypeId: { type: Number, required: true },
-    passwordHash: { type: String, required: true },
-    mustResetPassword: { type: Boolean, required: true, default: true },
+    /** Omitted for minimal users (e.g. respondent/respondent attorney) who have no login. */
+    passwordHash: { type: String, required: false },
+    mustResetPassword: { type: Boolean, required: false, default: true },
+    /** Forgot-password: time-limited token sent by email; cleared after use or expiry. */
+    passwordResetToken: { type: String, required: false, index: true },
+    passwordResetTokenExpiresAt: { type: Date, required: false },
 		createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 		updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },

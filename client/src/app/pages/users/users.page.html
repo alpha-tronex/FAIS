@@ -7,16 +7,6 @@
 
     <form (ngSubmit)="create()" class="gridForm">
       <label>
-        Username
-        <input name="uname" [(ngModel)]="uname" required class="input" [disabled]="busy || !!editingUserId" />
-      </label>
-
-      <label>
-        Email
-        <input name="email" [(ngModel)]="email" required class="input" />
-      </label>
-
-      <label>
         First name
         <input name="firstName" [(ngModel)]="firstName" class="input" />
       </label>
@@ -26,14 +16,29 @@
         <input name="lastName" [(ngModel)]="lastName" class="input" />
       </label>
 
+      <label *ngIf="!editingUserId">
+        Role
+        <select name="roleTypeId" [(ngModel)]="roleTypeId" class="input" [disabled]="busy || roleTypes.length === 0">
+          <option *ngFor="let rt of createableRoleTypes" [ngValue]="rt.id">{{ rt.name }}</option>
+        </select>
+      </label>
+
       <label>
-        Password
+        <span class="labelLine">Username <span class="labelTooltip" title="Optional for respondent or respondent attorney" aria-label="Optional for respondent or respondent attorney">ⓘ</span></span>
+        <input name="uname" [(ngModel)]="uname" class="input" [disabled]="busy || !!editingUserId" />
+      </label>
+
+      <label>
+        <span class="labelLine">Email <span class="labelTooltip" title="Optional for respondent or respondent attorney" aria-label="Optional for respondent or respondent attorney">ⓘ</span></span>
+        <input name="email" [(ngModel)]="email" type="email" class="input" />
+      </label>
+
+      <label>
+        <span class="labelLine">Password <span class="labelTooltip" title="Optional for respondent or respondent attorney" aria-label="Optional for respondent or respondent attorney">ⓘ</span></span>
         <div class="inputWithToggle">
           <input
             name="password"
             [(ngModel)]="password"
-            required
-            minlength="8"
             class="input"
             [type]="showPassword ? 'text' : 'password'"
           />
@@ -69,21 +74,38 @@
 
   <section class="mt16">
     <h2>All users</h2>
+    <div class="rowActions mt8" *ngIf="users.length > 0">
+      <label class="filterLabel">
+        Filter by role
+        <select name="roleFilter" [(ngModel)]="roleFilter" class="input" style="max-width: 200px;">
+          <option [ngValue]="null">All roles</option>
+          <option *ngFor="let rt of roleTypes" [ngValue]="rt.id">{{ rt.name }}</option>
+        </select>
+      </label>
+    </div>
     <p *ngIf="busy && users.length === 0">Loading…</p>
 
-    <table *ngIf="users.length > 0" class="table">
+    <table *ngIf="users.length > 0" class="table mt12">
       <thead>
         <tr>
-          <th class="th">Name</th>
-          <th class="th">Username</th>
-          <th class="th">Email</th>
-          <th class="th">Role</th>
+          <th class="th thSortable" (click)="setSort('name')" [attr.aria-sort]="sortBy === 'name' ? (sortDir === 'asc' ? 'ascending' : 'descending') : null">
+            Name <span *ngIf="sortBy === 'name'" class="sortIcon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+          </th>
+          <th class="th thSortable" (click)="setSort('uname')" [attr.aria-sort]="sortBy === 'uname' ? (sortDir === 'asc' ? 'ascending' : 'descending') : null">
+            Username <span *ngIf="sortBy === 'uname'" class="sortIcon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+          </th>
+          <th class="th thSortable" (click)="setSort('email')" [attr.aria-sort]="sortBy === 'email' ? (sortDir === 'asc' ? 'ascending' : 'descending') : null">
+            Email <span *ngIf="sortBy === 'email'" class="sortIcon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+          </th>
+          <th class="th thSortable" (click)="setSort('role')" [attr.aria-sort]="sortBy === 'role' ? (sortDir === 'asc' ? 'ascending' : 'descending') : null">
+            Role <span *ngIf="sortBy === 'role'" class="sortIcon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+          </th>
           <th class="th">Edit</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let u of users">
+        <tr *ngFor="let u of filteredUsers">
           <td class="td">{{ u.lastName || '' }}, {{ u.firstName || '' }}</td>
           <td class="td">{{ u.uname }}</td>
           <td class="td">{{ u.email }}</td>
@@ -94,6 +116,7 @@
         </tr>
       </tbody>
     </table>
+    <p *ngIf="!busy && users.length > 0 && filteredUsers.length === 0" class="muted mt8">No users match the selected role filter.</p>
   </section>
 
   <app-confirm-popup

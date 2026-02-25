@@ -43,3 +43,42 @@ export async function sendInviteEmail(p: InviteEmailParams): Promise<void> {
   const transport = nodemailer.createTransport(smtpUrl);
   await transport.sendMail({ from, to: p.to, subject, text });
 }
+
+export type PasswordResetEmailParams = {
+  to: string;
+  appUrl: string;
+  resetToken: string;
+};
+
+function formatPasswordResetText(p: PasswordResetEmailParams): string {
+  const resetUrl = `${p.appUrl.replace(/\/+$/, '')}/reset-password?token=${encodeURIComponent(p.resetToken)}`;
+  return (
+    `You requested a password reset for your FAIS account.\n\n` +
+    `Click the link below to set a new password (link expires in 1 hour):\n\n` +
+    `${resetUrl}\n\n` +
+    `If you did not request this, you can ignore this email.\n`
+  );
+}
+
+/**
+ * Sends a password-reset email with a link containing the token.
+ * Uses same SMTP env as invite: SMTP_URL, SMTP_FROM.
+ */
+export async function sendPasswordResetEmail(p: PasswordResetEmailParams): Promise<void> {
+  const smtpUrl = process.env.SMTP_URL?.trim();
+  const from = process.env.SMTP_FROM?.trim() || 'no-reply@localhost';
+
+  const subject = 'FAIS password reset';
+  const text = formatPasswordResetText(p);
+
+  if (!smtpUrl) {
+    console.log('[password-reset-email] SMTP_URL not configured; skipping send.');
+    console.log('[password-reset-email] To:', p.to);
+    console.log('[password-reset-email] Subject:', subject);
+    console.log(text);
+    return;
+  }
+
+  const transport = nodemailer.createTransport(smtpUrl);
+  await transport.sendMail({ from, to: p.to, subject, text });
+}

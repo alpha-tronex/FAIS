@@ -1,6 +1,7 @@
 <main class="page">
   <h1 style="font-size: 24px;">Financial Affidavit Inventory System (FAIS)</h1>
   <p>Log in to continue.</p>
+  <p *ngIf="resetSuccess" class="success" role="status">Your password has been updated. You can log in now.</p>
 
   <section class="panel mt16">
     <h2 class="panelTitle">Log in</h2>
@@ -29,8 +30,7 @@
       <button type="submit" [disabled]="busy" class="submit">Log in</button>
 
       <p class="mt10">
-        New here?
-        <a routerLink="/register" class="link">Create an account</a>
+        <a routerLink="/forgot-password" class="link">Forgot password?</a>
       </p>
 
       <p *ngIf="error" class="error" role="alert" aria-live="polite">{{ error }}</p>

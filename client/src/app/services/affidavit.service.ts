@@ -27,29 +27,30 @@ export class AffidavitService {
 
   constructor(private readonly http: HttpClient) {}
 
-  async summary(userId?: string): Promise<AffidavitSummary> {
+  async summary(userId?: string, caseId?: string): Promise<AffidavitSummary> {
+    const params: Record<string, string> = {};
+    if (userId) params['userId'] = userId;
+    if (caseId) params['caseId'] = caseId;
     return await firstValueFrom(
-      this.http.get<AffidavitSummary>(`${this.apiBase}/affidavit/summary`, {
-        params: userId ? { userId } : {}
-      })
+      this.http.get<AffidavitSummary>(`${this.apiBase}/affidavit/summary`, { params })
     );
   }
 
   /**
-   * Generate PDF. Server returns official Florida form for admins, HTML/Playwright PDF for regular users.
+   * Generate PDF. Server returns official Florida form for admins, HTML summary PDF for others.
+   * Respondents (2/4) must pass caseId and only receive HTML PDF.
    */
   async generatePdf(
     form: 'auto' | 'short' | 'long' = 'auto',
     userId?: string,
     caseId?: string
   ): Promise<Blob> {
+    const params: Record<string, string> = { form };
+    if (userId) params['userId'] = userId;
+    if (caseId) params['caseId'] = caseId;
     return await firstValueFrom(
       this.http.get(`${this.apiBase}/affidavit/pdf`, {
-        params: {
-          form,
-          ...(userId ? { userId } : {}),
-          ...(caseId ? { caseId } : {})
-        },
+        params,
         responseType: 'blob'
       })
     );

@@ -26,6 +26,12 @@ export class UsersPage implements OnInit, OnDestroy {
   showPassword = false;
   firstName = '';
   lastName = '';
+  roleTypeId = 1;
+
+  /** Role types that can be assigned when creating a user (excludes Administrator). */
+  get createableRoleTypes(): RoleTypeItem[] {
+    return this.roleTypes.filter((rt) => rt.id !== 5);
+  }
 
   editingUserId: string | null = null;
 
@@ -33,6 +39,12 @@ export class UsersPage implements OnInit, OnDestroy {
   /** When true, show "Send invitation email?" confirm popup before creating user. */
   showSendEmailConfirm = false;
   subscription: Subscription | null = null;
+
+  /** Table sort: column key and direction. */
+  sortBy: 'name' | 'uname' | 'email' | 'role' = 'name';
+  sortDir: 'asc' | 'desc' = 'asc';
+  /** Filter by role type; null = show all. */
+  roleFilter: number | null = null;
 
   constructor(
     private readonly auth: AuthService,
@@ -61,6 +73,10 @@ export class UsersPage implements OnInit, OnDestroy {
       .list()
       .then((items) => {
         this.roleTypes = items;
+        const createable = items.filter((rt) => rt.id !== 5);
+        if (createable.length > 0 && !createable.some((rt) => rt.id === this.roleTypeId)) {
+          this.roleTypeId = createable[0].id;
+        }
       })
       .catch(() => {
         // role types are used for display only; keep page usable if unavailable
@@ -90,6 +106,49 @@ export class UsersPage implements OnInit, OnDestroy {
     return this.roleTypes.find((rt) => rt.id === roleTypeId)?.name ?? String(roleTypeId);
   }
 
+  /** Users filtered by roleFilter and sorted by sortBy/sortDir. */
+  get filteredUsers(): UserListItem[] {
+    let list = this.roleFilter != null ? this.users.filter((u) => u.roleTypeId === this.roleFilter!) : this.users;
+    const dir = this.sortDir === 'asc' ? 1 : -1;
+    list = [...list].sort((a, b) => {
+      let cmp = 0;
+      switch (this.sortBy) {
+        case 'name':
+          const na = `${(a.lastName ?? '').toLowerCase()}, ${(a.firstName ?? '').toLowerCase()}`;
+          const nb = `${(b.lastName ?? '').toLowerCase()}, ${(b.firstName ?? '').toLowerCase()}`;
+          cmp = na.localeCompare(nb);
+          break;
+        case 'uname':
+          cmp = (a.uname ?? '').toLowerCase().localeCompare((b.uname ?? '').toLowerCase());
+          break;
+        case 'email':
+          cmp = (a.email ?? '').toLowerCase().localeCompare((b.email ?? '').toLowerCase());
+          break;
+        case 'role':
+          cmp = a.roleTypeId - b.roleTypeId;
+          if (cmp === 0) {
+            const ra = this.roleTypeName(a.roleTypeId).toLowerCase();
+            const rb = this.roleTypeName(b.roleTypeId).toLowerCase();
+            cmp = ra.localeCompare(rb);
+          }
+          break;
+        default:
+          break;
+      }
+      return cmp * dir;
+    });
+    return list;
+  }
+
+  setSort(column: 'name' | 'uname' | 'email' | 'role') {
+    if (this.sortBy === column) {
+      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortDir = 'asc';
+    }
+  }
+
   create() {
     if (!this.canCreate) {
       this.error = 'Forbidden';
@@ -109,51 +168,69 @@ export class UsersPage implements OnInit, OnDestroy {
       return;
     }
 
-    // When creating (not editing), ask admin whether to send invitation email before calling API.
+    const isMinimal = this.isMinimalCreate();
+    if (isMinimal) {
+      this.createMinimalUser();
+      return;
+    }
+
     this.showSendEmailConfirm = true;
+  }
+
+  /** True when role is 2 or 4 and username, email, password are not all filled (minimal create, no invite). */
+  private isMinimalCreate(): boolean {
+    const role = Number(this.roleTypeId);
+    if (role !== 2 && role !== 4) return false;
+    const u = this.uname.trim();
+    const e = this.email.trim();
+    const p = this.password;
+    return !u && !e && !p;
   }
 
   /** Returns an error message if create form is invalid, otherwise null. */
   private validateCreateForm(): string | null {
+    const first = this.firstName.trim();
+    const last = this.lastName.trim();
+    const role = Number(this.roleTypeId) || 0;
+    if (!first) return 'First name is required.';
+    if (!last) return 'Last name is required.';
+    if (!this.createableRoleTypes.some((rt) => rt.id === role)) return 'Please select a role.';
+
     const u = this.uname.trim();
     const e = this.email.trim();
     const p = this.password;
-    if (!u) return 'Username is required.';
-    if (!e) return 'Email is required.';
-    const emailSimple = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailSimple.test(e)) return 'Please enter a valid email address.';
-    if (!p) return 'Password is required.';
-    if (p.length < 8) return 'Password must be at least 8 characters.';
+    const hasAnyCredential = !!u || !!e || !!p;
+
+    if (hasAnyCredential) {
+      if (!u) return 'Username is required when providing email or password.';
+      if (!e) return 'Email is required when providing username or password.';
+      const emailSimple = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailSimple.test(e)) return 'Please enter a valid email address.';
+      if (!p) return 'Password is required when providing username or email.';
+      if (p.length < 8) return 'Password must be at least 8 characters.';
+    } else if (role !== 2 && role !== 4) {
+      return 'For petitioner or petitioner attorney, please enter username, email, and password so the user can log in.';
+    }
+
     return null;
   }
 
-  /** Called after admin chooses in the send-email popup. Creates user with or without invite email. */
-  createUserWithInviteChoice(sendInviteEmail: boolean) {
-    this.showSendEmailConfirm = false;
-
+  private createMinimalUser(): void {
     this.busy = true;
     this.error = null;
     this.success = null;
 
     const req = {
-      uname: this.uname.trim(),
-      email: this.email.trim(),
-      password: this.password,
-      firstName: this.firstName.trim() || undefined,
-      lastName: this.lastName.trim() || undefined,
-      sendInviteEmail
+      firstName: this.firstName.trim(),
+      lastName: this.lastName.trim(),
+      roleTypeId: Number(this.roleTypeId)
     };
 
     this.subscription = from(this.usersApi.create(req))
       .pipe(
         switchMap(() => {
-          this.success = sendInviteEmail ? 'User created. Invitation email sent.' : 'User created.';
-          this.uname = '';
-          this.email = '';
-          this.password = '';
-          this.showPassword = false;
-          this.firstName = '';
-          this.lastName = '';
+          this.success = 'User created. Complete their profile to add details.';
+          this.resetCreateForm();
           return from(this.usersApi.list());
         }),
         finalize(() => {
@@ -176,6 +253,61 @@ export class UsersPage implements OnInit, OnDestroy {
       });
   }
 
+  /** Called after admin chooses in the send-email popup. Creates user with or without invite email. */
+  createUserWithInviteChoice(sendInviteEmail: boolean) {
+    this.showSendEmailConfirm = false;
+
+    this.busy = true;
+    this.error = null;
+    this.success = null;
+
+    const req = {
+      uname: this.uname.trim(),
+      email: this.email.trim(),
+      password: this.password,
+      firstName: this.firstName.trim() || undefined,
+      lastName: this.lastName.trim() || undefined,
+      roleTypeId: Number(this.roleTypeId) || 1,
+      sendInviteEmail
+    };
+
+    this.subscription = from(this.usersApi.create(req))
+      .pipe(
+        switchMap(() => {
+          this.success = sendInviteEmail ? 'User created. Invitation email sent.' : 'User created.';
+          this.resetCreateForm();
+          return from(this.usersApi.list());
+        }),
+        finalize(() => {
+          this.busy = false;
+        })
+      )
+      .subscribe({
+        next: (users) => {
+          this.users = users;
+        },
+        error: (e: any) => {
+          const msg = e?.error?.error;
+          this.error = typeof msg === 'string' && msg.length > 0 ? msg : 'Failed to create user. Please check the form and try again.';
+          this.success = null;
+          if (e?.status === 401) {
+            this.auth.logout();
+            void this.router.navigateByUrl('/login');
+          }
+        }
+      });
+  }
+
+  private resetCreateForm(): void {
+    this.uname = '';
+    this.email = '';
+    this.password = '';
+    this.showPassword = false;
+    this.firstName = '';
+    this.lastName = '';
+    this.roleTypeId = this.createableRoleTypes[0]?.id ?? 1;
+  }
+
   editUser(u: UserListItem) {
     if (!this.canCreate) return;
     void this.router.navigate(['/admin/users', u.id, 'profile']);
@@ -190,13 +322,7 @@ export class UsersPage implements OnInit, OnDestroy {
     this.editingUserId = null;
     this.error = null;
     this.success = null;
-
-    this.uname = '';
-    this.email = '';
-    this.password = '';
-    this.showPassword = false;
-    this.firstName = '';
-    this.lastName = '';
+    this.resetCreateForm();
   }
 
   private update() {

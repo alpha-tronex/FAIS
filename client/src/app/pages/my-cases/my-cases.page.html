@@ -17,7 +17,7 @@
           <th class="th">Petitioner</th>
           <th class="th">Respondent</th>
           <th class="th">Created</th>
-          <th class="th">Select</th>
+          <th class="th">{{ isRespondentViewer ? 'View' : 'Select' }}</th>
         </tr>
       </thead>
 
@@ -33,7 +33,7 @@
           </td>
           <td class="td">{{ c.createdAt | date:'short' }}</td>
           <td class="td">
-            <button type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">Select</button>
+            <button type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">{{ isRespondentViewer ? 'View affidavit' : 'Select' }}</button>
           </td>
         </tr>
       </tbody>
