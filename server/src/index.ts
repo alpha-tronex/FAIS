@@ -19,12 +19,17 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = Number(process.env.PORT ?? 3001);
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI?.trim();
 const JWT_SECRET = process.env.JWT_SECRET;
 const SSN_ENCRYPTION_KEY_B64 = process.env.SSN_ENCRYPTION_KEY_B64;
 
 if (!MONGODB_URI) {
   throw new Error('Missing MONGODB_URI');
+}
+if (!/^mongodb(\+srv)?:\/\//.test(MONGODB_URI)) {
+  throw new Error(
+    'MONGODB_URI must start with mongodb:// or mongodb+srv://. Check for extra spaces, newlines, or a wrong value in your environment.'
+  );
 }
 if (!JWT_SECRET) {
   throw new Error('Missing JWT_SECRET');
