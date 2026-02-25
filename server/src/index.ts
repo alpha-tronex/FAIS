@@ -1,3 +1,5 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -13,6 +15,8 @@ import { createLookupsRouter } from './routes/lookups.routes.js';
 import { createAffidavitRouter } from './routes/affidavit.routes.js';
 
 dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = Number(process.env.PORT ?? 3001);
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -68,13 +72,26 @@ app.use(
 
 const { requireAuth, requireAdmin, requireStaffOrAdmin } = createAuthMiddlewares(jwtSecret);
 
-app.use(createHealthRouter());
-app.use(createRoleTypesRouter({ requireAuth }));
-app.use(createAuthRouter({ jwtSecret, jwtExpiresIn, requireAuth }));
-app.use(createUsersRouter({ requireAuth, requireAdmin }));
-app.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
-app.use(createLookupsRouter({ requireAuth }));
-app.use(createAffidavitRouter({ requireAuth }));
+// Mount all API routes under /api for production (client calls /api/...)
+const apiRouter = express.Router();
+apiRouter.use(createHealthRouter());
+apiRouter.use(createRoleTypesRouter({ requireAuth }));
+apiRouter.use(createAuthRouter({ jwtSecret, jwtExpiresIn, requireAuth }));
+apiRouter.use(createUsersRouter({ requireAuth, requireAdmin }));
+apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
+apiRouter.use(createLookupsRouter({ requireAuth }));
+apiRouter.use(createAffidavitRouter({ requireAuth }));
+app.use('/api', apiRouter);
+
+// Serve built Angular app when present (production: client build copied to server/dist/public)
+const publicDir = path.join(__dirname, 'public');
+const fs = await import('fs');
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(publicDir, 'index.html'));
+  });
+}
 
 async function main() {
   await mongoose.connect(mongoUri);
