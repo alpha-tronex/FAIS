@@ -9,7 +9,11 @@ server/dist/
 server/.env
 server/server-request.log
 
+#Report: html Playwright pdf files and official florida short and long form pdf files
+FAIS Downloads/
 
+# Cursor (debug logs, etc.)
+.cursor/
 
 # System
 .DS_Store

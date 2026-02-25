@@ -552,9 +552,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       case 'monthlyOtherExpenses':
         return this.monthlyOtherExpenses.length > 0 || this.noneSelected.monthlyOtherExpenses;
       case 'assets':
-        return this.assets.length > 0 || this.noneSelected.assets;
+        return this.assets.length > 0;
       case 'liabilities':
-        return this.liabilities.length > 0 || this.noneSelected.liabilities;
+        return this.liabilities.length > 0;
       case 'contingentAssets':
         return this.contingentAssets.length > 0 || this.noneSelected.contingentAssets;
       case 'contingentLiabilities':
