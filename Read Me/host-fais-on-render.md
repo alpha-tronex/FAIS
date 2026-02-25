@@ -37,7 +37,7 @@ Create a **Web Service** and connect the FAIS GitHub repo.
 |--------|--------|
 | **Root Directory** | (leave blank; repo root has `package.json`) |
 | **Runtime** | Node |
-| **Build Command** | `npm install && npm run build` |
+| **Build Command** | `npm run render:build` (installs root + server + client deps, then builds) |
 | **Start Command** | `npm run server:start` |
 
 **Environment variables** (Render Dashboard → Environment):
