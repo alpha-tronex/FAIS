@@ -88,7 +88,8 @@ const publicDir = path.join(__dirname, 'public');
 const fs = await import('fs');
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
-  app.get('*', (_req, res) => {
+  // Express 5 / path-to-regexp no longer accept '*'; use catch-all path (.*)
+  app.get('/(.*)', (_req, res) => {
     res.sendFile(path.join(publicDir, 'index.html'));
   });
 }
