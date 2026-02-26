@@ -2,7 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs/promises';
 import mongoose from 'mongoose';
-import { PDFDocument } from 'pdf-lib';
+import type { PDFDocument } from 'pdf-lib';
 
 export type PdfTemplateKey = 'short' | 'long';
 
@@ -16,10 +16,11 @@ export function templatePath(key: PdfTemplateKey): string {
 }
 
 export async function loadTemplatePdf(key: PdfTemplateKey): Promise<PDFDocument> {
+  const { PDFDocument: PDFDocumentLib } = await import('pdf-lib');
   const p = templatePath(key);
   try {
     const bytes = await fs.readFile(p);
-    return await PDFDocument.load(bytes);
+    return await PDFDocumentLib.load(bytes);
   } catch (e: unknown) {
     const err = new Error(
       `Missing PDF template file: ${p}. Place the official form PDFs under server/private/forms/.`

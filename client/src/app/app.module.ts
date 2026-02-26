@@ -9,60 +9,14 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/auth.interceptor';
 import { unauthInterceptor } from './core/unauth.interceptor';
 
-import { LoginPage } from './pages/login/login.page';
-import { RegisterPage } from './pages/register/register.page';
-import { ResetPage } from './pages/reset/reset.page';
-import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.page';
-import { ResetPasswordPage } from './pages/reset-password/reset-password.page';
-import { UsersPage } from './pages/users/users.page';
-import { CasesPage } from './pages/cases/cases.page';
-import { MyCasesPage } from './pages/my-cases/my-cases.page';
-import { AffidavitPage } from './pages/affidavit/affidavit.page';
-import { AffidavitEditPage } from './pages/affidavit-edit/affidavit-edit.page';
-import { ProfilePage } from './pages/profile/profile.page';
-import { AdminPage } from './pages/admin/admin.page';
-import { AdminAffidavitPage } from './pages/admin-affidavit/admin-affidavit.page';
-import { AffidavitEmploymentSectionComponent } from './pages/affidavit-edit/sections/affidavit-employment-section.component';
-import { AffidavitMonthlyLinesSectionComponent } from './pages/affidavit-edit/sections/affidavit-monthly-lines-section.component';
-import { AffidavitAssetsSectionComponent } from './pages/affidavit-edit/sections/affidavit-assets-section.component';
-import { AffidavitLiabilitiesSectionComponent } from './pages/affidavit-edit/sections/affidavit-liabilities-section.component';
-import { AffidavitContingentAssetsSectionComponent } from './pages/affidavit-edit/sections/affidavit-contingent-assets-section.component';
-import { AffidavitContingentLiabilitiesSectionComponent } from './pages/affidavit-edit/sections/affidavit-contingent-liabilities-section.component';
-import { ConfirmPopupComponent } from './shared/confirm-popup/confirm-popup.component';
-import { SessionExpiryModalComponent } from './shared/session-expiry-modal/session-expiry-modal.component';
+import { SharedModule } from './shared/shared.module';
 import { AppLayoutComponent } from './layout/app-layout.component';
 import { HeaderComponent } from './layout/header/header.component';
 import { FooterComponent } from './layout/footer/footer.component';
 
 @NgModule({
-  declarations: [
-    App,
-    AppLayoutComponent,
-    HeaderComponent,
-    FooterComponent,
-    LoginPage,
-    RegisterPage,
-    ResetPage,
-    ForgotPasswordPage,
-    ResetPasswordPage,
-    UsersPage,
-    CasesPage,
-    MyCasesPage,
-    AffidavitPage,
-    AffidavitEditPage,
-    ProfilePage,
-    AffidavitEmploymentSectionComponent,
-    AffidavitMonthlyLinesSectionComponent,
-    AffidavitAssetsSectionComponent,
-    AffidavitLiabilitiesSectionComponent,
-    AffidavitContingentAssetsSectionComponent,
-    AffidavitContingentLiabilitiesSectionComponent,
-    AdminPage,
-    AdminAffidavitPage,
-    ConfirmPopupComponent,
-    SessionExpiryModalComponent
-  ],
-  imports: [BrowserModule, FormsModule, RouterModule.forRoot(routes)],
+  declarations: [App, AppLayoutComponent, HeaderComponent, FooterComponent],
+  imports: [BrowserModule, FormsModule, RouterModule.forRoot(routes), SharedModule],
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withInterceptors([authInterceptor, unauthInterceptor]))
