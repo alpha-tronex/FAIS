@@ -45,11 +45,13 @@ Create a **Web Service** and connect the FAIS GitHub repo.
 - **Required**: `MONGODB_URI`, `JWT_SECRET`, `SSN_ENCRYPTION_KEY_B64` (generate: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`).
 - **PORT**: Set by Render automatically; server uses `process.env.PORT ?? 3001`.
 - **APP_BASE_URL**: Your Render URL (e.g. `https://<service>.onrender.com`) for invite/password-reset links.
-- **Optional**: `JWT_EXPIRES_IN`, `SMTP_URL`, `SMTP_FROM` if you use invite/password-reset emails.
+- **Optional**: `JWT_EXPIRES_IN`, and SMTP vars below if you use invite/password-reset emails.
 
-**Sending invite and password-reset emails:** Without `SMTP_URL`, the app still generates the correct links and logs the email body but does not send mail. To actually deliver emails, set in Render:
-- **SMTP_URL** – Full SMTP URL (e.g. `smtps://user:password@smtp.example.com:465` for TLS, or `smtp://...:587`). For Gmail use an [App Password](https://support.google.com/accounts/answer/185833) and e.g. `smtps://you@gmail.com:APP_PASSWORD@smtp.gmail.com:465`. If the password has special characters, URL-encode them.
-- **SMTP_FROM** – Sender address shown in emails (e.g. `FAIS <no-reply@yourdomain.com>` or `FAIS <you@gmail.com>`).
+**Sending invite and password-reset emails:** Without SMTP configured, the app still generates the correct links and logs the email body but does not send mail. To deliver emails from Render, use either:
+
+- **Option A – SMTP URL:** `SMTP_URL` (e.g. `smtps://user:password@smtp.example.com:465`) and optionally `SMTP_FROM`. For Gmail use an [App Password](https://support.google.com/accounts/answer/185833); URL-encode special characters in the password.
+
+- **Option B – Separate SMTP vars:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and optionally `SMTP_FROM`. Example for **Yahoo**: `SMTP_HOST=smtp.mail.yahoo.com`, `SMTP_PORT=587` (or 465), `SMTP_USER=you@yahoo.com`, `SMTP_PASS=<Yahoo app password>`. **Yahoo requires the sender to be your Yahoo address:** set `SMTP_FROM=FAIS <you@yahoo.com>` or leave `SMTP_FROM` unset (the app will use `SMTP_USER` as sender). If you get **connection timeout** from Render, try port **587** instead of 465; some environments allow STARTTLS (587) when direct SSL (465) is blocked.
 
 ---
 

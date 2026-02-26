@@ -42,17 +42,26 @@ function getSmtpTransport(): nodemailer.Transporter | null {
   });
 }
 
+/** Sender address. Yahoo (and many SMTP providers) require From to match the authenticated account; default to SMTP_USER when using SMTP_HOST. */
+function getFromAddress(): string {
+  const explicit = process.env.SMTP_FROM?.trim();
+  if (explicit) return explicit;
+  const user = process.env.SMTP_USER?.trim();
+  if (user) return `FAIS <${user}>`;
+  return 'no-reply@localhost';
+}
+
 /**
  * Sends an invite email if SMTP is configured.
  *
  * Env:
  * - SMTP_URL (e.g. smtps://user:pass@smtp.example.com:465) OR
  * - SMTP_HOST, SMTP_PORT (465 or 587), SMTP_USER, SMTP_PASS
- * - SMTP_FROM (e.g. "FAIS <no-reply@example.com>")
+ * - SMTP_FROM (e.g. "FAIS <no-reply@example.com>"). For Yahoo, use your Yahoo address or leave unset to use SMTP_USER.
  */
 export async function sendInviteEmail(p: InviteEmailParams): Promise<void> {
   const transport = getSmtpTransport();
-  const from = process.env.SMTP_FROM?.trim() || 'no-reply@localhost';
+  const from = getFromAddress();
 
   const subject = 'FAIS account created';
   const text = formatInviteText(p);
@@ -91,7 +100,7 @@ function formatPasswordResetText(p: PasswordResetEmailParams): string {
  */
 export async function sendPasswordResetEmail(p: PasswordResetEmailParams): Promise<void> {
   const transport = getSmtpTransport();
-  const from = process.env.SMTP_FROM?.trim() || 'no-reply@localhost';
+  const from = getFromAddress();
 
   const subject = 'FAIS password reset';
   const text = formatPasswordResetText(p);
