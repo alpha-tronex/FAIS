@@ -47,6 +47,10 @@ Create a **Web Service** and connect the FAIS GitHub repo.
 - **APP_BASE_URL**: Your Render URL (e.g. `https://<service>.onrender.com`) for invite/password-reset links.
 - **Optional**: `JWT_EXPIRES_IN`, `SMTP_URL`, `SMTP_FROM` if you use invite/password-reset emails.
 
+**Sending invite and password-reset emails:** Without `SMTP_URL`, the app still generates the correct links and logs the email body but does not send mail. To actually deliver emails, set in Render:
+- **SMTP_URL** – Full SMTP URL (e.g. `smtps://user:password@smtp.example.com:465` for TLS, or `smtp://...:587`). For Gmail use an [App Password](https://support.google.com/accounts/answer/185833) and e.g. `smtps://you@gmail.com:APP_PASSWORD@smtp.gmail.com:465`. If the password has special characters, URL-encode them.
+- **SMTP_FROM** – Sender address shown in emails (e.g. `FAIS <no-reply@yourdomain.com>` or `FAIS <you@gmail.com>`).
+
 ---
 
 ## 5. Optional: `render.yaml` (Blueprint)

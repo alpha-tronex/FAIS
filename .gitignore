@@ -12,6 +12,9 @@ server/server-request.log
 #Report: html Playwright pdf files and official florida short and long form pdf files
 FAIS Downloads/
 
+#mongodb dump
+fais-dump/
+
 # Cursor (debug logs, etc.)
 .cursor/
 
