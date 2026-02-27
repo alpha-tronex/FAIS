@@ -113,7 +113,9 @@
     message="Do you want to reschedule this appointment? If yes, the attorney or admin can propose a new date and time."
     confirmText="Yes, reschedule"
     cancelText="No, cancel entirely"
+    dismissText="Cancel"
     (confirm)="onReschedulePromptConfirm()"
     (cancel)="onReschedulePromptCancel()"
+    (dismiss)="onReschedulePromptDismiss()"
   />
 </main>

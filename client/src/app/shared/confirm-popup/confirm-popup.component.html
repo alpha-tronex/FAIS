@@ -12,6 +12,9 @@
       <h2 id="confirm-popup-title" class="panelTitle">{{ title }}</h2>
       <p id="confirm-popup-message" class="confirmMessage">{{ message }}</p>
       <div class="rowActions confirmActions">
+        @if (dismissText) {
+          <button type="button" (click)="onDismiss()">{{ dismissText }}</button>
+        }
         <button type="button" (click)="onCancel()">{{ cancelText }}</button>
         <button
           type="button"

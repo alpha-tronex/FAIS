@@ -40,7 +40,7 @@ export class LoginPage implements OnInit {
       if (res.mustResetPassword) {
         this.router.navigateByUrl('/register');
       } else if (res.user?.roleTypeId === 5) {
-        this.router.navigateByUrl('/admin');
+        this.router.navigateByUrl('/admin/users');
       } else {
         this.router.navigateByUrl('/my-cases');
       }

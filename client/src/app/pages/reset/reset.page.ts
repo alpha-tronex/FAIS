@@ -25,7 +25,7 @@ export class ResetPage {
       if (wasOnboarding) {
         await this.router.navigateByUrl('/register');
       } else {
-        await this.router.navigateByUrl(this.auth.isAdmin() ? '/admin' : '/my-cases');
+        await this.router.navigateByUrl(this.auth.isAdmin() ? '/admin/users' : '/my-cases');
       }
     } catch (e: any) {
       this.error = e?.error?.error ?? 'Failed to change password';

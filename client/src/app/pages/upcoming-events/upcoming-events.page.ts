@@ -244,6 +244,11 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
     this.setStatus(a, 'reschedule_requested');
   }
 
+  onReschedulePromptDismiss(): void {
+    this.reschedulePromptOpen = false;
+    this.reschedulePromptAppointment = null;
+  }
+
   onReschedulePromptCancel(): void {
     const a = this.reschedulePromptAppointment;
     const ifNo = this.reschedulePromptIfNo;
@@ -286,6 +291,7 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
                   : 'You have requested to reschedule. The attorney or admin can propose a new time.';
           this.success = msg;
           this.refresh();
+          this.appointmentsApi.requestPendingActionsRefresh();
         },
         error: (e: unknown) => {
           const err = e as { error?: { error?: string }; status?: number };
@@ -343,6 +349,7 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
             : 'Appointment rescheduled.';
           this.cancelRescheduleForm();
           this.refresh();
+          this.appointmentsApi.requestPendingActionsRefresh();
         },
         error: (e: unknown) => {
           const err = e as { error?: { error?: string }; status?: number };

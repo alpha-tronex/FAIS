@@ -17,6 +17,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   /** Count of pending actions (accept/reject or reschedule) for the Upcoming Events badge. */
   pendingActionsCount = 0;
   private routerSub: Subscription | null = null;
+  private refreshSub: Subscription | null = null;
 
   constructor(
     private readonly router: Router,
@@ -42,10 +43,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.loadPendingActionsCount();
       }
     });
+    this.refreshSub = this.appointmentsApi.getPendingActionsRefresh().subscribe(() => {
+      if (this.showUpcomingEventsLink) {
+        this.loadPendingActionsCount();
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.routerSub?.unsubscribe();
+    this.refreshSub?.unsubscribe();
   }
 
   private loadPendingActionsCount(): void {
@@ -77,9 +84,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.auth.isAdmin();
   }
 
-  /** When true, show admin nav (Users | Cases | Affidavit) instead of main nav. */
+  /** When true, show admin nav (Users | Cases | Affidavit | Upcoming Events) instead of main nav (My cases | Profile | Upcoming Events). */
   get showAdminNav(): boolean {
-    return this.isAdmin && this.router.url.split('?')[0].startsWith('/admin');
+    return this.isAdmin;
   }
 
   /** Respondent (2) or Respondent Attorney (4): view-only affidavit from My Cases, no Edit data. */

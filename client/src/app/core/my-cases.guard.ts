@@ -16,7 +16,7 @@ export const myCasesGuard: CanActivateFn = () => {
 
   // Admins shouldn’t use the My Cases view.
   if (auth.isAdmin()) {
-    return router.parseUrl('/admin');
+    return router.parseUrl('/admin/users');
   }
 
   return true;

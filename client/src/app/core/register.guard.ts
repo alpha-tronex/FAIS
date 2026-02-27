@@ -15,7 +15,7 @@ export const registerGuard: CanActivateFn = () => {
   }
 
   if (!auth.mustCompleteRegistration()) {
-    return auth.isAdmin() ? router.parseUrl('/admin') : router.parseUrl('/my-cases');
+    return auth.isAdmin() ? router.parseUrl('/admin/users') : router.parseUrl('/my-cases');
   }
 
   return true;

@@ -57,8 +57,7 @@ export class ProfilePage implements OnInit {
     private readonly usersApi: UsersService,
     private readonly router: Router,
     private readonly route: ActivatedRoute
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
 		const id = this.route.snapshot.paramMap.get('id');

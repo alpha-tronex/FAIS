@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { Subject } from 'rxjs';
+import type { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export type UserSummary = {
@@ -38,8 +40,19 @@ export type CreateAppointmentRequest = {
 @Injectable({ providedIn: 'root' })
 export class AppointmentsService {
   private readonly apiBase = environment.apiUrl;
+  private readonly pendingActionsRefresh$ = new Subject<void>();
 
   constructor(private readonly http: HttpClient) {}
+
+  /** Emit when the header badge should refetch pending count (e.g. after completing an action on Upcoming Events). */
+  getPendingActionsRefresh(): Observable<void> {
+    return this.pendingActionsRefresh$.asObservable();
+  }
+
+  /** Call after an appointment status change or reschedule so the header badge updates. */
+  requestPendingActionsRefresh(): void {
+    this.pendingActionsRefresh$.next();
+  }
 
   async list(caseId?: string): Promise<AppointmentListItem[]> {
     const qs = caseId ? `?caseId=${encodeURIComponent(caseId)}` : '';

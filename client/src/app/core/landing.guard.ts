@@ -14,5 +14,5 @@ export const landingGuard: CanActivateFn = () => {
     return router.parseUrl('/register');
   }
 
-  return auth.isAdmin() ? router.parseUrl('/admin') : router.parseUrl('/my-cases');
+  return auth.isAdmin() ? router.parseUrl('/admin/users') : router.parseUrl('/my-cases');
 };

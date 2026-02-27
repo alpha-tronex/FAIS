@@ -124,7 +124,7 @@ export class RegisterPage {
         await this.auth.updateMySsn({ ssn: this.ssn.trim(), confirmSsn: this.confirmSsn.trim() });
         await this.auth.changePassword(this.password);
 
-        await this.router.navigateByUrl(this.auth.isAdmin() ? '/admin' : '/my-cases');
+        await this.router.navigateByUrl(this.auth.isAdmin() ? '/admin/users' : '/my-cases');
         return;
       }
 
@@ -145,7 +145,7 @@ export class RegisterPage {
       if (res.mustResetPassword) {
         await this.router.navigateByUrl('/register');
       } else if (res.user?.roleTypeId === 5) {
-        await this.router.navigateByUrl('/admin');
+        await this.router.navigateByUrl('/admin/users');
       } else {
         await this.router.navigateByUrl('/my-cases');
       }

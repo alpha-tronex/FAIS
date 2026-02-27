@@ -107,7 +107,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
   }
 
   goBack() {
-    void this.router.navigateByUrl(this.isRespondentViewer || !this.auth.isAdmin() ? '/my-cases' : '/admin');
+    void this.router.navigateByUrl(this.isRespondentViewer || !this.auth.isAdmin() ? '/my-cases' : '/admin/users');
   }
 
   logout() {
