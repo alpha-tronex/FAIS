@@ -29,6 +29,9 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
   reschedulePromptAppointment: AppointmentListItem | null = null;
   reschedulePromptIfNo: 'rejected' | 'cancelled' = 'rejected';
 
+  /** When set, show confirm popup before cancelling (admin/attorney/legal assistant). */
+  cancelAppointmentConfirmTarget: AppointmentListItem | null = null;
+
   editingRescheduleAppointment: AppointmentListItem | null = null;
   rescheduleScheduledAt = '';
   rescheduleNotes = '';
@@ -360,6 +363,22 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
           }
         },
       });
+  }
+
+  openCancelAppointmentConfirm(appointment: AppointmentListItem): void {
+    if ((!this.isAttorney && !this.isLegalAssistant && !this.isAdmin) || appointment.status === 'cancelled') return;
+    this.cancelAppointmentConfirmTarget = appointment;
+  }
+
+  onCancelAppointmentConfirm(): void {
+    const appointment = this.cancelAppointmentConfirmTarget;
+    this.cancelAppointmentConfirmTarget = null;
+    if (!appointment) return;
+    this.cancelByAttorneyOrAdmin(appointment);
+  }
+
+  onCancelAppointmentDismiss(): void {
+    this.cancelAppointmentConfirmTarget = null;
   }
 
   cancelByAttorneyOrAdmin(appointment: AppointmentListItem): void {

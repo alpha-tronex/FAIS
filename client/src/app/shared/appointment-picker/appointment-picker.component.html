@@ -1,0 +1,30 @@
+<div class="appointmentPicker">
+  <label class="pickerLabel">
+    <span class="pickerLabelText">Date</span>
+    <input
+      type="date"
+      class="input dateInput"
+      [ngModel]="datePart"
+      (ngModelChange)="datePart = $event; onDateChange()"
+      [disabled]="disabled"
+      [required]="required"
+      aria-label="Appointment date"
+    />
+  </label>
+  <label class="pickerLabel">
+    <span class="pickerLabelText">Time</span>
+    <select
+      class="input timeSelect"
+      [ngModel]="timePart"
+      (ngModelChange)="timePart = $event; onTimeChange()"
+      [disabled]="disabled"
+      [required]="required"
+      aria-label="Appointment time"
+    >
+      <option value="">(select time)</option>
+      @for (slot of timeSlots; track slot) {
+        <option [value]="slot">{{ formatTime(slot) }}</option>
+      }
+    </select>
+  </label>
+</div>

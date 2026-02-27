@@ -25,7 +25,7 @@
       </label>
       <label>
         Date and time
-        <input name="scheduledAt" type="datetime-local" [(ngModel)]="scheduledAt" required class="input" />
+        <app-appointment-picker [(value)]="scheduledAt" [required]="true" />
       </label>
       <label>
         Notes (optional)
@@ -74,7 +74,7 @@
                 <button type="button" (click)="openRescheduleForm(a)" [disabled]="busy" class="submit">Reschedule</button>
               </ng-container>
               <ng-container *ngIf="(isAttorney || isLegalAssistant || isAdmin) && a.status !== 'cancelled' && a.status !== 'reschedule_requested'">
-                <button type="button" (click)="cancelByAttorneyOrAdmin(a)" [disabled]="busy">Cancel</button>
+                <button type="button" (click)="openCancelAppointmentConfirm(a)" [disabled]="busy">Cancel</button>
               </ng-container>
               <ng-container *ngIf="isPetitioner && (a.status === 'rejected' || a.status === 'cancelled' || a.status === 'reschedule_requested')">
                 —
@@ -93,7 +93,7 @@
       <form (ngSubmit)="submitReschedule()" class="gridForm mt12">
         <label>
           Date and time
-          <input name="rescheduleScheduledAt" type="datetime-local" [(ngModel)]="rescheduleScheduledAt" required class="input" />
+          <app-appointment-picker [(value)]="rescheduleScheduledAt" [required]="true" />
         </label>
         <label>
           Notes (optional)
@@ -117,5 +117,16 @@
     (confirm)="onReschedulePromptConfirm()"
     (cancel)="onReschedulePromptCancel()"
     (dismiss)="onReschedulePromptDismiss()"
+  />
+
+  <app-confirm-popup
+    [open]="!!cancelAppointmentConfirmTarget"
+    title="Cancel appointment?"
+    message="Are you sure you want to cancel this appointment? The petitioner will see the appointment as cancelled."
+    confirmText="Yes, cancel appointment"
+    cancelText="No, keep it"
+    [danger]="true"
+    (confirm)="onCancelAppointmentConfirm()"
+    (cancel)="onCancelAppointmentDismiss()"
   />
 </main>

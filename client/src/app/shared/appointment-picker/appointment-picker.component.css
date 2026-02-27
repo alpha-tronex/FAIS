@@ -1,0 +1,26 @@
+.appointmentPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: flex-end;
+}
+
+.pickerLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pickerLabelText {
+  font-size: var(--controlFontSize, 0.875rem);
+  color: var(--muted, #666);
+}
+
+.dateInput {
+  min-width: 140px;
+}
+
+.timeSelect {
+  min-width: 120px;
+}
