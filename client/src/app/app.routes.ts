@@ -4,6 +4,7 @@ import { landingGuard } from './core/landing.guard';
 import { myCasesGuard } from './core/my-cases.guard';
 import { registerGuard } from './core/register.guard';
 import { affidavitEditGuard } from './core/affidavit-edit.guard';
+import { upcomingEventsGuard } from './core/upcoming-events.guard';
 
 export const routes: Routes = [
 	{
@@ -55,6 +56,12 @@ export const routes: Routes = [
 		path: 'profile',
 		loadChildren: () =>
 			import('./pages/profile/profile.module').then((m) => m.ProfileModule)
+	},
+	{
+		path: 'upcoming-events',
+		canActivate: [upcomingEventsGuard],
+		loadChildren: () =>
+			import('./pages/upcoming-events/upcoming-events.module').then((m) => m.UpcomingEventsModule)
 	},
 	{
 		path: 'admin',

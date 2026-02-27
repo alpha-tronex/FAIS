@@ -27,6 +27,7 @@ export class CasesPage implements OnInit, OnDestroy {
   respondents: UserListItem[] = [];
   petitionerAttorneys: UserListItem[] = [];
   respondentAttorneys: UserListItem[] = [];
+  legalAssistants: UserListItem[] = [];
   cases: CaseListItem[] = [];
   circuits: LookupItem[] = [];
   allCounties: LookupItem[] = [];
@@ -43,6 +44,7 @@ export class CasesPage implements OnInit, OnDestroy {
   respondentId = '';
   petitionerAttId = '';
   respondentAttId = '';
+  legalAssistantId = '';
 
   editingCaseId: string | null = null;
 
@@ -82,22 +84,25 @@ export class CasesPage implements OnInit, OnDestroy {
 
   private applyUserTypeFilters() {
     // Create-case dropdowns are filtered by the simplified RoleType IDs.
-    // 1 Petitioner, 2 Respondent, 3 Petitioner Attorney, 4 Respondent Attorney, 5 Administrator
+    // 1 Petitioner, 2 Respondent, 3 Petitioner Attorney, 4 Respondent Attorney, 5 Administrator, 6 Legal Assistant
     const petitioners = this.users.filter((u) => u.roleTypeId === 1);
     const respondents = this.users.filter((u) => u.roleTypeId === 2);
     const petitionerAttorneys = this.users.filter((u) => u.roleTypeId === 3);
     const respondentAttorneys = this.users.filter((u) => u.roleTypeId === 4);
+    const legalAssistants = this.users.filter((u) => u.roleTypeId === 6);
 
     this.petitioners = petitioners;
     this.respondents = respondents;
     this.petitionerAttorneys = petitionerAttorneys;
     this.respondentAttorneys = respondentAttorneys;
+    this.legalAssistants = legalAssistants;
 
     // Keep selections if still valid; otherwise clear.
     if (this.petitionerId && !this.petitioners.some((u) => u.id === this.petitionerId)) this.petitionerId = '';
     if (this.respondentId && !this.respondents.some((u) => u.id === this.respondentId)) this.respondentId = '';
     if (this.petitionerAttId && !this.petitionerAttorneys.some((u) => u.id === this.petitionerAttId)) this.petitionerAttId = '';
     if (this.respondentAttId && !this.respondentAttorneys.some((u) => u.id === this.respondentAttId)) this.respondentAttId = '';
+    if (this.legalAssistantId && !this.legalAssistants.some((u) => u.id === this.legalAssistantId)) this.legalAssistantId = '';
   }
 
   private loadAll() {
@@ -141,6 +146,7 @@ export class CasesPage implements OnInit, OnDestroy {
     this.respondentId = '';
     this.petitionerAttId = '';
     this.respondentAttId = '';
+    this.legalAssistantId = '';
     this.editingCaseId = null;
 
     if (this.circuits.length > 0) {
@@ -237,7 +243,8 @@ export class CasesPage implements OnInit, OnDestroy {
       petitionerId: this.petitionerId || undefined,
       respondentId: this.respondentId || undefined,
       petitionerAttId: this.petitionerAttId || undefined,
-      respondentAttId: this.respondentAttId || undefined
+      respondentAttId: this.respondentAttId || undefined,
+      legalAssistantId: this.legalAssistantId || undefined
     };
 
     const save$ = (
@@ -317,6 +324,7 @@ export class CasesPage implements OnInit, OnDestroy {
           this.respondentId = c.respondentId ?? '';
           this.petitionerAttId = c.petitionerAttId ?? '';
           this.respondentAttId = c.respondentAttId ?? '';
+          this.legalAssistantId = c.legalAssistantId ?? '';
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load case';

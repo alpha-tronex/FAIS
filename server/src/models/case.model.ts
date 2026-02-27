@@ -14,6 +14,7 @@ export const caseSchema = new mongoose.Schema(
     respondentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     petitionerAttId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     respondentAttId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    legalAssistantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
     createdByUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   },

@@ -17,7 +17,8 @@ const caseCreateSchema = z.object({
   petitionerId: z.string().optional(),
   respondentId: z.string().optional(),
   petitionerAttId: z.string().optional(),
-  respondentAttId: z.string().optional()
+  respondentAttId: z.string().optional(),
+  legalAssistantId: z.string().optional(),
 });
 
 const caseUpdateSchema = caseCreateSchema.partial();
@@ -30,17 +31,20 @@ function canSeeCase(auth: AuthPayload, c: any): boolean {
   const respondentObjId = c.respondentId?._id?.toString?.() ?? c.respondentId?.toString?.();
   const petitionerAttObjId = c.petitionerAttId?._id?.toString?.() ?? c.petitionerAttId?.toString?.();
   const respondentAttObjId = c.respondentAttId?._id?.toString?.() ?? c.respondentAttId?.toString?.();
+  const legalAssistantObjId = c.legalAssistantId?._id?.toString?.() ?? c.legalAssistantId?.toString?.();
 
   const isPetitionerByObjId = petitionerObjId === userId;
   const isRespondentByObjId = respondentObjId === userId;
   const isPetitionerAttorneyByObjId = petitionerAttObjId === userId;
   const isRespondentAttorneyByObjId = respondentAttObjId === userId;
+  const isLegalAssistantByObjId = legalAssistantObjId === userId;
 
   return (
     isPetitionerByObjId ||
     isRespondentByObjId ||
     isPetitionerAttorneyByObjId ||
-    isRespondentAttorneyByObjId
+    isRespondentAttorneyByObjId ||
+    isLegalAssistantByObjId
   );
 }
 
@@ -54,7 +58,7 @@ async function hydrateUsersForCases(cases: any[]): Promise<{
   const objectIdStrings = new Set<string>();
 
   for (const c of cases) {
-    for (const key of ['petitionerId', 'respondentId', 'petitionerAttId', 'respondentAttId'] as const) {
+    for (const key of ['petitionerId', 'respondentId', 'petitionerAttId', 'respondentAttId', 'legalAssistantId'] as const) {
       const v = c?.[key];
       const id = v?._id?.toString?.() ?? v?.toString?.();
       if (id && mongoose.isValidObjectId(id)) objectIdStrings.add(id);
@@ -100,7 +104,8 @@ export function createCasesRouter(
         { petitionerId: new mongoose.Types.ObjectId(authPayload.sub) },
         { respondentId: new mongoose.Types.ObjectId(authPayload.sub) },
         { petitionerAttId: new mongoose.Types.ObjectId(authPayload.sub) },
-        { respondentAttId: new mongoose.Types.ObjectId(authPayload.sub) }
+        { respondentAttId: new mongoose.Types.ObjectId(authPayload.sub) },
+        { legalAssistantId: new mongoose.Types.ObjectId(authPayload.sub) },
       ];
     } else if (queryUserId) {
       if (!mongoose.isValidObjectId(queryUserId)) {
@@ -111,7 +116,8 @@ export function createCasesRouter(
         { petitionerId: oid },
         { respondentId: oid },
         { petitionerAttId: oid },
-        { respondentAttId: oid }
+        { respondentAttId: oid },
+        { legalAssistantId: oid },
       ];
     }
 
@@ -146,6 +152,11 @@ export function createCasesRouter(
         })(),
         respondentAttorney: (() => {
           const id = c.respondentAttId?._id?.toString?.() ?? c.respondentAttId?.toString?.();
+          if (id && byObjectId.has(id)) return toUserSummary(byObjectId.get(id));
+          return null;
+        })(),
+        legalAssistant: (() => {
+          const id = c.legalAssistantId?._id?.toString?.() ?? c.legalAssistantId?.toString?.();
           if (id && byObjectId.has(id)) return toUserSummary(byObjectId.get(id));
           return null;
         })(),
@@ -185,11 +196,13 @@ export function createCasesRouter(
     let respondentId: mongoose.Types.ObjectId | undefined;
     let petitionerAttId: mongoose.Types.ObjectId | undefined;
     let respondentAttId: mongoose.Types.ObjectId | undefined;
+    let legalAssistantId: mongoose.Types.ObjectId | undefined;
     try {
       petitionerId = parseOptionalObjectId(parsed.data.petitionerId, 'petitionerId');
       respondentId = parseOptionalObjectId(parsed.data.respondentId, 'respondentId');
       petitionerAttId = parseOptionalObjectId(parsed.data.petitionerAttId, 'petitionerAttId');
       respondentAttId = parseOptionalObjectId(parsed.data.respondentAttId, 'respondentAttId');
+      legalAssistantId = parseOptionalObjectId(parsed.data.legalAssistantId, 'legalAssistantId');
     } catch (e) {
       sendError(res, e, 400);
     }
@@ -206,6 +219,7 @@ export function createCasesRouter(
       respondentId,
       petitionerAttId,
       respondentAttId,
+      legalAssistantId,
       createdByUserId: new mongoose.Types.ObjectId(authPayload.sub)
     });
 
@@ -231,7 +245,8 @@ export function createCasesRouter(
       petitionerId: (c.petitionerId?._id?.toString?.() ?? c.petitionerId?.toString?.()) ?? null,
       respondentId: (c.respondentId?._id?.toString?.() ?? c.respondentId?.toString?.()) ?? null,
       petitionerAttId: (c.petitionerAttId?._id?.toString?.() ?? c.petitionerAttId?.toString?.()) ?? null,
-      respondentAttId: (c.respondentAttId?._id?.toString?.() ?? c.respondentAttId?.toString?.()) ?? null
+      respondentAttId: (c.respondentAttId?._id?.toString?.() ?? c.respondentAttId?.toString?.()) ?? null,
+      legalAssistantId: (c.legalAssistantId?._id?.toString?.() ?? c.legalAssistantId?.toString?.()) ?? null
     });
   });
 
@@ -240,7 +255,7 @@ export function createCasesRouter(
     if (!parsed.success) return res.status(400).json({ error: 'Invalid payload' });
 
     const update: any = { ...parsed.data };
-    for (const key of ['petitionerId', 'respondentId', 'petitionerAttId', 'respondentAttId'] as const) {
+    for (const key of ['petitionerId', 'respondentId', 'petitionerAttId', 'respondentAttId', 'legalAssistantId'] as const) {
       if (key in update) {
         if (update[key] == null || update[key] === '') {
           update[key] = undefined;

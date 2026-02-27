@@ -18,7 +18,7 @@ const userCreateSchema = z
     password: z.string().min(8).max(200).optional(),
     firstName: z.string().min(1).max(100).optional(),
     lastName: z.string().min(1).max(100).optional(),
-    roleTypeId: z.number().int().min(1).max(5).optional(),
+    roleTypeId: z.number().int().min(1).max(6).optional(),
     /** When true, send invitation email. Only used for full create. */
     sendInviteEmail: z.boolean().optional()
   })

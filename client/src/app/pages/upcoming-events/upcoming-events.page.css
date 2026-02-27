@@ -1,0 +1,64 @@
+.success {
+  color: var(--success-color, green);
+  margin-bottom: 0.5rem;
+}
+
+.panel {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.panelTitle {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.rowActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.mt8 {
+  margin-top: 8px;
+}
+
+.mt12 {
+  margin-top: 12px;
+}
+
+.mt16 {
+  margin-top: 16px;
+}
+
+.gridForm label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.gridForm .rowActions {
+  margin-top: 1rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th,
+.td {
+  padding: 0.5rem;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.th {
+  font-weight: 600;
+}
+
+.error {
+  color: var(--error-color, #c00);
+  margin-bottom: 0.5rem;
+}

@@ -17,9 +17,10 @@ export function caseIncludesUser(caseDoc: {
   respondentId?: unknown;
   petitionerAttId?: unknown;
   respondentAttId?: unknown;
+  legalAssistantId?: unknown;
 }, userObjectId: string): boolean {
   const target = String(userObjectId);
-  const ids = [caseDoc?.petitionerId, caseDoc?.respondentId, caseDoc?.petitionerAttId, caseDoc?.respondentAttId]
+  const ids = [caseDoc?.petitionerId, caseDoc?.respondentId, caseDoc?.petitionerAttId, caseDoc?.respondentAttId, caseDoc?.legalAssistantId]
     .map((v: unknown) => (v as { _id?: { toString?: () => string } })?._id?.toString?.() ?? (v as object)?.toString?.())
     .filter(Boolean);
   return ids.some((id: string) => id === target);

@@ -13,6 +13,8 @@ import { createUsersRouter } from './routes/users.routes.js';
 import { createCasesRouter } from './routes/cases.routes.js';
 import { createLookupsRouter } from './routes/lookups.routes.js';
 import { createAffidavitRouter } from './routes/affidavit.routes.js';
+import { createAppointmentsRouter } from './routes/appointments.routes.js';
+import { scheduleAppointmentReminderJob } from './jobs/appointment-reminder.job.js';
 
 dotenv.config();
 
@@ -86,6 +88,7 @@ apiRouter.use(createUsersRouter({ requireAuth, requireAdmin }));
 apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
 apiRouter.use(createLookupsRouter({ requireAuth }));
 apiRouter.use(createAffidavitRouter({ requireAuth }));
+apiRouter.use(createAppointmentsRouter({ requireAuth }));
 app.use('/api', apiRouter);
 
 // Serve built Angular app when present (production: client build copied to server/dist/public)
@@ -102,6 +105,8 @@ if (fs.existsSync(publicDir)) {
 async function main() {
   await mongoose.connect(mongoUri);
 
+  scheduleAppointmentReminderJob();
+
   // Best-effort startup checks to surface role data issues early.
   try {
     const legacyAdminCount = await User.countDocuments({ roleTypeId: 4, passwordHash: { $exists: true } });
@@ -113,10 +118,10 @@ async function main() {
       );
     }
 
-    const invalidRoleCount = await User.countDocuments({ roleTypeId: { $nin: [1, 2, 3, 4, 5] }, passwordHash: { $exists: true } });
+    const invalidRoleCount = await User.countDocuments({ roleTypeId: { $nin: [1, 2, 3, 4, 5, 6] }, passwordHash: { $exists: true } });
     if (invalidRoleCount > 0) {
       // eslint-disable-next-line no-console
-      console.warn(`WARNING: Detected ${invalidRoleCount} user(s) with invalid roleTypeId (expected 1-5).`);
+      console.warn(`WARNING: Detected ${invalidRoleCount} user(s) with invalid roleTypeId (expected 1-6).`);
     }
   } catch {
     // ignore

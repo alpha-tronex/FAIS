@@ -115,3 +115,93 @@ export async function sendPasswordResetEmail(p: PasswordResetEmailParams): Promi
 
   await transport.sendMail({ from, to: p.to, subject, text });
 }
+
+export type AppointmentInviteEmailParams = {
+  to: string;
+  petitionerName?: string;
+  attorneyName?: string;
+  scheduledAt: Date;
+  appUrl: string;
+  caseNumber?: string;
+};
+
+function formatAppointmentInviteText(p: AppointmentInviteEmailParams): string {
+  const dateStr = p.scheduledAt.toLocaleString('en-US', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+    timeZone: process.env.TZ || 'America/New_York',
+  });
+  const eventsUrl = `${p.appUrl.replace(/\/+$/, '')}/upcoming-events`;
+  let body =
+    `An appointment has been scheduled.\n\n` +
+    `Date & time: ${dateStr}\n`;
+  if (p.caseNumber) body += `Case: ${p.caseNumber}\n`;
+  if (p.petitionerName) body += `Petitioner: ${p.petitionerName}\n`;
+  if (p.attorneyName) body += `Attorney: ${p.attorneyName}\n`;
+  body += `\nView and manage your upcoming events: ${eventsUrl}\n`;
+  return body;
+}
+
+/**
+ * Sends an appointment invitation email to petitioner or attorney.
+ */
+export async function sendAppointmentInvite(p: AppointmentInviteEmailParams): Promise<void> {
+  const transport = getSmtpTransport();
+  const from = getFromAddress();
+
+  const subject = 'FAIS: Appointment scheduled';
+  const text = formatAppointmentInviteText(p);
+
+  if (!transport) {
+    console.log('[appointment-invite] SMTP not configured; skipping send.');
+    console.log('[appointment-invite] To:', p.to);
+    console.log('[appointment-invite] Subject:', subject);
+    console.log(text);
+    return;
+  }
+
+  await transport.sendMail({ from, to: p.to, subject, text });
+}
+
+export type AppointmentReminderEmailParams = {
+  to: string;
+  scheduledAt: Date;
+  otherPartyName?: string;
+  appUrl: string;
+};
+
+function formatAppointmentReminderText(p: AppointmentReminderEmailParams): string {
+  const dateStr = p.scheduledAt.toLocaleString('en-US', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+    timeZone: process.env.TZ || 'America/New_York',
+  });
+  const eventsUrl = `${p.appUrl.replace(/\/+$/, '')}/upcoming-events`;
+  let body =
+    `Reminder: You have an appointment tomorrow.\n\n` +
+    `Date & time: ${dateStr}\n`;
+  if (p.otherPartyName) body += `With: ${p.otherPartyName}\n`;
+  body += `\nView your upcoming events: ${eventsUrl}\n`;
+  return body;
+}
+
+/**
+ * Sends an appointment reminder (e.g. on the eve of the appointment).
+ */
+export async function sendAppointmentReminder(p: AppointmentReminderEmailParams): Promise<void> {
+  const transport = getSmtpTransport();
+  const from = getFromAddress();
+
+  const subject = 'FAIS: Appointment reminder';
+  const text = formatAppointmentReminderText(p);
+
+  if (!transport) {
+    console.log('[appointment-reminder] SMTP not configured; skipping send.');
+    console.log('[appointment-reminder] To:', p.to);
+    console.log('[appointment-reminder] Subject:', subject);
+    console.log(text);
+    return;
+  }
+
+  await transport.sendMail({ from, to: p.to, subject, text });
+}

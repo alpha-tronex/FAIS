@@ -1,0 +1,119 @@
+<main class="page">
+  <h1>Upcoming Events</h1>
+
+  <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+  <p *ngIf="success" class="success" role="status">{{ success }}</p>
+
+  <section *ngIf="canCreate" class="panel mt16">
+    <h2 class="panelTitle">Create appointment</h2>
+    <form (ngSubmit)="create()" class="gridForm">
+      <label>
+        Case
+        <select name="caseId" [(ngModel)]="caseId" required class="input">
+          <option value="">(select a case)</option>
+          <option *ngFor="let c of casesForCreate" [ngValue]="c.id">
+            {{ c.caseNumber }} – {{ displayName(c.petitioner) }} / {{ displayName(c.petitionerAttorney) }}{{ c.legalAssistant ? ' / ' + displayName(c.legalAssistant) : '' }}
+          </option>
+        </select>
+      </label>
+      <label *ngIf="isAdmin">
+        Schedule with
+        <select name="scheduleWith" [(ngModel)]="scheduleWith" class="input">
+          <option value="attorney">Petitioner attorney</option>
+          <option value="legal_assistant">Legal assistant</option>
+        </select>
+      </label>
+      <label>
+        Date and time
+        <input name="scheduledAt" type="datetime-local" [(ngModel)]="scheduledAt" required class="input" />
+      </label>
+      <label>
+        Notes (optional)
+        <input name="notes" type="text" [(ngModel)]="notes" class="input" maxlength="500" />
+      </label>
+      <div class="rowActions">
+        <button type="submit" [disabled]="busy || !selectedCase" class="submit">Create appointment</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="mt16">
+    <div class="rowActions">
+      <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
+      <span *ngIf="busy">Loading…</span>
+    </div>
+
+    <table *ngIf="appointments.length > 0" class="table mt12">
+      <thead>
+        <tr>
+          <th class="th">Case #</th>
+          <th class="th">Date & time</th>
+          <th class="th" *ngIf="isPetitioner">With</th>
+          <th class="th" *ngIf="!isPetitioner">Petitioner</th>
+          <th class="th">Status</th>
+          <th class="th">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of appointments">
+          <td class="td">{{ a.caseNumber || '—' }}</td>
+          <td class="td">{{ a.scheduledAt | date:'short' }}</td>
+          <td class="td" *ngIf="isPetitioner">{{ counterpartyName(a) }}</td>
+          <td class="td" *ngIf="!isPetitioner">{{ displayName(a.petitioner) }}</td>
+          <td class="td">{{ a.status }}</td>
+          <td class="td">
+            <span class="rowActions">
+              <ng-container *ngIf="isPetitioner && a.status === 'pending'">
+                <button type="button" (click)="setStatus(a, 'accepted')" [disabled]="busy" class="submit">Accept</button>
+                <button type="button" (click)="openReschedulePrompt(a, 'rejected')" [disabled]="busy">Reject</button>
+              </ng-container>
+              <ng-container *ngIf="isPetitioner && a.status === 'accepted'">
+                <button type="button" (click)="openReschedulePrompt(a, 'cancelled')" [disabled]="busy">Cancel</button>
+              </ng-container>
+              <ng-container *ngIf="canReschedule(a)">
+                <button type="button" (click)="openRescheduleForm(a)" [disabled]="busy" class="submit">Reschedule</button>
+              </ng-container>
+              <ng-container *ngIf="(isAttorney || isLegalAssistant || isAdmin) && a.status !== 'cancelled' && a.status !== 'reschedule_requested'">
+                <button type="button" (click)="cancelByAttorneyOrAdmin(a)" [disabled]="busy">Cancel</button>
+              </ng-container>
+              <ng-container *ngIf="isPetitioner && (a.status === 'rejected' || a.status === 'cancelled' || a.status === 'reschedule_requested')">
+                —
+              </ng-container>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="!busy && appointments.length === 0" class="mt12">No upcoming events.</p>
+
+    <section *ngIf="editingRescheduleAppointment" class="panel mt16">
+      <h2 class="panelTitle">Reschedule appointment</h2>
+      <p class="mt8">Propose a new date and time. The petitioner will be able to accept or reject.</p>
+      <form (ngSubmit)="submitReschedule()" class="gridForm mt12">
+        <label>
+          Date and time
+          <input name="rescheduleScheduledAt" type="datetime-local" [(ngModel)]="rescheduleScheduledAt" required class="input" />
+        </label>
+        <label>
+          Notes (optional)
+          <input name="rescheduleNotes" type="text" [(ngModel)]="rescheduleNotes" class="input" maxlength="500" />
+        </label>
+        <div class="rowActions">
+          <button type="submit" [disabled]="busy" class="submit">Reschedule and send invitations</button>
+          <button type="button" (click)="cancelRescheduleForm()" [disabled]="busy">Cancel</button>
+        </div>
+      </form>
+    </section>
+  </section>
+
+  <app-confirm-popup
+    [open]="reschedulePromptOpen"
+    title="Reschedule?"
+    message="Do you want to reschedule this appointment? If yes, the attorney or admin can propose a new date and time."
+    confirmText="Yes, reschedule"
+    cancelText="No, cancel entirely"
+    (confirm)="onReschedulePromptConfirm()"
+    (cancel)="onReschedulePromptCancel()"
+  />
+</main>

@@ -136,6 +136,25 @@ export class AuthService {
     }
   }
 
+  /** Best-effort JWT decode to read sub (user id). */
+  getUserIdFromToken(): string | null {
+    const token = getToken();
+    if (!token) return null;
+
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    try {
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(base64Url.length / 4) * 4, '=');
+      const json = globalThis.atob(base64);
+      const payload = JSON.parse(json) as JwtPayload;
+      return typeof payload?.sub === 'string' ? payload.sub : null;
+    } catch {
+      return null;
+    }
+  }
+
   /**
    * JWT exp claim (seconds since epoch), or null if no token / invalid.
    * Used by session idle to show warning before expiry.

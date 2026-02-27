@@ -7,11 +7,25 @@
       <a routerLink="/admin/cases" class="navLink" routerLinkActive="navLinkActive">Cases</a>
       <span class="sep">|</span>
       <a routerLink="/admin/affidavit" class="navLink" routerLinkActive="navLinkActive">Affidavit</a>
+      <ng-container *ngIf="showUpcomingEventsLink">
+        <span class="sep">|</span>
+        <span class="navLinkWrap">
+          <a routerLink="/upcoming-events" class="navLink" routerLinkActive="navLinkActive">Upcoming Events</a>
+          <span *ngIf="pendingActionsCount > 0" class="navBadge" [attr.aria-label]="'You have ' + pendingActionsCount + ' pending action(s)'"></span>
+        </span>
+      </ng-container>
     </ng-container>
     <ng-container *ngIf="!showAdminNav">
       <a routerLink="/my-cases" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive" [routerLinkActiveOptions]="{ exact: true }">My cases</a>
       <span class="sep">|</span>
       <a [routerLink]="['/profile']" [queryParams]="profileQueryParams" class="navLink" routerLinkActive="navLinkActive">Profile</a>
+      <ng-container *ngIf="showUpcomingEventsLink">
+        <span class="sep">|</span>
+        <span class="navLinkWrap">
+          <a routerLink="/upcoming-events" class="navLink" routerLinkActive="navLinkActive">Upcoming Events</a>
+          <span *ngIf="pendingActionsCount > 0" class="navBadge" [attr.aria-label]="'You have ' + pendingActionsCount + ' pending action(s)'"></span>
+        </span>
+      </ng-container>
     </ng-container>
     <span class="sep">|</span>
     <button type="button" class="navBtn link" (click)="logout()">Logout</button>

@@ -21,7 +21,8 @@ async function main() {
     { id: 2, name: 'Respondent' },
     { id: 3, name: 'Petitioner Attorney' },
     { id: 4, name: 'Respondent Attorney' },
-    { id: 5, name: 'Administrator' }
+    { id: 5, name: 'Administrator' },
+    { id: 6, name: 'Legal Assistant' },
   ];
 
   for (const row of seed) {

@@ -79,6 +79,14 @@
         </select>
       </label>
 
+      <label>
+        Legal assistant
+        <select name="legalAssistantId" [(ngModel)]="legalAssistantId" class="input">
+          <option [ngValue]="''">(none)</option>
+          <option *ngFor="let u of legalAssistants" [ngValue]="u.id">{{ displayName(u) }}</option>
+        </select>
+      </label>
+
       <div class="rowActions">
         <button type="submit" [disabled]="busy" class="submit">{{ editingCaseId ? 'Update' : 'Create' }}</button>
         <button *ngIf="editingCaseId" type="button" (click)="onCancelEdit()" [disabled]="busy">Cancel</button>

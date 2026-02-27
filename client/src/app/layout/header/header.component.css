@@ -58,3 +58,18 @@
   margin: 0 6px;
   color: var(--muted);
 }
+
+.navLinkWrap {
+  position: relative;
+  display: inline-block;
+}
+
+.navBadge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success-color, green);
+}

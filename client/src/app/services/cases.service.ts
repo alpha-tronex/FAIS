@@ -11,6 +11,7 @@ export type CaseListItem = {
   respondent: { id: string; uname: string; firstName?: string; lastName?: string } | null;
   petitionerAttorney: { id: string; uname: string; firstName?: string; lastName?: string } | null;
   respondentAttorney: { id: string; uname: string; firstName?: string; lastName?: string } | null;
+  legalAssistant: { id: string; uname: string; firstName?: string; lastName?: string } | null;
   circuitId?: number;
   countyId?: number;
   numChildren?: number;
@@ -32,6 +33,7 @@ export type CaseDetail = {
   respondentId: string | null;
   petitionerAttId: string | null;
   respondentAttId: string | null;
+  legalAssistantId: string | null;
 };
 
 export type CreateCaseRequest = {
@@ -45,6 +47,7 @@ export type CreateCaseRequest = {
   respondentId?: string;
   petitionerAttId?: string;
   respondentAttId?: string;
+  legalAssistantId?: string;
 };
 
 @Injectable({ providedIn: 'root' })
