@@ -10,6 +10,8 @@ export const appointmentSchema = new mongoose.Schema(
     petitionerAttId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     legalAssistantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     scheduledAt: { type: Date, required: true },
+    /** Length in minutes (15, 30, 45, or 60). Default 15. */
+    durationMinutes: { type: Number, default: 15, min: 15, max: 60 },
     notes: { type: String },
     status: { type: String, enum: statusEnum, default: 'pending', required: true },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

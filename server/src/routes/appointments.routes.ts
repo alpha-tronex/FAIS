@@ -13,6 +13,7 @@ const appointmentCreateSchema = z.object({
   petitionerAttId: z.string().optional(),
   legalAssistantId: z.string().optional(),
   scheduledAt: z.string().min(1),
+  durationMinutes: z.union([z.literal(15), z.literal(30), z.literal(45), z.literal(60)]).optional(),
   notes: z.string().max(500).optional(),
 });
 
@@ -35,6 +36,22 @@ function parseObjectId(value: string, fieldName: string): mongoose.Types.ObjectI
 
 function toUserSummary(u: any): { id: string; uname: string; firstName?: string; lastName?: string } {
   return toUserSummaryDTO(u);
+}
+
+/** 6:00–22:00 in 15-min steps (HH:mm) for next-available search. */
+const TIME_SLOTS_15: string[] = (() => {
+  const out: string[] = [];
+  for (let h = 6; h <= 22; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      if (h === 22 && m > 0) break;
+      out.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`);
+    }
+  }
+  return out;
+})();
+
+function slotCount(durationMinutes: number): number {
+  return Math.max(1, Math.min(4, Math.round(durationMinutes / 15)));
 }
 
 export function createAppointmentsRouter(
@@ -70,6 +87,119 @@ export function createAppointmentsRouter(
     res.json({ count });
   });
 
+  router.get('/appointments/next-available', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
+    const roleTypeId = authPayload.roleTypeId;
+    const userId = authPayload.sub;
+
+    if (roleTypeId !== 3 && roleTypeId !== 5 && roleTypeId !== 6) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const queryPetitionerId = String((req.query?.petitionerId ?? '') as string).trim();
+    const queryFrom = String((req.query?.from ?? '') as string).trim();
+    const queryDuration = String((req.query?.durationMinutes ?? '15') as string).trim();
+    const queryUserId = String((req.query?.userId ?? '') as string).trim();
+
+    if (!queryPetitionerId || !mongoose.isValidObjectId(queryPetitionerId)) {
+      return res.status(400).json({ error: 'petitionerId is required' });
+    }
+
+    const durationMinutes = Math.min(60, Math.max(15, parseInt(queryDuration, 10) || 15));
+    if (![15, 30, 45, 60].includes(durationMinutes)) {
+      return res.status(400).json({ error: 'durationMinutes must be 15, 30, 45, or 60' });
+    }
+
+    const count = slotCount(durationMinutes);
+
+    let staffUserId: string;
+    if (roleTypeId === 5 && queryUserId && mongoose.isValidObjectId(queryUserId)) {
+      staffUserId = queryUserId;
+    } else if (roleTypeId === 3 || roleTypeId === 6) {
+      staffUserId = userId;
+    } else {
+      return res.status(400).json({ error: 'userId required when admin' });
+    }
+
+    let fromDate: Date;
+    if (queryFrom && /^\d{4}-\d{2}-\d{2}$/.test(queryFrom)) {
+      const [y, m, d] = queryFrom.split('-').map(Number);
+      fromDate = new Date(Date.UTC(y, m - 1, d, 0, 0, 0, 0));
+    } else {
+      fromDate = new Date();
+      fromDate.setUTCHours(0, 0, 0, 0);
+    }
+
+    const maxDays = 30;
+    for (let dayOffset = 0; dayOffset < maxDays; dayOffset++) {
+      const d = new Date(fromDate);
+      d.setUTCDate(d.getUTCDate() + dayOffset);
+      const y = d.getUTCFullYear();
+      const m = d.getUTCMonth();
+      const day = d.getUTCDate();
+      const startOfDay = new Date(Date.UTC(y, m, day, 0, 0, 0, 0));
+      const endOfDay = new Date(Date.UTC(y, m, day + 1, 0, 0, 0, 0));
+      const dateStr = `${y}-${(m + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+      const staffFilter = {
+        $or: [
+          { petitionerAttId: new mongoose.Types.ObjectId(staffUserId) },
+          { legalAssistantId: new mongoose.Types.ObjectId(staffUserId) },
+        ],
+        status: { $ne: 'cancelled' },
+        scheduledAt: { $gte: startOfDay, $lt: endOfDay },
+      };
+      const petitionerFilter = {
+        petitionerId: new mongoose.Types.ObjectId(queryPetitionerId),
+        status: { $ne: 'cancelled' },
+        scheduledAt: { $gte: startOfDay, $lt: endOfDay },
+      };
+
+      const [staffAppointments, petitionerAppointments] = await Promise.all([
+        AppointmentModel.find(staffFilter).select({ scheduledAt: 1, durationMinutes: 1 }).lean<any[]>(),
+        AppointmentModel.find(petitionerFilter).select({ scheduledAt: 1, durationMinutes: 1 }).lean<any[]>(),
+      ]);
+
+      const busySet = new Set<string>();
+      for (const a of [...staffAppointments, ...petitionerAppointments]) {
+        const at = new Date(a.scheduledAt);
+        let h = at.getUTCHours();
+        let m = at.getUTCMinutes();
+        const rounded = Math.round(m / 15) * 15;
+        if (rounded === 60) {
+          h += 1;
+          m = 0;
+        } else {
+          m = rounded;
+        }
+        const slot = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        const dur = a.durationMinutes ?? 15;
+        const n = slotCount(dur);
+        const idx = TIME_SLOTS_15.indexOf(slot);
+        if (idx === -1) continue;
+        for (let i = 0; i < n && idx + i < TIME_SLOTS_15.length; i++) {
+          busySet.add(TIME_SLOTS_15[idx + i]);
+        }
+      }
+
+      for (let i = 0; i <= TIME_SLOTS_15.length - count; i++) {
+        const candidate = TIME_SLOTS_15[i];
+        let allFree = true;
+        for (let j = 0; j < count; j++) {
+          if (busySet.has(TIME_SLOTS_15[i + j])) {
+            allFree = false;
+            break;
+          }
+        }
+        if (allFree) {
+          return res.json({ date: dateStr, time: candidate });
+        }
+      }
+    }
+
+    return res.status(404).json({ error: 'No available slot found in the next 30 days' });
+  });
+
   router.get('/appointments', auth.requireAuth, async (req, res) => {
     const authPayload = (req as any).auth as AuthPayload;
     const roleTypeId = authPayload.roleTypeId;
@@ -81,9 +211,20 @@ export function createAppointmentsRouter(
     }
 
     const queryCaseId = String((req.query?.caseId ?? '') as string).trim();
+    const queryDate = String((req.query?.date ?? '') as string).trim();
+    const queryUserId = String((req.query?.userId ?? '') as string).trim();
+    const queryPetitionerId = String((req.query?.petitionerId ?? '') as string).trim();
     const filter: Record<string, unknown> = {};
 
-    if (roleTypeId === 1) {
+    // When petitionerId is requested (by staff/admin), return that petitioner's appointments only (for availability: avoid double-booking the client).
+    const requestingPetitionerSlots =
+      (roleTypeId === 3 || roleTypeId === 5 || roleTypeId === 6) &&
+      queryPetitionerId &&
+      mongoose.isValidObjectId(queryPetitionerId);
+
+    if (requestingPetitionerSlots) {
+      filter.petitionerId = new mongoose.Types.ObjectId(queryPetitionerId);
+    } else if (roleTypeId === 1) {
       filter.petitionerId = new mongoose.Types.ObjectId(userId);
     } else if (roleTypeId === 3) {
       filter.petitionerAttId = new mongoose.Types.ObjectId(userId);
@@ -94,6 +235,21 @@ export function createAppointmentsRouter(
       if (queryCaseId && mongoose.isValidObjectId(queryCaseId)) {
         filter.caseId = new mongoose.Types.ObjectId(queryCaseId);
       }
+      // Admin: optional filter by userId (for availability: appointments for this attorney/LA)
+      if (queryUserId && mongoose.isValidObjectId(queryUserId)) {
+        filter.$or = [
+          { petitionerAttId: new mongoose.Types.ObjectId(queryUserId) },
+          { legalAssistantId: new mongoose.Types.ObjectId(queryUserId) },
+        ];
+      }
+    }
+
+    // Optional: restrict to appointments on a specific calendar day (UTC)
+    if (queryDate && /^\d{4}-\d{2}-\d{2}$/.test(queryDate)) {
+      const [y, m, d] = queryDate.split('-').map(Number);
+      const startOfDay = new Date(Date.UTC(y, m - 1, d, 0, 0, 0, 0));
+      const endOfDay = new Date(Date.UTC(y, m - 1, d + 1, 0, 0, 0, 0));
+      filter.scheduledAt = { $gte: startOfDay, $lt: endOfDay };
     }
 
     const appointments = await AppointmentModel.find(filter)
@@ -144,6 +300,7 @@ export function createAppointmentsRouter(
           legalAssistantId: laid ?? null,
           legalAssistant: laid && userById.has(laid) ? toUserSummary(userById.get(laid)) : null,
           scheduledAt: a.scheduledAt ?? null,
+          durationMinutes: a.durationMinutes ?? 15,
           notes: a.notes ?? null,
           status: a.status ?? 'pending',
           createdAt: a.createdAt ?? null,
@@ -219,12 +376,18 @@ export function createAppointmentsRouter(
       return res.status(400).json({ error: 'Invalid scheduledAt' });
     }
 
+    const durationMinutes = parsed.data.durationMinutes ?? 15;
+    if (![15, 30, 45, 60].includes(durationMinutes)) {
+      return res.status(400).json({ error: 'durationMinutes must be 15, 30, 45, or 60' });
+    }
+
     const created = await AppointmentModel.create({
       caseId,
       petitionerId,
       petitionerAttId: petitionerAttId ?? undefined,
       legalAssistantId: legalAssistantId ?? undefined,
       scheduledAt,
+      durationMinutes,
       notes: parsed.data.notes?.trim() || undefined,
       status: 'pending',
       createdBy: new mongoose.Types.ObjectId(authPayload.sub),

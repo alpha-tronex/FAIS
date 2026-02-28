@@ -14,6 +14,12 @@
           <span *ngIf="pendingActionsCount > 0" class="navBadge" [attr.aria-label]="'You have ' + pendingActionsCount + ' pending action(s)'"></span>
         </span>
       </ng-container>
+      <ng-container *ngIf="showReportsLink">
+        <span class="sep">|</span>
+        <a routerLink="/reports/structured" class="navLink" routerLinkActive="navLinkActive">Report (Structured)</a>
+        <span class="sep">|</span>
+        <a routerLink="/reports/natural" class="navLink" routerLinkActive="navLinkActive">Report (Natural)</a>
+      </ng-container>
     </ng-container>
     <ng-container *ngIf="!showAdminNav">
       <a routerLink="/my-cases" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive" [routerLinkActiveOptions]="{ exact: true }">My cases</a>
@@ -25,6 +31,12 @@
           <a routerLink="/upcoming-events" class="navLink" routerLinkActive="navLinkActive">Upcoming Events</a>
           <span *ngIf="pendingActionsCount > 0" class="navBadge" [attr.aria-label]="'You have ' + pendingActionsCount + ' pending action(s)'"></span>
         </span>
+      </ng-container>
+      <ng-container *ngIf="showReportsLink">
+        <span class="sep">|</span>
+        <a routerLink="/reports/structured" class="navLink" routerLinkActive="navLinkActive">Report (Structured)</a>
+        <span class="sep">|</span>
+        <a routerLink="/reports/natural" class="navLink" routerLinkActive="navLinkActive">Report (Natural)</a>
       </ng-container>
     </ng-container>
     <span class="sep">|</span>

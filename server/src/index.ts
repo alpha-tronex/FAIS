@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
@@ -14,11 +15,26 @@ import { createCasesRouter } from './routes/cases.routes.js';
 import { createLookupsRouter } from './routes/lookups.routes.js';
 import { createAffidavitRouter } from './routes/affidavit.routes.js';
 import { createAppointmentsRouter } from './routes/appointments.routes.js';
+import { createReportsRouter } from './routes/reports.routes.js';
 import { scheduleAppointmentReminderJob } from './jobs/appointment-reminder.job.js';
 
-dotenv.config();
+// eslint-disable-next-line no-console
+console.log('FAIS server boot (index.ts)');
+const __dirnameSrc = path.dirname(fileURLToPath(import.meta.url));
+const serverEnvPath = path.join(__dirnameSrc, '..', '.env');
+dotenv.config({ path: serverEnvPath, override: true });
+if (process.env.OPENAI_API_KEY?.trim()) {
+  // eslint-disable-next-line no-console
+  console.log('OPENAI_API_KEY loaded (AI reports enabled).');
+} else {
+  dotenv.config({ override: true });
+}
+if (!process.env.OPENAI_API_KEY?.trim()) {
+  // eslint-disable-next-line no-console
+  console.log('OPENAI_API_KEY not set - AI report endpoints will return 503. Add OPENAI_API_KEY to server/.env');
+}
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = __dirnameSrc;
 
 const PORT = Number(process.env.PORT ?? 3001);
 const MONGODB_URI = process.env.MONGODB_URI?.trim();
@@ -77,7 +93,7 @@ app.use(
   })
 );
 
-const { requireAuth, requireAdmin, requireStaffOrAdmin } = createAuthMiddlewares(jwtSecret);
+const { requireAuth, requireAdmin, requireStaffOrAdmin, requireReportAccess } = createAuthMiddlewares(jwtSecret);
 
 // Mount all API routes under /api for production (client calls /api/...)
 const apiRouter = express.Router();
@@ -89,11 +105,11 @@ apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
 apiRouter.use(createLookupsRouter({ requireAuth }));
 apiRouter.use(createAffidavitRouter({ requireAuth }));
 apiRouter.use(createAppointmentsRouter({ requireAuth }));
+apiRouter.use(createReportsRouter({ requireAuth, requireReportAccess }));
 app.use('/api', apiRouter);
 
 // Serve built Angular app when present (production: client build copied to server/dist/public)
 const publicDir = path.join(__dirname, 'public');
-const fs = await import('fs');
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir));
   // Express 5 / path-to-regexp v8 require named wildcard; {*splat} matches everything including /

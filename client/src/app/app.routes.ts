@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminChildGuard, adminGuard } from './core/admin.guard';
+import { reportsGuard } from './core/reports.guard';
 import { landingGuard } from './core/landing.guard';
 import { myCasesGuard } from './core/my-cases.guard';
 import { registerGuard } from './core/register.guard';
@@ -67,6 +68,11 @@ export const routes: Routes = [
 		path: 'admin',
 		canActivate: [adminGuard],
 		loadChildren: () => import('./pages/admin/admin.module').then((m) => m.AdminModule)
+	},
+	{
+		path: 'reports',
+		canActivate: [reportsGuard],
+		loadChildren: () => import('./pages/reports/reports.module').then((m) => m.ReportsModule)
 	},
 	{ path: 'users', redirectTo: 'admin/users' },
 	{ path: 'cases', redirectTo: 'my-cases' },

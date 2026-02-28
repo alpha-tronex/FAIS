@@ -16,12 +16,9 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
   cases: CaseListItem[] = [];
 
   caseId = '';
-  /** For admin: schedule with petitioner attorney or legal assistant. */
-  scheduleWith: 'attorney' | 'legal_assistant' = 'attorney';
-  scheduledAt = '';
-  notes = '';
 
   busy = false;
+  schedulePopupOpen = false;
   error: string | null = null;
   success: string | null = null;
 
@@ -82,6 +79,21 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
     return this.cases.find((c) => c.id === this.caseId) ?? null;
   }
 
+  openSchedulePopup(): void {
+    this.schedulePopupOpen = true;
+  }
+
+  onSchedulePopupClose(): void {
+    this.schedulePopupOpen = false;
+  }
+
+  onSchedulePopupCreated(): void {
+    this.schedulePopupOpen = false;
+    this.success = 'Appointment set and invitation sent.';
+    this.refresh();
+    this.appointmentsApi.requestPendingActionsRefresh();
+  }
+
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
       void this.router.navigateByUrl('/login');
@@ -120,7 +132,7 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
     this.success = null;
 
     const caseIdFilter = this.isAdmin && this.caseId ? this.caseId : undefined;
-    this.subscription = from(this.appointmentsApi.list(caseIdFilter))
+    this.subscription = from(this.appointmentsApi.list(caseIdFilter ? { caseId: caseIdFilter } : undefined))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -151,86 +163,6 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
   counterpartyName(a: AppointmentListItem): string {
     const u = a.petitionerAttorney ?? a.legalAssistant;
     return this.displayName(u);
-  }
-
-  create(): void {
-    if (!this.canCreate || !this.selectedCase) return;
-    const c = this.selectedCase;
-    const petitionerId = c.petitioner?.id;
-    if (!petitionerId) {
-      this.error = 'Selected case must have a petitioner.';
-      return;
-    }
-    let petitionerAttId: string | undefined;
-    let legalAssistantId: string | undefined;
-    if (this.isAdmin) {
-      if (this.scheduleWith === 'attorney') {
-        petitionerAttId = c.petitionerAttorney?.id;
-        if (!petitionerAttId) {
-          this.error = 'Selected case has no petitioner attorney.';
-          return;
-        }
-      } else {
-        legalAssistantId = c.legalAssistant?.id;
-        if (!legalAssistantId) {
-          this.error = 'Selected case has no legal assistant. Choose Petitioner Attorney or add a legal assistant to the case.';
-          return;
-        }
-      }
-    } else if (this.isAttorney) {
-      petitionerAttId = c.petitionerAttorney?.id;
-      if (!petitionerAttId) {
-        this.error = 'Selected case must have a petitioner attorney.';
-        return;
-        }
-    } else if (this.isLegalAssistant) {
-      legalAssistantId = c.legalAssistant?.id;
-      if (!legalAssistantId) {
-        this.error = 'You are not the legal assistant on this case.';
-        return;
-      }
-    }
-    const scheduledAt = this.scheduledAt?.trim();
-    if (!scheduledAt) {
-      this.error = 'Please select date and time.';
-      return;
-    }
-    this.busy = true;
-    this.error = null;
-    this.success = null;
-
-    const payload = {
-      caseId: c.id,
-      petitionerId,
-      scheduledAt,
-      notes: this.notes?.trim() || undefined,
-      ...(petitionerAttId ? { petitionerAttId } : { legalAssistantId: legalAssistantId! }),
-    };
-
-    from(this.appointmentsApi.create(payload))
-      .pipe(
-        finalize(() => {
-          this.busy = false;
-        })
-      )
-      .subscribe({
-        next: (res) => {
-          this.success = res.emailSent
-            ? 'Appointment set and invitation emails have been sent.'
-            : 'Appointment set; one or more invitation emails could not be sent.';
-          this.scheduledAt = '';
-          this.notes = '';
-          this.refresh();
-        },
-        error: (e: unknown) => {
-          const err = e as { error?: { error?: string }; status?: number };
-          this.error = err?.error?.error ?? 'Failed to create appointment';
-          if (err?.status === 401) {
-            this.auth.logout();
-            void this.router.navigateByUrl('/login');
-          }
-        },
-      });
   }
 
   openReschedulePrompt(appointment: AppointmentListItem, ifNo: 'rejected' | 'cancelled'): void {

@@ -1,0 +1,105 @@
+@if (open) {
+  <div
+    class="scheduleOverlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="schedule-popup-title"
+    data-schedule-backdrop
+    (click)="onBackdropClick($event)"
+  >
+    <div class="schedulePanel">
+      <h2 id="schedule-popup-title" class="panelTitle">Schedule appointment</h2>
+
+      <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+
+      <form class="scheduleForm" (ngSubmit)="create()">
+        <label>
+          Case
+          <select name="caseId" [(ngModel)]="caseId" class="input" required (ngModelChange)="selectedSlot = null; loadAvailability(); fetchNextAvailable()">
+            <option value="">(select a case)</option>
+            <option *ngFor="let c of casesForCreate" [ngValue]="c.id">
+              {{ c.caseNumber }} – {{ displayName(c.petitioner) }} / {{ displayName(c.petitionerAttorney) }}{{ c.legalAssistant ? ' / ' + displayName(c.legalAssistant) : '' }}
+            </option>
+          </select>
+        </label>
+
+        @if (isAdmin) {
+          <label>
+            Schedule with
+            <select name="scheduleWith" [(ngModel)]="scheduleWith" class="input" (ngModelChange)="loadAvailability(); fetchNextAvailable()">
+              <option value="attorney">Petitioner attorney</option>
+              <option value="legal_assistant">Legal assistant</option>
+            </select>
+          </label>
+        }
+
+        <label>
+          Day
+          <input
+            type="date"
+            name="selectedDate"
+            [(ngModel)]="selectedDate"
+            class="input"
+            required
+            (ngModelChange)="selectedSlot = null; loadAvailability()"
+          />
+        </label>
+
+        <label>
+          Duration
+          <select name="durationMinutes" [(ngModel)]="durationMinutes" class="input" (ngModelChange)="selectedSlot = null; fetchNextAvailable()">
+            @for (d of durationOptions; track d) {
+              <option [value]="d">{{ d }} min</option>
+            }
+          </select>
+        </label>
+
+        @if (canFetchNextAvailable) {
+          <div class="nextAvailableSection">
+            @if (loadingNextAvailable) {
+              <p class="muted">Finding next available…</p>
+            } @else if (nextAvailable) {
+              <p class="nextAvailableText">Next available: <strong>{{ nextAvailableDisplay() }}</strong></p>
+              <button type="button" class="submit" (click)="useNextAvailable()">Use this time</button>
+            } @else {
+              <p class="muted">No available slot in the next 30 days.</p>
+            }
+          </div>
+        }
+
+        @if (canLoadSlots) {
+          <div class="availabilitySection">
+            <p class="availabilityHint">Open slots are free for both you and the client. Click an open slot to select the start time.</p>
+            @if (loadingSlots) {
+              <p class="muted">Loading availability…</p>
+            } @else {
+              <app-appointment-availability-grid
+                [date]="selectedDate"
+                [busySlots]="busySlots"
+                [busySlotLabels]="busySlotLabels"
+                [selectedSlot]="selectedSlot"
+                [durationMinutes]="durationMinutes"
+                [disabled]="busy"
+                (slotSelect)="onSlotSelect($event)"
+              />
+            }
+          </div>
+        }
+
+        @if (selectedSlot) {
+          <p class="selectedTime">Selected: {{ selectedTimeDisplay() }}</p>
+        }
+
+        <label>
+          Notes (optional)
+          <input name="notes" type="text" [(ngModel)]="notes" class="input" maxlength="500" />
+        </label>
+
+        <div class="rowActions scheduleActions">
+          <button type="button" (click)="onClose()">Cancel</button>
+          <button type="submit" class="submit" [disabled]="!canCreate">Create appointment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -99,6 +99,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.auth.hasRole(1, 3, 5, 6);
   }
 
+  /** Petitioner Attorney (3) or Admin (5): show Reports links. */
+  get showReportsLink(): boolean {
+    return this.auth.hasRole(3, 5);
+  }
+
   /** Query params for Profile link: none (profile is own page; do not carry caseId/userId from affidavit). */
   get profileQueryParams(): Record<string, string> {
     return {};

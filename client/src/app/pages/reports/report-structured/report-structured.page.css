@@ -1,0 +1,16 @@
+.description {
+  margin-top: 0.5rem;
+  color: var(--text-secondary, #555);
+}
+.formRow label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.formRow textarea {
+  width: 100%;
+  max-width: 32rem;
+  box-sizing: border-box;
+}
+.narrative p {
+  margin: 0;
+}

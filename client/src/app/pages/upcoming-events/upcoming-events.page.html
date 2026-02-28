@@ -4,37 +4,8 @@
   <p *ngIf="error" class="error" role="alert">{{ error }}</p>
   <p *ngIf="success" class="success" role="status">{{ success }}</p>
 
-  <section *ngIf="canCreate" class="panel mt16">
-    <h2 class="panelTitle">Create appointment</h2>
-    <form (ngSubmit)="create()" class="gridForm">
-      <label>
-        Case
-        <select name="caseId" [(ngModel)]="caseId" required class="input">
-          <option value="">(select a case)</option>
-          <option *ngFor="let c of casesForCreate" [ngValue]="c.id">
-            {{ c.caseNumber }} – {{ displayName(c.petitioner) }} / {{ displayName(c.petitionerAttorney) }}{{ c.legalAssistant ? ' / ' + displayName(c.legalAssistant) : '' }}
-          </option>
-        </select>
-      </label>
-      <label *ngIf="isAdmin">
-        Schedule with
-        <select name="scheduleWith" [(ngModel)]="scheduleWith" class="input">
-          <option value="attorney">Petitioner attorney</option>
-          <option value="legal_assistant">Legal assistant</option>
-        </select>
-      </label>
-      <label>
-        Date and time
-        <app-appointment-picker [(value)]="scheduledAt" [required]="true" />
-      </label>
-      <label>
-        Notes (optional)
-        <input name="notes" type="text" [(ngModel)]="notes" class="input" maxlength="500" />
-      </label>
-      <div class="rowActions">
-        <button type="submit" [disabled]="busy || !selectedCase" class="submit">Create appointment</button>
-      </div>
-    </form>
+  <section *ngIf="canCreate" class="mt16">
+    <button type="button" class="submit" (click)="openSchedulePopup()">Schedule</button>
   </section>
 
   <section class="mt16">
@@ -128,5 +99,12 @@
     [danger]="true"
     (confirm)="onCancelAppointmentConfirm()"
     (cancel)="onCancelAppointmentDismiss()"
+  />
+
+  <app-schedule-popup
+    [open]="schedulePopupOpen"
+    [cases]="cases"
+    (close)="onSchedulePopupClose()"
+    (created)="onSchedulePopupCreated()"
   />
 </main>

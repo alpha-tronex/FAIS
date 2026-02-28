@@ -48,6 +48,8 @@ npm --prefix client install
 npm run dev
 ```
 
+The API loads `server/.env` (e.g. `OPENAI_API_KEY` for AI reports). To run only the server: `npm run server:dev`; to run the built server: `npm run server:build` then `npm run server:start`.
+
 If you want to start the UI even when Mongo isn’t up yet:
 
 ```bash

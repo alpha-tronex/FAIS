@@ -1,0 +1,17 @@
+<div class="slotGrid" role="listbox" aria-label="Appointment time slots for the selected day">
+  @for (slot of timeSlots; track slot) {
+    <button
+      type="button"
+      class="slotBtn"
+      [class.slotBusy]="isBusy(slot)"
+      [class.slotSelected]="isInSelectedRange(slot)"
+      [disabled]="disabled || !isSelectable(slot)"
+      [attr.aria-selected]="isInSelectedRange(slot)"
+      [title]="isBusy(slot) ? getBusyLabel(slot) : (isSelectable(slot) ? formatTime(slot) + ' – Open' : 'Not enough contiguous time')"
+      (click)="onSlotClick(slot)"
+    >
+      <span class="slotTime">{{ formatTime(slot) }}</span>
+      <span class="slotStatus">{{ isBusy(slot) ? getBusyLabel(slot) : (isSelectable(slot) ? 'Open' : '—') }}</span>
+    </button>
+  }
+</div>

@@ -13,6 +13,23 @@ export const APPOINTMENT_TIME_SLOTS: readonly string[] = (() => {
   return slots;
 })();
 
+/** Number of 15-min slots for a given duration in minutes. */
+export function getSlotCountForDuration(durationMinutes: number): number {
+  return Math.max(1, Math.min(4, Math.round(durationMinutes / 15)));
+}
+
+/** Return contiguous slot strings from startSlot (HH:mm) for the given duration. */
+export function getContiguousSlots(startSlot: string, durationMinutes: number): string[] {
+  const idx = APPOINTMENT_TIME_SLOTS.indexOf(startSlot);
+  if (idx === -1) return [];
+  const count = getSlotCountForDuration(durationMinutes);
+  const out: string[] = [];
+  for (let i = 0; i < count && idx + i < APPOINTMENT_TIME_SLOTS.length; i++) {
+    out.push(APPOINTMENT_TIME_SLOTS[idx + i]);
+  }
+  return out;
+}
+
 /** Format "HH:mm" as 12h display, e.g. "06:00" -> "6:00 AM", "14:30" -> "2:30 PM". */
 export function formatTimeSlotDisplay(value: string): string {
   const [hStr, mStr] = value.split(':');

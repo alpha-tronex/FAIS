@@ -17,6 +17,7 @@ fais-dump/
 
 # Cursor (debug logs, etc.)
 .cursor/
+debug-fa0dc2.log
 
 # System
 .DS_Store

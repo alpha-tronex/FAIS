@@ -1,0 +1,59 @@
+<main class="page">
+  <h1>AI Report (Natural Language)</h1>
+  <p class="description">
+    Ask for a report in plain language. This version understands a wider range of questions: income (e.g. under 50K or over 100K), number of children, and whether you mean petitioner or respondent.
+  </p>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section class="mt16">
+    <div class="formRow">
+      <label for="prompt">What report do you want?</label>
+      <textarea
+        id="prompt"
+        [(ngModel)]="prompt"
+        rows="3"
+        placeholder="e.g. Show all respondents making less than 50K per year, or cases with 3 or more children."
+        [disabled]="busy"
+      ></textarea>
+    </div>
+    <div class="rowActions mt12">
+      <button type="button" (click)="runReport()" [disabled]="busy">
+        {{ busy ? 'Generating…' : 'Generate report' }}
+      </button>
+    </div>
+  </section>
+
+  <section *ngIf="narrative" class="mt16 narrative">
+    <h2>Summary</h2>
+    <p>{{ narrative }}</p>
+  </section>
+
+  <section *ngIf="rows.length > 0" class="mt16">
+    <h2>Results ({{ rows.length }})</h2>
+    <table class="table mt12">
+      <thead>
+        <tr>
+          <th class="th">Case #</th>
+          <th class="th">Party</th>
+          <th class="th">Role</th>
+          <th class="th">Gross annual income</th>
+          <th class="th">Under 50K</th>
+          <th class="th" *ngIf="hasNumChildren">Children</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of rows">
+          <td class="td">{{ r.caseNumber }}</td>
+          <td class="td">{{ r.partyName }}</td>
+          <td class="td">{{ r.partyRole }}</td>
+          <td class="td">{{ r.grossAnnualIncome | number:'1.2-2' }}</td>
+          <td class="td">{{ r.under50K ? 'Yes' : 'No' }}</td>
+          <td class="td" *ngIf="hasNumChildren">{{ r.numChildren ?? '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <p *ngIf="!busy && rows.length === 0 && narrative !== null" class="mt16">No cases match the requested criteria.</p>
+</main>
