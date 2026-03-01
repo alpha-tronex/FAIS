@@ -8,6 +8,12 @@ export function toUserDTO(doc: any): UserDTO {
 
   const firstName = pickFirstString(doc?.firstName) ?? undefined;
   const lastName = pickFirstString(doc?.lastName) ?? undefined;
+  const gender = pickFirstString(doc?.gender) ?? undefined;
+  const dateOfBirth = doc?.dateOfBirth instanceof Date
+    ? doc.dateOfBirth.toISOString().slice(0, 10)
+    : typeof doc?.dateOfBirth === 'string' && doc.dateOfBirth
+      ? doc.dateOfBirth.slice(0, 10)
+      : undefined;
 
   const addressLine1 = pickFirstString(doc?.addressLine1) ?? undefined;
   const addressLine2 = pickFirstString(doc?.addressLine2) ?? undefined;
@@ -26,7 +32,9 @@ export function toUserDTO(doc: any): UserDTO {
     email,
     firstName,
     lastName,
-		addressLine1,
+    gender,
+    dateOfBirth,
+    addressLine1,
 		addressLine2,
 		city,
 		state,
@@ -52,7 +60,12 @@ export function toNormalizedUserUpdate(update: UserUpdateDTO): Record<string, un
   if (update.email !== undefined) out.email = update.email;
   if (update.firstName !== undefined) out.firstName = update.firstName;
   if (update.lastName !== undefined) out.lastName = update.lastName;
-	if (update.addressLine1 !== undefined) out.addressLine1 = update.addressLine1;
+  if (update.gender !== undefined) out.gender = update.gender;
+  if (update.dateOfBirth !== undefined) {
+    const d = typeof update.dateOfBirth === 'string' ? update.dateOfBirth.trim() : '';
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) out.dateOfBirth = new Date(d + 'T00:00:00.000Z');
+  }
+  if (update.addressLine1 !== undefined) out.addressLine1 = update.addressLine1;
 	if (update.addressLine2 !== undefined) out.addressLine2 = update.addressLine2;
 	if (update.city !== undefined) out.city = update.city;
 	if (update.state !== undefined) out.state = update.state;

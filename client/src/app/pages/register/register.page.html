@@ -27,6 +27,23 @@
       </label>
 
       <label>
+        Gender
+        <select name="gender" [(ngModel)]="gender" class="input">
+          <option value="">—</option>
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+          <option value="non-binary">Non-binary</option>
+          <option value="other">Other</option>
+          <option value="prefer-not-to-say">Prefer not to say</option>
+        </select>
+      </label>
+
+      <label>
+        Date of birth
+        <input name="dateOfBirth" type="date" [(ngModel)]="dateOfBirth" class="input" />
+      </label>
+
+      <label>
         Address line 1
         <input name="addressLine1" [(ngModel)]="addressLine1" required class="input" />
       </label>

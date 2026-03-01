@@ -40,6 +40,16 @@ export class UsersPage implements OnInit, OnDestroy {
   showSendEmailConfirm = false;
   subscription: Subscription | null = null;
 
+  /** Create minimal user by ask */
+  askPrompt = '';
+  askBusy = false;
+  askError: string | null = null;
+  showMinimalUserSuccessPopup = false;
+  /** Message for the success popup (e.g. "Jim Kelly was created as respondent.") */
+  minimalUserSuccessMessage = '';
+  /** Id of the user just created via ask, for undo. */
+  createdUserIdForUndo: string | null = null;
+
   /** Table sort: column key and direction. */
   sortBy: 'name' | 'uname' | 'email' | 'role' = 'name';
   sortDir: 'asc' | 'desc' = 'asc';
@@ -147,6 +157,68 @@ export class UsersPage implements OnInit, OnDestroy {
       this.sortBy = column;
       this.sortDir = 'asc';
     }
+  }
+
+  submitAskCreateUser(): void {
+    if (this.askBusy || !this.askPrompt.trim()) return;
+    this.askBusy = true;
+    this.askError = null;
+    this.error = null;
+    this.usersApi
+      .createFromPrompt(this.askPrompt.trim())
+      .then((res) => {
+        const name = [res.firstName, res.lastName].filter(Boolean).join(' ') || 'User';
+        const roleName = res.roleTypeId === 4 ? 'respondent attorney' : 'respondent';
+        this.minimalUserSuccessMessage = `${name} was created as ${roleName}. You can complete their profile from the list below.`;
+        this.createdUserIdForUndo = res.id;
+        this.showMinimalUserSuccessPopup = true;
+        this.askPrompt = '';
+        this.refresh();
+      })
+      .catch((e: { error?: { error?: string }; status?: number }) => {
+        if (e?.status === 401) {
+          this.auth.logout();
+          void this.router.navigateByUrl('/login');
+          return;
+        }
+        if (e?.status === 503) {
+          this.askError = 'AI create-from-prompt is not configured. Please contact support.';
+          return;
+        }
+        if (e?.status === 429 || e?.status === 402) {
+          this.askError = 'AI quota exceeded. Please try again later.';
+          return;
+        }
+        this.askError = e?.error?.error ?? 'Failed to create user from prompt.';
+      })
+      .finally(() => {
+        this.askBusy = false;
+      });
+  }
+
+  onUndoMinimalUser(): void {
+    const id = this.createdUserIdForUndo;
+    this.showMinimalUserSuccessPopup = false;
+    this.createdUserIdForUndo = null;
+    if (!id) return;
+    this.busy = true;
+    this.usersApi
+      .delete(id)
+      .then(() => {
+        this.success = 'User removed.';
+        this.refresh();
+      })
+      .catch((e: { error?: { error?: string } }) => {
+        this.error = e?.error?.error ?? 'Failed to remove user.';
+      })
+      .finally(() => {
+        this.busy = false;
+      });
+  }
+
+  onDismissMinimalUserSuccess(): void {
+    this.showMinimalUserSuccessPopup = false;
+    this.createdUserIdForUndo = null;
   }
 
   create() {

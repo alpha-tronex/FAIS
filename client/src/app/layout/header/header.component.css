@@ -66,10 +66,18 @@
 
 .navBadge {
   position: absolute;
-  top: -2px;
-  right: -4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
   background: var(--success-color, green);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }

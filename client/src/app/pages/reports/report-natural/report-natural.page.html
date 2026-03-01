@@ -29,12 +29,20 @@
     <p>{{ narrative }}</p>
   </section>
 
+  <section *ngIf="aboutUserSummary?.bullets?.length" class="mt16 about-user">
+    <h2>About this user</h2>
+    <ul class="about-user-bullets">
+      <li *ngFor="let item of aboutBulletItems"><strong>{{ item.label }}</strong> {{ item.value }}</li>
+    </ul>
+  </section>
+
   <section *ngIf="rows.length > 0" class="mt16">
     <h2>Results ({{ rows.length }})</h2>
     <table class="table mt12">
       <thead>
         <tr>
           <th class="th">Case #</th>
+          <th class="th">County</th>
           <th class="th">Party</th>
           <th class="th">Role</th>
           <th class="th">Gross annual income</th>
@@ -45,6 +53,7 @@
       <tbody>
         <tr *ngFor="let r of rows">
           <td class="td">{{ r.caseNumber }}</td>
+          <td class="td">{{ r.countyName ?? '—' }}</td>
           <td class="td">{{ r.partyName }}</td>
           <td class="td">{{ r.partyRole }}</td>
           <td class="td">{{ r.grossAnnualIncome | number:'1.2-2' }}</td>
@@ -55,5 +64,5 @@
     </table>
   </section>
 
-  <p *ngIf="!busy && rows.length === 0 && narrative !== null" class="mt16">No cases match the requested criteria.</p>
+  <p *ngIf="!busy && rows.length === 0 && narrative !== null && narrative !== 'No case found for that user.'" class="mt16">No cases match the requested criteria.</p>
 </main>

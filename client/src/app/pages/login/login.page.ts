@@ -39,10 +39,8 @@ export class LoginPage implements OnInit {
       const res = await this.auth.login(this.uname.trim(), this.password);
       if (res.mustResetPassword) {
         this.router.navigateByUrl('/register');
-      } else if (res.user?.roleTypeId === 5) {
-        this.router.navigateByUrl('/admin/users');
       } else {
-        this.router.navigateByUrl('/my-cases');
+        this.router.navigateByUrl('/home');
       }
     } catch (e: unknown) {
       this.error = (e as { error?: { error?: string } })?.error?.error ?? 'Login failed';

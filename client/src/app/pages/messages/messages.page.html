@@ -1,0 +1,103 @@
+<main class="page messagesPage">
+  <h1>Messages</h1>
+
+  <p *ngIf="error" class="error" role="alert">{{ error }}</p>
+
+  <div class="messagesLayout">
+    <aside class="conversationsPanel">
+      <section class="panel">
+        <h2 class="panelTitle">Conversations</h2>
+        <div class="rowActions">
+          <button type="button" (click)="loadConversations()" [disabled]="busy">Refresh</button>
+          <button type="button" (click)="markAllAsRead()" [disabled]="markReadBusy">Mark all as read</button>
+        </div>
+        <ul class="conversationList" *ngIf="!busy && conversations.length > 0">
+          <li
+            *ngFor="let conv of conversations"
+            class="conversationItem"
+            [class.selected]="conv.otherUser?.id === selectedUserId"
+          >
+            <button type="button" class="conversationBtn" (click)="selectConversation(conv)">
+              <span class="convName">{{ displayName(conv.otherUser) }}</span>
+              <span *ngIf="conv.unreadCount > 0" class="unreadBadge">{{ conv.unreadCount }}</span>
+              <span *ngIf="conv.lastMessage" class="convPreview">{{ (conv.lastMessage.body || '') | slice:0:60 }}{{ (conv.lastMessage.body || '').length > 60 ? '…' : '' }}</span>
+            </button>
+          </li>
+        </ul>
+        <p *ngIf="!busy && conversations.length === 0" class="muted">No conversations yet.</p>
+      </section>
+
+      <section class="panel">
+        <h2 class="panelTitle">Start new</h2>
+        <ul class="recipientList" *ngIf="recipients.length > 0">
+          <li *ngFor="let r of recipients">
+            <button type="button" class="recipientBtn" (click)="selectRecipient(r)">
+              {{ displayName(r) }}
+            </button>
+          </li>
+        </ul>
+        <p *ngIf="recipients.length === 0" class="muted">No recipients available.</p>
+      </section>
+    </aside>
+
+    <div class="threadPanel" *ngIf="selectedUserId">
+      <div class="threadHeader">
+        <h2 class="threadTitle">{{ displayName(selectedUser) }}</h2>
+        <button
+          type="button"
+          class="clearBtn"
+          (click)="markCurrentAsRead()"
+          [disabled]="markReadBusy"
+        >
+          Mark as read
+        </button>
+      </div>
+
+      <div class="threadScroll">
+        <div class="loadMore" *ngIf="hasMore">
+          <button type="button" (click)="loadMore()" [disabled]="loadingMore">
+            {{ loadingMore ? 'Loading…' : 'Load older messages' }}
+          </button>
+        </div>
+        <ul class="messageList">
+          <li
+            *ngFor="let msg of messages.slice().reverse()"
+            class="messageItem"
+            [class.fromMe]="isFromMe(msg)"
+            [class.fromOther]="!isFromMe(msg)"
+          >
+            <span class="messageMeta">
+              {{ isFromMe(msg) ? 'You' : displayName(selectedUser) }}
+              · {{ msg.createdAt | date:'short' }}
+              <span *ngIf="msg.recipientId === myUserId && msg.readAt" class="readLabel">Read</span>
+            </span>
+            <p class="messageBody">{{ msg.body }}</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sendBox">
+        <textarea
+          [(ngModel)]="sendBody"
+          class="sendInput"
+          rows="2"
+          placeholder="Type a message…"
+          [disabled]="sendBusy"
+          (keydown.enter)="$event.preventDefault(); send()"
+       ></textarea>
+        <button
+          type="button"
+          class="submit"
+          (click)="send()"
+          [disabled]="sendBusy || !sendBody.trim()"
+        >
+          {{ sendBusy ? 'Sending…' : 'Send' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="threadPlaceholder" *ngIf="!selectedUserId">
+      <p>Select a conversation or start a new message.</p>
+    </div>
+  </div>
+</main>

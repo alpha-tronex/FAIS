@@ -2,9 +2,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import express from 'express';
+import mongoose from 'mongoose';
 import OpenAI from 'openai';
 import { User } from '../models.js';
-import { runReport, type ReportCriteria, type ReportRow } from '../lib/report-runner.js';
+import { getAboutUserSummary, runReport, type ReportCriteria, type ReportRow } from '../lib/report-runner.js';
 import { sendError, sendErrorWithMessage } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 
@@ -15,24 +16,26 @@ function getOpenAIClient(): OpenAI | null {
   return new OpenAI({ apiKey: key });
 }
 
-const STRUCTURED_SYSTEM = `You must output only valid JSON with exactly these keys: roleType, incomeMin, incomeMax, filterByUsername.
+const STRUCTURED_SYSTEM = `You must output only valid JSON with exactly these keys: roleType, incomeMin, incomeMax, filterByUsername, filterByCounty.
 - roleType: string, one of "respondent" or "petitioner" (who to filter: the respondent or the petitioner on each case).
 - incomeMin: number or null (minimum gross annual income; use null if not specified).
 - incomeMax: number or null (maximum gross annual income; use null if not specified).
-- filterByUsername: string or null. If the user asks about a specific user (e.g. "tell me about user admin", "about user john"), set this to the username only (e.g. "admin", "john") and set roleType, incomeMin, incomeMax to null. Otherwise set filterByUsername to null.
+- filterByUsername: string or null. If the user asks about a specific user (e.g. "tell me about user admin", "about user john"), set this to the username only (e.g. "admin", "john") and set roleType, incomeMin, incomeMax, filterByCounty to null. Otherwise set filterByUsername to null.
+- filterByCounty: string or null. If the user asks for cases in a specific county (e.g. "petitioners in Hillsborough county", "respondents in Miami-Dade", "cases in Escambia"), set this to the county name only (e.g. "Hillsborough", "Miami-Dade", "Escambia"). Otherwise set filterByCounty to null.
 If the user asks for "under 50K" or "less than 50000" or "making less than 50K/year", set incomeMax to 50000 and roleType to "respondent" unless they clearly mean petitioner, and filterByUsername to null.
 If they ask for "over 100K", set incomeMin to 100000. Output no other keys and no markdown or explanation.`;
 
-const NATURAL_SYSTEM = `You must output only valid JSON. Allowed keys: reportType, roleType, incomeMin, incomeMax, numChildrenMin, numChildrenMax, filterByUsername.
-- reportType: string, one of "income_filter" or "children_filter" or "income_and_children".
+const NATURAL_SYSTEM = `You must output only valid JSON. Allowed keys: reportType, roleType, incomeMin, incomeMax, numChildrenMin, numChildrenMax, filterByUsername, filterByCounty.
+- reportType: string, one of "income_filter" or "children_filter" or "income_and_children" or "county_filter".
 - roleType: "respondent" or "petitioner" (which party to report on).
 - incomeMin, incomeMax: number or null (gross annual income range).
 - numChildrenMin, numChildrenMax: number or null (filter cases by number of children).
-- filterByUsername: string or null. If the user asks about a specific user (e.g. "tell me about user admin", "about user john"), set this to the username only (e.g. "admin", "john") and set all other keys to null. Otherwise set filterByUsername to null.
-Interpret the user's request and set the appropriate fields. For "respondents under 50K" use reportType "income_filter", roleType "respondent", incomeMax 50000, filterByUsername null.
-For "cases with 3 or more children" use reportType "children_filter", numChildrenMin 3. Output no other keys and no markdown or explanation.`;
+- filterByUsername: string or null. If the user asks about a specific user (e.g. "tell me about user admin", "about user john"), set this to the username only and set all other keys to null. Otherwise set filterByUsername to null.
+- filterByCounty: string or null. If the user asks for cases in a specific county (e.g. "petitioners in Hillsborough county", "respondents in Miami-Dade", "cases in Escambia"), set this to the county name only (e.g. "Hillsborough", "Miami-Dade", "Escambia"). Otherwise set filterByCounty to null.
+Interpret the user's request and set the appropriate fields. For "respondents under 50K" use reportType "income_filter", roleType "respondent", incomeMax 50000, filterByUsername null, filterByCounty null.
+For "cases with 3 or more children" use reportType "children_filter", numChildrenMin 3. For "petitioners in Hillsborough county" use reportType "county_filter", roleType "petitioner", filterByCounty "Hillsborough". Output no other keys and no markdown or explanation.`;
 
-type StructuredParams = { roleType: string; incomeMin: number | null; incomeMax: number | null; filterByUsername: string | null };
+type StructuredParams = { roleType: string; incomeMin: number | null; incomeMax: number | null; filterByUsername: string | null; filterByCounty: string | null };
 type NaturalParams = {
   reportType?: string;
   roleType?: string;
@@ -41,6 +44,7 @@ type NaturalParams = {
   numChildrenMin?: number | null;
   numChildrenMax?: number | null;
   filterByUsername?: string | null;
+  filterByCounty?: string | null;
 };
 
 function parseStructuredResponse(text: string): StructuredParams | null {
@@ -48,6 +52,7 @@ function parseStructuredResponse(text: string): StructuredParams | null {
   try {
     const obj = JSON.parse(cleaned) as Record<string, unknown>;
     const filterByUsername = typeof obj.filterByUsername === 'string' && obj.filterByUsername.trim() ? obj.filterByUsername.trim() : null;
+    const filterByCounty = typeof obj.filterByCounty === 'string' && obj.filterByCounty.trim() ? obj.filterByCounty.trim() : null;
     const roleType = typeof obj.roleType === 'string' ? obj.roleType : 'respondent';
     const incomeMin = typeof obj.incomeMin === 'number' && Number.isFinite(obj.incomeMin) ? obj.incomeMin : obj.incomeMin === null ? null : null;
     const incomeMax = typeof obj.incomeMax === 'number' && Number.isFinite(obj.incomeMax) ? obj.incomeMax : obj.incomeMax === null ? null : null;
@@ -56,6 +61,7 @@ function parseStructuredResponse(text: string): StructuredParams | null {
       incomeMin: incomeMin ?? null,
       incomeMax: incomeMax ?? null,
       filterByUsername,
+      filterByCounty,
     };
   } catch {
     return null;
@@ -67,6 +73,7 @@ function parseNaturalResponse(text: string): NaturalParams | null {
   try {
     const obj = JSON.parse(cleaned) as Record<string, unknown>;
     const filterByUsername = typeof obj.filterByUsername === 'string' && obj.filterByUsername.trim() ? obj.filterByUsername.trim() : null;
+    const filterByCounty = typeof obj.filterByCounty === 'string' && obj.filterByCounty.trim() ? obj.filterByCounty.trim() : null;
     return {
       reportType: typeof obj.reportType === 'string' ? obj.reportType : 'income_filter',
       roleType: typeof obj.roleType === 'string' && (obj.roleType === 'petitioner' || obj.roleType === 'respondent') ? obj.roleType : 'respondent',
@@ -75,23 +82,25 @@ function parseNaturalResponse(text: string): NaturalParams | null {
       numChildrenMin: typeof obj.numChildrenMin === 'number' && Number.isFinite(obj.numChildrenMin) ? obj.numChildrenMin : obj.numChildrenMin === null ? null : null,
       numChildrenMax: typeof obj.numChildrenMax === 'number' && Number.isFinite(obj.numChildrenMax) ? obj.numChildrenMax : obj.numChildrenMax === null ? null : null,
       filterByUsername,
+      filterByCounty,
     };
   } catch {
     return null;
   }
 }
 
-function toCriteriaStructured(p: StructuredParams): ReportCriteria {
+function toCriteriaStructured(p: StructuredParams, countyId?: number | null): ReportCriteria {
   const incomeMin = p.incomeMin != null ? Math.max(0, Math.min(10_000_000, p.incomeMin)) : null;
   const incomeMax = p.incomeMax != null ? Math.max(0, Math.min(10_000_000, p.incomeMax)) : null;
   return {
     roleType: p.roleType === 'petitioner' ? 'petitioner' : 'respondent',
     incomeMin: incomeMin ?? undefined,
     incomeMax: incomeMax ?? undefined,
+    countyId: countyId ?? undefined,
   };
 }
 
-function toCriteriaNatural(p: NaturalParams): ReportCriteria {
+function toCriteriaNatural(p: NaturalParams, countyId?: number | null): ReportCriteria {
   const roleType = (p.roleType === 'petitioner' ? 'petitioner' : 'respondent') as 'respondent' | 'petitioner';
   const incomeMin = p.incomeMin != null ? Math.max(0, Math.min(10_000_000, p.incomeMin)) : undefined;
   const incomeMax = p.incomeMax != null ? Math.max(0, Math.min(10_000_000, p.incomeMax)) : undefined;
@@ -103,6 +112,7 @@ function toCriteriaNatural(p: NaturalParams): ReportCriteria {
     incomeMax: incomeMax ?? undefined,
     numChildrenMin: numChildrenMin ?? undefined,
     numChildrenMax: numChildrenMax ?? undefined,
+    countyId: countyId ?? undefined,
   };
 }
 
@@ -110,6 +120,23 @@ function toCriteriaNatural(p: NaturalParams): ReportCriteria {
 async function resolveUsername(uname: string): Promise<string | null> {
   const user = await User.findOne({ uname: uname.trim() }).select('_id').lean();
   return user ? String(user._id) : null;
+}
+
+/** Resolve county name (case-insensitive) to county id from lookup_counties, or null if not found. */
+async function resolveCountyName(countyName: string): Promise<number | null> {
+  const normalized = countyName.trim();
+  if (!normalized) return null;
+  const rows = await mongoose.connection
+    .collection('lookup_counties')
+    .find({})
+    .project({ id: 1, name: 1 })
+    .toArray();
+  const lower = normalized.toLowerCase();
+  const match = (rows as { id?: unknown; name?: string }[]).find(
+    (r) => r?.name && String(r.name).trim().toLowerCase() === lower
+  );
+  const id = match && typeof match.id === 'number' && Number.isFinite(match.id) ? match.id : Number(match?.id);
+  return Number.isFinite(id) && id > 0 ? id : null;
 }
 
 async function callLLM(client: OpenAI, system: string, userPrompt: string): Promise<string> {
@@ -183,7 +210,21 @@ export function createReportsRouter(
         }
         filterUserId = resolved;
       }
-      const criteria = toCriteriaStructured(params);
+      if (filterUserId && params.filterByUsername && !params.filterByCounty && params.incomeMin == null && params.incomeMax == null) {
+        const aboutSummary = await getAboutUserSummary(authPayload, filterUserId);
+        if (aboutSummary) {
+          return res.json({ rows: [], narrative: null, aboutUserSummary: { bullets: aboutSummary.bullets } });
+        }
+        return res.json({ rows: [], narrative: 'No case found for that user.', aboutUserSummary: null });
+      }
+      let countyId: number | null = null;
+      if (params.filterByCounty) {
+        countyId = await resolveCountyName(params.filterByCounty);
+        if (countyId == null) {
+          return res.status(400).json({ error: `County "${params.filterByCounty}" not found.` });
+        }
+      }
+      const criteria = toCriteriaStructured(params, countyId);
       const rows = await runReport(authPayload, criteria, { filterUserId: filterUserId || null });
       let narrative: string | undefined;
       try {
@@ -233,7 +274,29 @@ export function createReportsRouter(
         }
         filterUserId = resolved;
       }
-      const criteria = toCriteriaNatural(params);
+      const onlyAboutUser =
+        filterUserId &&
+        params.filterByUsername &&
+        !params.filterByCounty &&
+        params.incomeMin == null &&
+        params.incomeMax == null &&
+        params.numChildrenMin == null &&
+        params.numChildrenMax == null;
+      if (onlyAboutUser && filterUserId) {
+        const aboutSummary = await getAboutUserSummary(authPayload, filterUserId);
+        if (aboutSummary) {
+          return res.json({ rows: [], narrative: null, aboutUserSummary: { bullets: aboutSummary.bullets } });
+        }
+        return res.json({ rows: [], narrative: 'No case found for that user.', aboutUserSummary: null });
+      }
+      let countyId: number | null = null;
+      if (params.filterByCounty) {
+        countyId = await resolveCountyName(params.filterByCounty);
+        if (countyId == null) {
+          return res.status(400).json({ error: `County "${params.filterByCounty}" not found.` });
+        }
+      }
+      const criteria = toCriteriaNatural(params, countyId);
       const rows = await runReport(authPayload, criteria, { filterUserId: filterUserId || null });
       let narrative: string | undefined;
       try {

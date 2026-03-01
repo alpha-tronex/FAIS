@@ -15,6 +15,7 @@ export class ReportNaturalPage {
   error: string | null = null;
   rows: ReportRow[] = [];
   narrative: string | null = null;
+  aboutUserSummary: { bullets: string[] } | null = null;
 
   constructor(
     private readonly reports: ReportsService,
@@ -27,7 +28,7 @@ export class ReportNaturalPage {
       void this.router.navigateByUrl('/login');
       return;
     }
-    if (!this.auth.hasRole(3, 5)) {
+    if (!this.auth.hasRole(3, 5, 6)) {
       void this.router.navigateByUrl('/my-cases');
       return;
     }
@@ -35,6 +36,15 @@ export class ReportNaturalPage {
 
   get hasNumChildren(): boolean {
     return this.rows.some((r) => r.numChildren != null);
+  }
+
+  get aboutBulletItems(): { label: string; value: string }[] {
+    if (!this.aboutUserSummary?.bullets?.length) return [];
+    return this.aboutUserSummary.bullets.map((b) => {
+      const i = b.indexOf(':** ');
+      if (i === -1) return { label: b.replace(/\*\*/g, ''), value: '' };
+      return { label: b.slice(0, i).replace(/\*\*/g, ''), value: b.slice(i + 4) };
+    });
   }
 
   runReport(): void {
@@ -46,11 +56,13 @@ export class ReportNaturalPage {
     this.error = null;
     this.rows = [];
     this.narrative = null;
+    this.aboutUserSummary = null;
     this.reports
       .queryNatural(this.prompt)
       .then((res) => {
-        this.rows = res.rows;
+        this.rows = res.rows ?? [];
         this.narrative = res.narrative ?? null;
+        this.aboutUserSummary = res.aboutUserSummary ?? null;
       })
       .catch((e: { error?: { error?: string }; status?: number }) => {
         if (e?.status === 401) {

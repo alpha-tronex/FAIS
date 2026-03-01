@@ -22,6 +22,8 @@ export class ProfilePage implements OnInit {
   email = '';
   firstName = '';
   lastName = '';
+  gender = '';
+  dateOfBirth = '';
   addressLine1 = '';
   addressLine2 = '';
   city = '';
@@ -116,6 +118,8 @@ export class ProfilePage implements OnInit {
     this.email = me.email ?? '';
     this.firstName = me.firstName ?? '';
     this.lastName = me.lastName ?? '';
+    this.gender = me.gender ?? '';
+    this.dateOfBirth = me.dateOfBirth ?? '';
     this.addressLine1 = me.addressLine1 ?? '';
     this.addressLine2 = me.addressLine2 ?? '';
     this.city = me.city ?? '';
@@ -227,6 +231,8 @@ export class ProfilePage implements OnInit {
         email: this.email.trim() || undefined,
         firstName: this.firstName.trim() || undefined,
         lastName: this.lastName.trim() || undefined,
+        gender: this.gender.trim() || undefined,
+        dateOfBirth: this.dateOfBirth.trim() || undefined,
         addressLine1: this.addressLine1.trim() || undefined,
         addressLine2: this.addressLine2.trim() || undefined,
         city: this.city.trim() || undefined,

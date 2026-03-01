@@ -68,6 +68,26 @@
 
     <p *ngIf="success" class="success" role="status" aria-live="polite">{{ success }}</p>
     <p *ngIf="error" class="error">{{ error }}</p>
+    <section class="panel mt16">
+      <h2 class="panelTitle">Create minimal user by ask</h2>
+      <p class="mt8">Quickly add a respondent or respondent attorney with just a name. Describe in plain language, e.g. "create respondent Jim Kelly" or "add respondent attorney Jane Doe". For users who need to log in (username, email, password), use the form above.</p>
+      <div class="mt12">
+        <textarea
+          name="askPrompt"
+          [(ngModel)]="askPrompt"
+          class="input"
+          rows="2"
+          placeholder="e.g. create respondent Jim Kelly"
+          [disabled]="askBusy"
+        ></textarea>
+      </div>
+      <p *ngIf="askError" class="error mt8" role="alert">{{ askError }}</p>
+      <div class="rowActions mt8">
+        <button type="button" class="submit" (click)="submitAskCreateUser()" [disabled]="askBusy || !askPrompt.trim()">
+          {{ askBusy ? 'Creating…' : 'Create minimal user' }}
+        </button>
+      </div>
+    </section>
   </section>
 
   <p *ngIf="!canCreate" class="mt16">You don’t have permission to create users.</p>
@@ -138,5 +158,16 @@
     cancelText="Create without email"
     (confirm)="createUserWithInviteChoice(true)"
     (cancel)="createUserWithInviteChoice(false)"
+  />
+
+  <app-confirm-popup
+    [open]="showMinimalUserSuccessPopup"
+    title="User created"
+    [message]="minimalUserSuccessMessage"
+    confirmText="Undo"
+    cancelText="OK"
+    [danger]="true"
+    (confirm)="onUndoMinimalUser()"
+    (cancel)="onDismissMinimalUserSuccess()"
   />
 </div>

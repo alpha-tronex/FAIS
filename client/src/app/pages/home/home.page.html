@@ -1,0 +1,27 @@
+<main class="page homePage">
+  <h1>Home</h1>
+  <p class="homeIntro">Choose an option below to get started.</p>
+
+  <div class="tileGrid" role="list">
+    <ng-container *ngFor="let tile of tiles">
+      <a
+        *ngIf="!tile.comingSoon && tile.route"
+        [class.tile]="true"
+        [routerLink]="tile.route"
+        routerLinkActive="tileActive"
+        role="listitem"
+      >
+        <span class="tileLabel">{{ tile.label }}</span>
+      </a>
+      <div
+        *ngIf="tile.comingSoon"
+        class="tile tileComingSoon"
+        role="listitem"
+        aria-disabled="true"
+      >
+        <span class="tileLabel">{{ tile.label }}</span>
+        <span class="tileBadge">Coming soon</span>
+      </div>
+    </ng-container>
+  </div>
+</main>

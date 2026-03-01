@@ -4,6 +4,8 @@ export type UserDTO = {
   email: string;
   firstName?: string;
   lastName?: string;
+  gender?: string;
+  dateOfBirth?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;
@@ -34,6 +36,8 @@ export type UserUpdateDTO = {
   email?: string;
   firstName?: string;
   lastName?: string;
+  gender?: string;
+  dateOfBirth?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;

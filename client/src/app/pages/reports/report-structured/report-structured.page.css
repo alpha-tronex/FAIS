@@ -14,3 +14,10 @@
 .narrative p {
   margin: 0;
 }
+.about-user-bullets {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+}
+.about-user-bullets li {
+  margin-bottom: 0.5rem;
+}

@@ -2,11 +2,14 @@ import crypto from 'crypto';
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
+import OpenAI from 'openai';
 import { User, type UserDoc } from '../models.js';
 import { toUserDTO, toNormalizedUserUpdate } from '../mappers/user.mapper.js';
+import { sendError } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 import { computeSsnLast4, decryptSsn, encryptSsn } from '../security/ssn-crypto.js';
 import { sendInviteEmail, sendPasswordResetEmail } from '../services/invite-email.service.js';
+import { getOpenAIClient } from '../lib/openai.js';
 
 const PASSWORD_RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
@@ -38,6 +41,8 @@ const userUpdateSchema = z.object({
   email: z.string().email().optional(),
   firstName: z.string().max(100).optional(),
   lastName: z.string().max(100).optional(),
+  gender: z.string().max(50).optional(),
+  dateOfBirth: z.union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal('')]).optional(),
   addressLine1: z.string().min(1).max(200).optional(),
   addressLine2: z.string().max(200).optional(),
   city: z.string().min(1).max(100).optional(),
@@ -57,13 +62,95 @@ const userSsnUpdateSchema = z
     path: ['confirmSsn']
   });
 
-/** Generate unique placeholder uname and email for minimal users (no login). */
-function generateMinimalCredentials(): { uname: string; email: string } {
-  const suffix = crypto.randomBytes(8).toString('hex');
-  return {
-    uname: `minimal-${suffix}`,
-    email: `minimal-${suffix}@placeholder.local`
-  };
+/** Slugify a name for use in minimal username: lowercase, hyphens, alphanumeric only. */
+function slugifyName(name: string): string {
+  return (name ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+/** Generate unique uname (m-firstname-lastname, with -1, -2 for duplicates) and matching placeholder email for minimal users. */
+async function generateMinimalCredentials(
+  firstName: string | undefined,
+  lastName: string | undefined
+): Promise<{ uname: string; email: string }> {
+  const first = slugifyName(firstName ?? '');
+  const last = slugifyName(lastName ?? '');
+  const base =
+    last && first
+      ? `m-${first}-${last}`
+      : last
+        ? `m-${last}`
+        : first
+          ? `m-${first}`
+          : null;
+  let uname: string;
+  if (base) {
+    uname = base;
+    let n = 0;
+    while (await User.findOne({ uname }).select({ _id: 1 }).lean()) {
+      n++;
+      uname = `${base}-${n}`;
+    }
+  } else {
+    uname = `minimal-${crypto.randomBytes(8).toString('hex')}`;
+  }
+  const email = `${uname}@placeholder.local`;
+  return { uname, email };
+}
+
+const createFromPromptSchema = z.object({
+  prompt: z.string().min(1)
+});
+
+const CREATE_MINIMAL_USER_SYSTEM = `You must output only valid JSON with these keys: firstName, lastName, roleTypeId.
+- firstName: string, the person's first name (e.g. "Jim" from "Jim Kelly", "Ally" from "Ally Vitale"). Never omit the first name when two names are given.
+- lastName: string, the person's last name (e.g. "Kelly", "Vitale"). If only one name is given, set firstName to empty string and use that name as lastName.
+- roleTypeId: number, 2 for respondent (or "respondent party", "respondend"), 4 for respondent attorney.
+Interpret "add respondent Ally Vitale" as firstName: "Ally", lastName: "Vitale", roleTypeId: 2. Output no other keys and no markdown or explanation.`;
+
+type CreateFromPromptParams = {
+  firstName: string;
+  lastName: string;
+  roleTypeId: 2 | 4;
+};
+
+function parseCreateFromPromptResponse(text: string): CreateFromPromptParams | null {
+  const cleaned = text.replace(/^```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  try {
+    const obj = JSON.parse(cleaned) as Record<string, unknown>;
+    let firstName = typeof obj.firstName === 'string' ? obj.firstName.trim() : '';
+    let lastName = typeof obj.lastName === 'string' ? obj.lastName.trim() : '';
+    const roleTypeId = obj.roleTypeId === 4 ? 4 : 2;
+    if (!lastName && !firstName) return null;
+    if (!lastName && firstName) return { firstName: '', lastName: firstName, roleTypeId };
+    // If LLM put full name in lastName only (e.g. "Ally Vitale"), split into first + last
+    if (!firstName && lastName && lastName.includes(' ')) {
+      const parts = lastName.split(/\s+/);
+      firstName = parts[0].trim();
+      lastName = parts.slice(1).join(' ').trim() || firstName;
+    }
+    return { firstName, lastName, roleTypeId };
+  } catch {
+    return null;
+  }
+}
+
+async function callLLM(client: OpenAI, system: string, userPrompt: string): Promise<string> {
+  const completion = await client.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: userPrompt }
+    ],
+    max_tokens: 128
+  });
+  const content = completion.choices?.[0]?.message?.content;
+  return typeof content === 'string' ? content : '';
 }
 
 /** Turn zod validation errors into a single user-friendly message. */
@@ -103,7 +190,10 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
       parsed.data.lastName?.trim();
 
     if (isMinimal) {
-      const { uname, email } = generateMinimalCredentials();
+      const { uname, email } = await generateMinimalCredentials(
+        parsed.data.firstName?.trim(),
+        parsed.data.lastName?.trim()
+      );
       const created = await User.create({
         uname,
         email,
@@ -163,6 +253,75 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
     });
   });
 
+  router.post('/users/create-from-prompt', auth.requireAuth, auth.requireAdmin, async (req, res) => {
+    const bodyParsed = createFromPromptSchema.safeParse(req.body);
+    if (!bodyParsed.success) {
+      return res.status(400).json({ error: 'Prompt is required.', details: bodyParsed.error.flatten() });
+    }
+    const prompt = bodyParsed.data.prompt.trim();
+
+    const client = getOpenAIClient();
+    if (!client) {
+      return res.status(503).json({
+        error: 'AI create-from-prompt is not configured. Set OPENAI_API_KEY in server environment.'
+      });
+    }
+
+    let params: CreateFromPromptParams | null;
+    try {
+      const raw = await callLLM(client, CREATE_MINIMAL_USER_SYSTEM, prompt);
+      params = parseCreateFromPromptResponse(raw);
+      if (!params) {
+        return res.status(400).json({
+          error:
+            'Could not understand the request. Try something like "create respondent Jim Kelly" or "add respondent attorney Jane Doe".'
+        });
+      }
+    } catch (e) {
+      const err = e as { status?: number };
+      if (err?.status === 429 || err?.status === 402) {
+        return res.status(err.status).json({ error: 'AI quota exceeded. Check your OpenAI plan and billing.' });
+      }
+      return sendError(res, e);
+    }
+
+    const { uname, email } = await generateMinimalCredentials(params.firstName, params.lastName);
+    const created = await User.create({
+      uname,
+      email,
+      firstName: params.firstName || undefined,
+      lastName: params.lastName,
+      roleTypeId: params.roleTypeId,
+      createdBy: (req as any).auth?.sub,
+      updatedBy: (req as any).auth?.sub
+    });
+
+    return res.status(201).json({
+      id: created._id.toString(),
+      firstName: created.firstName,
+      lastName: created.lastName,
+      roleTypeId: created.roleTypeId
+    });
+  });
+
+  /** Delete a user. Only allowed for minimal users (placeholder email, no login). Used for "undo" after create-from-prompt. */
+  router.delete('/users/:id', auth.requireAuth, auth.requireAdmin, async (req, res) => {
+    const user = await User.findOne({ _id: req.params.id })
+      .select({ email: 1, passwordHash: 1 })
+      .lean<UserDoc>();
+    if (!user) return res.status(404).json({ error: 'Not found' });
+    const email = (user.email ?? '').trim();
+    const isMinimal =
+      (email.endsWith('@placeholder.local') || !email) && !(user as any).passwordHash;
+    if (!isMinimal) {
+      return res.status(403).json({
+        error: 'Only minimal users (no login) can be deleted. Use the full user management flow for other users.'
+      });
+    }
+    await User.deleteOne({ _id: req.params.id });
+    return res.json({ ok: true });
+  });
+
   router.post('/users/:id/send-password-reset', auth.requireAuth, auth.requireAdmin, async (req, res) => {
     const user = await User.findOne({ _id: req.params.id })
       .select({ email: 1, passwordHash: 1 })
@@ -198,6 +357,8 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
         email: 1,
         firstName: 1,
         lastName: 1,
+        gender: 1,
+        dateOfBirth: 1,
         addressLine1: 1,
         addressLine2: 1,
         city: 1,
@@ -323,6 +484,8 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
         email: 1,
         firstName: 1,
         lastName: 1,
+        gender: 1,
+        dateOfBirth: 1,
         addressLine1: 1,
         addressLine2: 1,
         city: 1,

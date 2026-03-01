@@ -3,6 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AppointmentsService } from '../../services/appointments.service';
+import { MessagesService } from '../../services/messages.service';
 import type { Subscription } from 'rxjs';
 
 @Component({
@@ -16,13 +17,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userDisplayName: string | null = null;
   /** Count of pending actions (accept/reject or reschedule) for the Upcoming Events badge. */
   pendingActionsCount = 0;
+  /** Count of unread messages for the Messages badge. */
+  unreadMessagesCount = 0;
   private routerSub: Subscription | null = null;
   private refreshSub: Subscription | null = null;
+  private messagesRefreshSub: Subscription | null = null;
 
   constructor(
     private readonly router: Router,
     private readonly auth: AuthService,
-    private readonly appointmentsApi: AppointmentsService
+    private readonly appointmentsApi: AppointmentsService,
+    private readonly messagesApi: MessagesService
   ) {}
 
   ngOnInit(): void {
@@ -36,11 +41,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.showUpcomingEventsLink) {
       this.loadPendingActionsCount();
     }
+    if (this.showMessagesLink) {
+      this.loadUnreadMessagesCount();
+    }
     this.routerSub = this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd)
     ).subscribe(() => {
       if (this.auth.isLoggedIn() && this.showUpcomingEventsLink) {
         this.loadPendingActionsCount();
+      }
+      if (this.auth.isLoggedIn() && this.showMessagesLink) {
+        this.loadUnreadMessagesCount();
       }
     });
     this.refreshSub = this.appointmentsApi.getPendingActionsRefresh().subscribe(() => {
@@ -48,11 +59,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.loadPendingActionsCount();
       }
     });
+    this.messagesRefreshSub = this.messagesApi.getUnreadCountRefresh().subscribe(() => {
+      if (this.showMessagesLink) {
+        this.loadUnreadMessagesCount();
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.routerSub?.unsubscribe();
     this.refreshSub?.unsubscribe();
+    this.messagesRefreshSub?.unsubscribe();
+  }
+
+  private loadUnreadMessagesCount(): void {
+    this.messagesApi.getUnreadCount()
+      .then((res) => { this.unreadMessagesCount = res.count; })
+      .catch(() => { this.unreadMessagesCount = 0; });
   }
 
   private loadPendingActionsCount(): void {
@@ -99,9 +122,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.auth.hasRole(1, 3, 5, 6);
   }
 
-  /** Petitioner Attorney (3) or Admin (5): show Reports links. */
+  /** Same roles as Upcoming Events: show Messages link. */
+  get showMessagesLink(): boolean {
+    return this.auth.hasRole(1, 3, 5, 6);
+  }
+
+  /** Petitioner Attorney (3), Legal Assistant (6), or Admin (5): show Reports links. */
   get showReportsLink(): boolean {
-    return this.auth.hasRole(3, 5);
+    return this.auth.hasRole(3, 5, 6);
   }
 
   /** Query params for Profile link: none (profile is own page; do not carry caseId/userId from affidavit). */

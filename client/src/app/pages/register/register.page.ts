@@ -20,6 +20,8 @@ export class RegisterPage {
 
   firstName = '';
   lastName = '';
+  gender = '';
+  dateOfBirth = '';
 
   addressLine1 = '';
   addressLine2 = '';
@@ -60,6 +62,8 @@ export class RegisterPage {
       this.email = me.email ?? this.email;
       this.firstName = me.firstName ?? this.firstName;
       this.lastName = me.lastName ?? this.lastName;
+      this.gender = me.gender ?? this.gender;
+      this.dateOfBirth = me.dateOfBirth ?? this.dateOfBirth;
       this.addressLine1 = me.addressLine1 ?? this.addressLine1;
       this.addressLine2 = me.addressLine2 ?? this.addressLine2;
       this.city = me.city ?? this.city;
@@ -113,6 +117,8 @@ export class RegisterPage {
           email: this.email.trim() || undefined,
           firstName: this.firstName.trim() || undefined,
           lastName: this.lastName.trim() || undefined,
+          gender: this.gender.trim() || undefined,
+          dateOfBirth: this.dateOfBirth.trim() || undefined,
           addressLine1: this.addressLine1.trim() || undefined,
           addressLine2: this.addressLine2.trim() || undefined,
           city: this.city.trim() || undefined,
@@ -134,6 +140,8 @@ export class RegisterPage {
         password: this.password,
         firstName: this.firstName.trim() || undefined,
         lastName: this.lastName.trim() || undefined,
+        gender: this.gender.trim() || undefined,
+        dateOfBirth: this.dateOfBirth.trim() || undefined,
         addressLine1: this.addressLine1.trim(),
         addressLine2: this.addressLine2.trim() || undefined,
         city: this.city.trim(),

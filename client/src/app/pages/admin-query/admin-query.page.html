@@ -1,0 +1,34 @@
+<main class="page">
+  <h1>Admin data query</h1>
+  <p class="description">
+    Ask a question in plain language. The AI will turn it into a read-only MongoDB query over cases, users, appointments, employment, assets, and other allowed collections.
+  </p>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section class="mt16">
+    <div class="formRow">
+      <label for="question">What do you want to know?</label>
+      <textarea
+        id="question"
+        [(ngModel)]="question"
+        rows="3"
+        placeholder="e.g. Show all users with roleTypeId 5, or list the last 20 cases, or appointments scheduled for next week."
+        [disabled]="busy"
+      ></textarea>
+    </div>
+    <div class="rowActions mt12">
+      <button type="button" (click)="runQuery()" [disabled]="busy">
+        {{ busy ? 'Running…' : 'Run query' }}
+      </button>
+    </div>
+  </section>
+
+  <section *ngIf="!busy && count > 0" class="mt16">
+    <h2>Results ({{ count }})</h2>
+    <pre class="resultsJson">{{ results | json }}</pre>
+  </section>
+
+  <p *ngIf="!busy && ranOnce && count === 0 && !error" class="mt16">No documents match.</p>
+  <p *ngIf="!busy && !ranOnce && !error" class="mt16 hint">Enter a question and click Run query.</p>
+</main>

@@ -108,6 +108,15 @@ export class AppointmentsService {
     );
   }
 
+  /**
+   * Schedule an appointment from a natural-language prompt (e.g. "schedule user john with attorney jane on 3/3/2026 from 1PM to 2PM").
+   */
+  async scheduleFromPrompt(prompt: string): Promise<{ id: string; emailSent: boolean }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string; emailSent: boolean }>(`${this.apiBase}/appointments/schedule-from-prompt`, { prompt })
+    );
+  }
+
   async updateStatus(
     appointmentId: string,
     status: 'pending' | 'accepted' | 'rejected' | 'cancelled' | 'reschedule_requested'

@@ -20,6 +20,8 @@ export type RegisterRequest = {
   password: string;
   firstName?: string;
   lastName?: string;
+  gender?: string;
+  dateOfBirth?: string;
   addressLine1: string;
   addressLine2?: string;
   city: string;
@@ -35,6 +37,8 @@ export type MeResponse = {
   email: string;
   firstName?: string;
   lastName?: string;
+  gender?: string;
+  dateOfBirth?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;
@@ -60,6 +64,8 @@ export type UpdateMeRequest = {
   email?: string;
   firstName?: string;
   lastName?: string;
+  gender?: string;
+  dateOfBirth?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;

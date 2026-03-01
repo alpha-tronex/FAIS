@@ -8,6 +8,27 @@
     <button type="button" class="submit" (click)="openSchedulePopup()">Schedule</button>
   </section>
 
+  <section *ngIf="canCreate" class="panel mt16">
+    <h2 class="panelTitle">Schedule by ask</h2>
+    <p class="mt8">Describe the appointment in plain language, e.g. “schedule user john with attorney jane on 3/3/2026 from 1PM to 2PM”.</p>
+    <div class="mt12">
+      <textarea
+        name="askPrompt"
+        [(ngModel)]="askPrompt"
+        class="input"
+        rows="3"
+        placeholder="e.g. schedule user john with attorney jane on 3/3/2026 from 1PM to 2PM"
+        [disabled]="askBusy"
+      ></textarea>
+    </div>
+    <p *ngIf="askError" class="error mt8" role="alert">{{ askError }}</p>
+    <div class="rowActions mt8">
+      <button type="button" class="submit" (click)="submitAskSchedule()" [disabled]="askBusy || !askPrompt.trim()">
+        {{ askBusy ? 'Scheduling…' : 'Schedule' }}
+      </button>
+    </div>
+  </section>
+
   <section class="mt16">
     <div class="rowActions">
       <button type="button" (click)="refresh()" [disabled]="busy">Refresh</button>
@@ -106,5 +127,16 @@
     [cases]="cases"
     (close)="onSchedulePopupClose()"
     (created)="onSchedulePopupCreated()"
+  />
+
+  <app-confirm-popup
+    [open]="showScheduleAskSuccessPopup"
+    title="Appointment scheduled"
+    [message]="scheduleAskSuccessMessage"
+    confirmText="Undo"
+    cancelText="OK"
+    [danger]="true"
+    (confirm)="onUndoScheduleAsk()"
+    (cancel)="onDismissScheduleAskSuccess()"
   />
 </main>

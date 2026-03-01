@@ -11,11 +11,15 @@ export type ReportRow = {
   grossAnnualIncome: number;
   under50K: boolean;
   numChildren?: number;
+  /** County name for the case. */
+  countyName?: string | null;
 };
 
 export type ReportResponse = {
   rows: ReportRow[];
-  narrative?: string;
+  narrative?: string | null;
+  /** When present, show this bullet list instead of the table (e.g. "Tell me about respondent x"). */
+  aboutUserSummary?: { bullets: string[] } | null;
 };
 
 @Injectable({ providedIn: 'root' })

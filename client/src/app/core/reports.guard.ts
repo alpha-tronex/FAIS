@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-/** Petitioner Attorney (3) or Administrator (5) may access report pages. */
+/** Petitioner Attorney (3), Legal Assistant (6), or Administrator (5) may access report pages. */
 export const reportsGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -15,7 +15,7 @@ export const reportsGuard: CanActivateFn = () => {
     return router.parseUrl('/register');
   }
 
-  if (!auth.hasRole(3, 5)) {
+  if (!auth.hasRole(3, 5, 6)) {
     return router.parseUrl('/my-cases');
   }
 

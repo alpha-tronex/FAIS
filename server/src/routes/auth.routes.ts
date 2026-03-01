@@ -34,6 +34,8 @@ const meUpdateSchema = z.object({
   email: z.string().email().optional(),
   firstName: z.string().max(100).optional(),
   lastName: z.string().max(100).optional(),
+  gender: z.string().max(50).optional(),
+  dateOfBirth: z.union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal('')]).optional(),
   addressLine1: z.string().min(1).max(200).optional(),
   addressLine2: z.string().max(200).optional(),
   city: z.string().min(1).max(100).optional(),
@@ -256,6 +258,19 @@ export function createAuthRouter(
 
     setOrUnsetTrimmed('firstName', parsed.data.firstName);
     setOrUnsetTrimmed('lastName', parsed.data.lastName);
+    if (parsed.data.gender !== undefined) {
+      const v = parsed.data.gender?.trim();
+      if (v) $set.gender = v;
+      else $unset.gender = '';
+    }
+    if (parsed.data.dateOfBirth !== undefined) {
+      const v = parsed.data.dateOfBirth?.trim();
+      if (v && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+        $set.dateOfBirth = new Date(v + 'T00:00:00.000Z');
+      } else {
+        $unset.dateOfBirth = '';
+      }
+    }
     setOrUnsetTrimmed('addressLine1', parsed.data.addressLine1);
     setOrUnsetTrimmed('addressLine2', parsed.data.addressLine2);
     setOrUnsetTrimmed('city', parsed.data.city);

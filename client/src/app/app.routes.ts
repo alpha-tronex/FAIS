@@ -2,10 +2,12 @@ import { Routes } from '@angular/router';
 import { adminChildGuard, adminGuard } from './core/admin.guard';
 import { reportsGuard } from './core/reports.guard';
 import { landingGuard } from './core/landing.guard';
+import { homeGuard } from './core/home.guard';
 import { myCasesGuard } from './core/my-cases.guard';
 import { registerGuard } from './core/register.guard';
 import { affidavitEditGuard } from './core/affidavit-edit.guard';
 import { upcomingEventsGuard } from './core/upcoming-events.guard';
+import { messagesGuard } from './core/messages.guard';
 
 export const routes: Routes = [
 	{
@@ -13,6 +15,11 @@ export const routes: Routes = [
 		pathMatch: 'full',
 		canActivate: [landingGuard],
 		loadChildren: () => import('./pages/login/login.module').then((m) => m.LoginModule)
+	},
+	{
+		path: 'home',
+		canActivate: [homeGuard],
+		loadChildren: () => import('./pages/home/home.module').then((m) => m.HomeModule)
 	},
 	{
 		path: 'login',
@@ -63,6 +70,12 @@ export const routes: Routes = [
 		canActivate: [upcomingEventsGuard],
 		loadChildren: () =>
 			import('./pages/upcoming-events/upcoming-events.module').then((m) => m.UpcomingEventsModule)
+	},
+	{
+		path: 'messages',
+		canActivate: [messagesGuard],
+		loadChildren: () =>
+			import('./pages/messages/messages.module').then((m) => m.MessagesModule)
 	},
 	{
 		path: 'admin',

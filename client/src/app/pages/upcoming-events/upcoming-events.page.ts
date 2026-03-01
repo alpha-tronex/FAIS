@@ -22,6 +22,15 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
   error: string | null = null;
   success: string | null = null;
 
+  askPrompt = '';
+  askBusy = false;
+  askError: string | null = null;
+
+  /** After Schedule by ask success: show popup with Undo (cancel appointment). */
+  showScheduleAskSuccessPopup = false;
+  scheduleAskSuccessMessage = '';
+  scheduleAskCreatedAppointmentId: string | null = null;
+
   reschedulePromptOpen = false;
   reschedulePromptAppointment: AppointmentListItem | null = null;
   reschedulePromptIfNo: 'rejected' | 'cancelled' = 'rejected';
@@ -92,6 +101,71 @@ export class UpcomingEventsPage implements OnInit, OnDestroy {
     this.success = 'Appointment set and invitation sent.';
     this.refresh();
     this.appointmentsApi.requestPendingActionsRefresh();
+  }
+
+  onUndoScheduleAsk(): void {
+    const id = this.scheduleAskCreatedAppointmentId;
+    this.showScheduleAskSuccessPopup = false;
+    this.scheduleAskCreatedAppointmentId = null;
+    if (!id) return;
+    this.busy = true;
+    this.appointmentsApi
+      .updateStatus(id, 'cancelled')
+      .then(() => {
+        this.success = 'Appointment cancelled.';
+        this.refresh();
+        this.appointmentsApi.requestPendingActionsRefresh();
+      })
+      .catch((e: { error?: { error?: string } }) => {
+        this.error = e?.error?.error ?? 'Failed to cancel appointment.';
+      })
+      .finally(() => {
+        this.busy = false;
+      });
+  }
+
+  onDismissScheduleAskSuccess(): void {
+    this.showScheduleAskSuccessPopup = false;
+    this.scheduleAskCreatedAppointmentId = null;
+  }
+
+  submitAskSchedule(): void {
+    if (this.askBusy || !this.askPrompt.trim()) return;
+    this.askBusy = true;
+    this.askError = null;
+    this.error = null;
+    this.success = null;
+    this.appointmentsApi
+      .scheduleFromPrompt(this.askPrompt.trim())
+      .then((res) => {
+        this.scheduleAskSuccessMessage = res.emailSent
+          ? 'Appointment set and invitation sent. You can cancel it from the list below if you change your mind.'
+          : 'Appointment set. You can cancel it from the list below if you change your mind.';
+        this.scheduleAskCreatedAppointmentId = res.id;
+        this.showScheduleAskSuccessPopup = true;
+        this.askPrompt = '';
+        this.refresh();
+        this.appointmentsApi.requestPendingActionsRefresh();
+      })
+      .catch((e: { error?: { error?: string }; status?: number }) => {
+        if (e?.status === 401) {
+          this.auth.logout();
+          void this.router.navigateByUrl('/login');
+          return;
+        }
+        if (e?.status === 503) {
+          this.askError = 'AI scheduling is not configured. Please contact support.';
+          return;
+        }
+        if (e?.status === 429 || e?.status === 402) {
+          this.askError = 'AI quota exceeded. Please try again later.';
+          return;
+        }
+        this.askError = e?.error?.error ?? 'Failed to schedule from prompt.';
+      })
+      .finally(() => {
+        this.askBusy = false;
+      });
   }
 
   ngOnInit(): void {

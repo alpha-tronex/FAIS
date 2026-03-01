@@ -42,6 +42,8 @@ export type UpdateUserRequest = {
   email?: string;
   firstName?: string;
   lastName?: string;
+  gender?: string;
+  dateOfBirth?: string;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;
@@ -77,6 +79,21 @@ export class UsersService {
 
   async create(req: CreateUserRequest): Promise<CreateUserResponse> {
     return await firstValueFrom(this.http.post<CreateUserResponse>(`${this.apiBase}/users`, req));
+  }
+
+  /** Admin: create a minimal user (respondent or respondent attorney) from a natural-language prompt. */
+  async createFromPrompt(prompt: string): Promise<{ id: string; firstName?: string; lastName?: string; roleTypeId: number }> {
+    return await firstValueFrom(
+      this.http.post<{ id: string; firstName?: string; lastName?: string; roleTypeId: number }>(
+        `${this.apiBase}/users/create-from-prompt`,
+        { prompt }
+      )
+    );
+  }
+
+  /** Admin: delete a minimal user (no login). Fails for full users. */
+  async delete(id: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(this.http.delete<{ ok: boolean }>(`${this.apiBase}/users/${id}`));
   }
 
   async update(id: string, req: UpdateUserRequest): Promise<UserListItem> {

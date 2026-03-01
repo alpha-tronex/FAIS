@@ -1,11 +1,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import OpenAI from 'openai';
 import { z } from 'zod';
 import { AppointmentModel, CaseModel, User } from '../models.js';
 import { toUserSummaryDTO } from '../mappers/user.mapper.js';
 import { sendError } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 import { sendAppointmentInvite } from '../services/invite-email.service.js';
+import { getOpenAIClient } from '../lib/openai.js';
+import { resolveUsername } from '../lib/user-resolve.js';
 
 const appointmentCreateSchema = z.object({
   caseId: z.string().min(1),
@@ -26,6 +29,58 @@ const appointmentRescheduleSchema = z.object({
   notes: z.string().max(500).optional(),
   resendInvites: z.boolean().optional(),
 });
+
+const scheduleFromPromptSchema = z.object({
+  prompt: z.string().min(1),
+});
+
+const SCHEDULE_FROM_PROMPT_SYSTEM = `You must output only valid JSON with these keys: petitionerUsername, attorneyUsername, legalAssistantUsername, scheduledAt, durationMinutes.
+- petitionerUsername: string, the username (uname) of the petitioner to schedule (the "user" in "schedule user X").
+- attorneyUsername: string or null. If the appointment is with a petitioner attorney, set this to their username; otherwise null.
+- legalAssistantUsername: string or null. If the appointment is with a legal assistant, set this to their username; otherwise null. Exactly one of attorneyUsername or legalAssistantUsername must be non-null.
+- scheduledAt: string, ISO 8601 datetime for the start of the appointment (e.g. "2026-03-03T13:00:00" for 1 PM). Infer from phrases like "3/3/2026 1PM", "March 3 2026 from 1PM to 2PM", "1:00 PM on 3/3/2026". Use a 24-hour or ISO format that JavaScript Date can parse.
+- durationMinutes: number, one of 15, 30, 45, or 60. Infer from "1PM to 2PM" as 60, "30 min" as 30; default 60 if not clear.
+Output no other keys and no markdown or explanation.`;
+
+type SchedulePromptParams = {
+  petitionerUsername: string;
+  attorneyUsername: string | null;
+  legalAssistantUsername: string | null;
+  scheduledAt: string;
+  durationMinutes: number;
+};
+
+function parseSchedulePromptResponse(text: string): SchedulePromptParams | null {
+  const cleaned = text.replace(/^```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  try {
+    const obj = JSON.parse(cleaned) as Record<string, unknown>;
+    const petitionerUsername = typeof obj.petitionerUsername === 'string' && obj.petitionerUsername.trim() ? obj.petitionerUsername.trim() : '';
+    const attorneyUsername = typeof obj.attorneyUsername === 'string' && obj.attorneyUsername.trim() ? obj.attorneyUsername.trim() : null;
+    const legalAssistantUsername = typeof obj.legalAssistantUsername === 'string' && obj.legalAssistantUsername.trim() ? obj.legalAssistantUsername.trim() : null;
+    const scheduledAt = typeof obj.scheduledAt === 'string' && obj.scheduledAt.trim() ? obj.scheduledAt.trim() : '';
+    let durationMinutes = typeof obj.durationMinutes === 'number' && [15, 30, 45, 60].includes(obj.durationMinutes) ? obj.durationMinutes : 60;
+    if (![15, 30, 45, 60].includes(durationMinutes)) durationMinutes = 60;
+    if (!petitionerUsername || !scheduledAt) return null;
+    if (!attorneyUsername && !legalAssistantUsername) return null;
+    if (attorneyUsername && legalAssistantUsername) return null;
+    return { petitionerUsername, attorneyUsername, legalAssistantUsername, scheduledAt, durationMinutes };
+  } catch {
+    return null;
+  }
+}
+
+async function callLLM(client: OpenAI, system: string, userPrompt: string): Promise<string> {
+  const completion = await client.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: userPrompt },
+    ],
+    max_tokens: 256,
+  });
+  const content = completion.choices?.[0]?.message?.content;
+  return typeof content === 'string' ? content : '';
+}
 
 function parseObjectId(value: string, fieldName: string): mongoose.Types.ObjectId {
   if (!value || !mongoose.isValidObjectId(value)) {
@@ -307,6 +362,200 @@ export function createAppointmentsRouter(
         };
       })
     );
+  });
+
+  router.post('/appointments/schedule-from-prompt', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
+    const roleTypeId = authPayload.roleTypeId;
+
+    if (roleTypeId !== 3 && roleTypeId !== 5 && roleTypeId !== 6) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const bodyParsed = scheduleFromPromptSchema.safeParse(req.body);
+    if (!bodyParsed.success) {
+      return res.status(400).json({ error: 'Prompt is required.', details: bodyParsed.error.flatten() });
+    }
+    const prompt = bodyParsed.data.prompt.trim();
+
+    const client = getOpenAIClient();
+    if (!client) {
+      return res.status(503).json({ error: 'AI scheduling is not configured. Set OPENAI_API_KEY in server environment.' });
+    }
+
+    let params: SchedulePromptParams | null;
+    try {
+      const raw = await callLLM(client, SCHEDULE_FROM_PROMPT_SYSTEM, prompt);
+      params = parseSchedulePromptResponse(raw);
+      if (!params) {
+        return res.status(400).json({
+          error: 'Could not understand the request. Include petitioner username, attorney or legal assistant username, and date/time (e.g. "schedule user john with attorney jane on 3/3/2026 from 1PM to 2PM").',
+        });
+      }
+    } catch (e) {
+      const err = e as { status?: number };
+      if (err?.status === 429 || err?.status === 402) {
+        return res.status(err.status).json({
+          error: 'AI quota exceeded. Check your OpenAI plan and billing.',
+        });
+      }
+      return sendError(res, e);
+    }
+
+    const petitionerId = await resolveUsername(params.petitionerUsername);
+    if (!petitionerId) {
+      return res.status(400).json({ error: `User "${params.petitionerUsername}" not found.` });
+    }
+    const attorneyId = params.attorneyUsername ? await resolveUsername(params.attorneyUsername) : null;
+    const legalAssistantId = params.legalAssistantUsername ? await resolveUsername(params.legalAssistantUsername) : null;
+    if (params.attorneyUsername && !attorneyId) {
+      return res.status(400).json({ error: `Attorney "${params.attorneyUsername}" not found.` });
+    }
+    if (params.legalAssistantUsername && !legalAssistantId) {
+      return res.status(400).json({ error: `Legal assistant "${params.legalAssistantUsername}" not found.` });
+    }
+
+    if (roleTypeId === 3 && attorneyId && attorneyId !== authPayload.sub) {
+      return res.status(403).json({ error: 'You can only schedule appointments with yourself as the attorney.' });
+    }
+    if (roleTypeId === 6 && legalAssistantId && legalAssistantId !== authPayload.sub) {
+      return res.status(403).json({ error: 'You can only schedule appointments with yourself as the legal assistant.' });
+    }
+
+    const caseFilter: Record<string, unknown> = {
+      petitionerId: new mongoose.Types.ObjectId(petitionerId),
+    };
+    if (attorneyId) caseFilter.petitionerAttId = new mongoose.Types.ObjectId(attorneyId);
+    else if (legalAssistantId) caseFilter.legalAssistantId = new mongoose.Types.ObjectId(legalAssistantId);
+
+    const cases = await CaseModel.find(caseFilter).limit(2).lean<any[]>();
+    if (cases.length === 0) {
+      return res.status(400).json({
+        error: 'No case found for that petitioner and attorney/assistant. Check that the petitioner and attorney (or legal assistant) are assigned to the same case.',
+      });
+    }
+    if (cases.length > 1) {
+      return res.status(400).json({
+        error: 'Multiple cases match. Please specify which case (e.g. by case number) or use the Schedule button to pick a case.',
+      });
+    }
+    const caseDoc = cases[0];
+    const caseId = caseDoc._id.toString();
+
+    const scheduledAt = new Date(params.scheduledAt);
+    if (Number.isNaN(scheduledAt.getTime())) {
+      return res.status(400).json({ error: 'Invalid date or time. Use a format like 3/3/2026 1PM or March 3, 2026 at 1:00 PM.' });
+    }
+    const durationMinutes = [15, 30, 45, 60].includes(params.durationMinutes) ? params.durationMinutes : 60;
+
+    const createPayload = {
+      caseId,
+      petitionerId,
+      ...(attorneyId ? { petitionerAttId: attorneyId } : { legalAssistantId: legalAssistantId! }),
+      scheduledAt: params.scheduledAt,
+      durationMinutes,
+    };
+
+    const parsed = appointmentCreateSchema.safeParse(createPayload);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Invalid scheduling parameters.', details: parsed.error.flatten() });
+    }
+
+    const hasAtt = typeof parsed.data.petitionerAttId === 'string' && parsed.data.petitionerAttId.trim().length > 0;
+    const hasLA = typeof parsed.data.legalAssistantId === 'string' && parsed.data.legalAssistantId.trim().length > 0;
+    let petitionerAttId: mongoose.Types.ObjectId | undefined;
+    let laId: mongoose.Types.ObjectId | undefined;
+    try {
+      if (hasAtt && parsed.data.petitionerAttId) {
+        petitionerAttId = parseObjectId(parsed.data.petitionerAttId, 'petitionerAttId');
+      } else if (hasLA && parsed.data.legalAssistantId) {
+        laId = parseObjectId(parsed.data.legalAssistantId, 'legalAssistantId');
+      }
+    } catch (e) {
+      return sendError(res, e, 400);
+    }
+
+    const casePetitionerId = (caseDoc.petitionerId?._id ?? caseDoc.petitionerId)?.toString();
+    const casePetitionerAttId = (caseDoc.petitionerAttId?._id ?? caseDoc.petitionerAttId)?.toString();
+    const caseLegalAssistantId = (caseDoc.legalAssistantId?._id ?? caseDoc.legalAssistantId)?.toString();
+    if (casePetitionerId !== petitionerId) {
+      return res.status(400).json({ error: 'Petitioner is not on this case.' });
+    }
+    if (petitionerAttId) {
+      if (casePetitionerAttId !== petitionerAttId.toString()) {
+        return res.status(400).json({ error: 'Petitioner attorney is not on this case.' });
+      }
+      if (roleTypeId === 3 && casePetitionerAttId !== authPayload.sub) {
+        return res.status(403).json({ error: 'You can only create appointments for cases where you are the petitioner attorney.' });
+      }
+    } else if (laId) {
+      if (caseLegalAssistantId !== laId.toString()) {
+        return res.status(400).json({ error: 'Legal assistant is not on this case.' });
+      }
+      if (roleTypeId === 6 && caseLegalAssistantId !== authPayload.sub) {
+        return res.status(403).json({ error: 'You can only create appointments for cases where you are the legal assistant.' });
+      }
+    }
+
+    const petitionerIdObj = parseObjectId(petitionerId, 'petitionerId');
+    const created = await AppointmentModel.create({
+      caseId: new mongoose.Types.ObjectId(caseId),
+      petitionerId: petitionerIdObj,
+      petitionerAttId: petitionerAttId ?? undefined,
+      legalAssistantId: laId ?? undefined,
+      scheduledAt,
+      durationMinutes,
+      notes: undefined,
+      status: 'pending',
+      createdBy: new mongoose.Types.ObjectId(authPayload.sub),
+    });
+
+    const otherPartyId = petitionerAttId?.toString() ?? laId?.toString();
+    let emailSent = true;
+    try {
+      const [petitionerUser, otherUser] = await Promise.all([
+        User.findById(petitionerIdObj).select({ email: 1, firstName: 1, lastName: 1 }).lean<any>(),
+        otherPartyId ? User.findById(otherPartyId).select({ email: 1, firstName: 1, lastName: 1 }).lean<any>() : null,
+      ]);
+      const appUrl = process.env.APP_BASE_URL?.trim() || 'http://localhost:4200';
+      const petitionerName = petitionerUser
+        ? [petitionerUser.firstName, petitionerUser.lastName].filter(Boolean).join(' ') || (petitionerUser as any).uname
+        : 'Petitioner';
+      const attorneyName = otherUser
+        ? [otherUser.firstName, otherUser.lastName].filter(Boolean).join(' ') || (otherUser as any).uname
+        : petitionerAttId ? 'Attorney' : 'Legal Assistant';
+      const caseNumber = caseDoc.caseNumber ?? '';
+
+      if (petitionerUser?.email && !(petitionerUser as any).email?.includes?.('@placeholder')) {
+        await sendAppointmentInvite({
+          to: (petitionerUser as any).email,
+          petitionerName,
+          attorneyName,
+          scheduledAt: created.scheduledAt,
+          appUrl,
+          caseNumber,
+        });
+      }
+      if (otherUser?.email && !(otherUser as any).email?.includes?.('@placeholder')) {
+        await sendAppointmentInvite({
+          to: (otherUser as any).email,
+          petitionerName,
+          attorneyName,
+          scheduledAt: created.scheduledAt,
+          appUrl,
+          caseNumber,
+        });
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[appointments] Failed to send invite emails:', err);
+      emailSent = false;
+    }
+
+    res.status(201).json({
+      id: created._id.toString(),
+      emailSent,
+    });
   });
 
   router.post('/appointments', auth.requireAuth, async (req, res) => {

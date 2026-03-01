@@ -16,6 +16,8 @@ import { createLookupsRouter } from './routes/lookups.routes.js';
 import { createAffidavitRouter } from './routes/affidavit.routes.js';
 import { createAppointmentsRouter } from './routes/appointments.routes.js';
 import { createReportsRouter } from './routes/reports.routes.js';
+import { createAdminRouter } from './routes/admin.routes.js';
+import { createMessagesRouter } from './routes/messages.routes.js';
 import { scheduleAppointmentReminderJob } from './jobs/appointment-reminder.job.js';
 
 // eslint-disable-next-line no-console
@@ -106,6 +108,8 @@ apiRouter.use(createLookupsRouter({ requireAuth }));
 apiRouter.use(createAffidavitRouter({ requireAuth }));
 apiRouter.use(createAppointmentsRouter({ requireAuth }));
 apiRouter.use(createReportsRouter({ requireAuth, requireReportAccess }));
+apiRouter.use(createAdminRouter({ requireAuth, requireAdmin }));
+apiRouter.use(createMessagesRouter({ requireAuth }));
 app.use('/api', apiRouter);
 
 // Serve built Angular app when present (production: client build copied to server/dist/public)

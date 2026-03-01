@@ -1,0 +1,66 @@
+.homePage {
+  max-width: var(--pageMaxWidth);
+}
+
+.homeIntro {
+  color: var(--muted);
+  margin: 0.5rem 0 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.tileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 88px;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: var(--panelBorderWidth) solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tile:hover:not(.tileComingSoon) {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.tile:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tileComingSoon {
+  opacity: 0.75;
+  cursor: default;
+  pointer-events: none;
+}
+
+.tileLabel {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.tileBadge {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.tileActive {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}

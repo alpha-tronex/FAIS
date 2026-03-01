@@ -7,6 +7,8 @@ export const userSchema = new mongoose.Schema(
     // Normalized-friendly fields (preferred by the API/UI)
     firstName: { type: String },
     lastName: { type: String },
+    gender: { type: String },
+    dateOfBirth: { type: Date },
     addressLine1: { type: String },
     addressLine2: { type: String },
     city: { type: String },
