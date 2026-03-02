@@ -194,6 +194,17 @@
   resize: vertical;
 }
 
+.sendBox.sendBoxDisabled .sendInput,
+.sendBox.sendBoxDisabled .submit {
+  background: var(--border, #eee);
+  color: var(--muted, #666);
+  cursor: not-allowed;
+}
+
+.sendBox.sendBoxDisabled .sendInput {
+  opacity: 0.8;
+}
+
 .threadPlaceholder {
   flex: 1;
   display: flex;

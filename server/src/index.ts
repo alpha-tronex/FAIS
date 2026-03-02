@@ -15,7 +15,6 @@ import { createCasesRouter } from './routes/cases.routes.js';
 import { createLookupsRouter } from './routes/lookups.routes.js';
 import { createAffidavitRouter } from './routes/affidavit.routes.js';
 import { createAppointmentsRouter } from './routes/appointments.routes.js';
-import { createReportsRouter } from './routes/reports.routes.js';
 import { createAdminRouter } from './routes/admin.routes.js';
 import { createMessagesRouter } from './routes/messages.routes.js';
 import { scheduleAppointmentReminderJob } from './jobs/appointment-reminder.job.js';
@@ -25,16 +24,7 @@ console.log('FAIS server boot (index.ts)');
 const __dirnameSrc = path.dirname(fileURLToPath(import.meta.url));
 const serverEnvPath = path.join(__dirnameSrc, '..', '.env');
 dotenv.config({ path: serverEnvPath, override: true });
-if (process.env.OPENAI_API_KEY?.trim()) {
-  // eslint-disable-next-line no-console
-  console.log('OPENAI_API_KEY loaded (AI reports enabled).');
-} else {
-  dotenv.config({ override: true });
-}
-if (!process.env.OPENAI_API_KEY?.trim()) {
-  // eslint-disable-next-line no-console
-  console.log('OPENAI_API_KEY not set - AI report endpoints will return 503. Add OPENAI_API_KEY to server/.env');
-}
+dotenv.config({ override: true });
 
 const __dirname = __dirnameSrc;
 
@@ -95,7 +85,7 @@ app.use(
   })
 );
 
-const { requireAuth, requireAdmin, requireStaffOrAdmin, requireReportAccess } = createAuthMiddlewares(jwtSecret);
+const { requireAuth, requireAdmin, requireStaffOrAdmin } = createAuthMiddlewares(jwtSecret);
 
 // Mount all API routes under /api for production (client calls /api/...)
 const apiRouter = express.Router();
@@ -107,7 +97,6 @@ apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
 apiRouter.use(createLookupsRouter({ requireAuth }));
 apiRouter.use(createAffidavitRouter({ requireAuth }));
 apiRouter.use(createAppointmentsRouter({ requireAuth }));
-apiRouter.use(createReportsRouter({ requireAuth, requireReportAccess }));
 apiRouter.use(createAdminRouter({ requireAuth, requireAdmin }));
 apiRouter.use(createMessagesRouter({ requireAuth }));
 app.use('/api', apiRouter);

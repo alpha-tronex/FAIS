@@ -1,9 +1,92 @@
+import mongoose from 'mongoose';
 import express from 'express';
 import { getOpenAIClient } from '../lib/openai.js';
 import { MONGO_QUERY_SCHEMA_DESCRIPTION } from '../lib/mongo-query-schema.js';
 import { validateAndSanitizeQuery, runMongoFind } from '../lib/mongo-query-runner.js';
 import { sendError, sendErrorWithMessage } from './error.js';
 import type { AuthMiddlewares } from './middleware.js';
+
+/** Load users by _id from the users collection (firstName, lastName for full name). */
+async function resolveUsers(
+  userIds: mongoose.Types.ObjectId[]
+): Promise<{ _id: string; firstName?: string; lastName?: string; uname?: string }[]> {
+  if (userIds.length === 0) return [];
+  const docs = await mongoose.connection
+    .collection('users')
+    .find({ _id: { $in: userIds } })
+    .project({ firstName: 1, lastName: 1, uname: 1 })
+    .toArray();
+  return (docs as { _id: mongoose.Types.ObjectId; firstName?: string; lastName?: string; uname?: string }[]).map(
+    (d) => ({
+      _id: d._id.toString(),
+      firstName: d.firstName,
+      lastName: d.lastName,
+      uname: d.uname,
+    })
+  );
+}
+
+/** Get user ObjectIds from results: from userId field, or from _id when collection is users. */
+function getUserIdsForLookup(
+  results: unknown[],
+  collection: string
+): mongoose.Types.ObjectId[] {
+  const ids = new Set<string>();
+  const isUsersCollection = collection === 'users';
+  for (const doc of results) {
+    if (!doc || typeof doc !== 'object') continue;
+    const d = doc as Record<string, unknown>;
+    if (isUsersCollection && d._id) {
+      const v = d._id;
+      if (v instanceof mongoose.Types.ObjectId) ids.add(v.toString());
+      else if (typeof v === 'string' && mongoose.isValidObjectId(v)) ids.add(v);
+    } else if (d.userId) {
+      const v = d.userId;
+      if (v instanceof mongoose.Types.ObjectId) ids.add(v.toString());
+      else if (typeof v === 'string' && mongoose.isValidObjectId(v)) ids.add(v);
+    }
+  }
+  return Array.from(ids)
+    .filter((id) => mongoose.isValidObjectId(id))
+    .map((id) => new mongoose.Types.ObjectId(id));
+}
+
+/** Fetch upcoming appointments for the given user IDs (as petitioner, attorney, or legal assistant). */
+async function fetchAppointmentsForUsers(
+  userIds: mongoose.Types.ObjectId[]
+): Promise<unknown[]> {
+  if (userIds.length === 0) return [];
+  const now = new Date();
+  const docs = await mongoose.connection
+    .collection('appointments')
+    .find({
+      $or: [
+        { petitionerId: { $in: userIds } },
+        { petitionerAttId: { $in: userIds } },
+        { legalAssistantId: { $in: userIds } },
+      ],
+      scheduledAt: { $gte: now },
+      status: { $nin: ['cancelled', 'rejected'] },
+    })
+    .sort({ scheduledAt: 1 })
+    .limit(20)
+    .project({ scheduledAt: 1, durationMinutes: 1, status: 1, caseId: 1, petitionerId: 1 })
+    .toArray();
+  return docs as unknown[];
+}
+
+/** Fetch assets for the given user IDs (affidavit assets, keyed by userId). */
+async function fetchAssetsForUsers(
+  userIds: mongoose.Types.ObjectId[]
+): Promise<unknown[]> {
+  if (userIds.length === 0) return [];
+  const docs = await mongoose.connection
+    .collection('assets')
+    .find({ userId: { $in: userIds } })
+    .project({ description: 1, marketValue: 1, assetsTypeId: 1 })
+    .toArray();
+  return docs as unknown[];
+}
 
 const QUERY_TOOL = {
   type: 'function' as const,
@@ -91,8 +174,72 @@ export function createAdminRouter(
         limit: args.limit,
       });
       const results = await runMongoFind(sanitized);
+      const count = results.length;
 
-      res.json({ results, count: results.length });
+      // User IDs for lookups: from userId in results, or from _id when the query was on users collection.
+      const userIds = getUserIdsForLookup(results, sanitized.collection);
+      const resolvedUsers = await resolveUsers(userIds);
+
+      // If the question is about appointments or assets and we have user IDs, fetch related data.
+      const questionLower = question.toLowerCase();
+      let appointmentsForUsers: unknown[] = [];
+      let assetsForUsers: unknown[] = [];
+      if (/appointment/.test(questionLower) && userIds.length > 0) {
+        appointmentsForUsers = await fetchAppointmentsForUsers(userIds);
+      }
+      if (/asset/.test(questionLower) && userIds.length > 0) {
+        assetsForUsers = await fetchAssetsForUsers(userIds);
+      }
+
+      // Summarize results in natural language for the admin.
+      const resultsJson = JSON.stringify(results);
+      const maxChars = 8000;
+      const truncated =
+        resultsJson.length > maxChars
+          ? resultsJson.slice(0, maxChars) + ' ... (truncated)'
+          : resultsJson;
+
+      let userContent = `Question: ${question}\n\nResults (${count} document(s)):\n${truncated}`;
+      if (resolvedUsers.length > 0) {
+        const fullNames = resolvedUsers.map(
+          (u) =>
+            `${u._id}: ${[u.firstName, u.lastName].filter(Boolean).join(' ') || u.uname || '—'}`
+        );
+        userContent += `\n\nResolved users (from users collection; use these for person full names when results reference userId):\n${fullNames.join('\n')}`;
+      }
+      if (appointmentsForUsers.length > 0) {
+        userContent += `\n\nAppointments (upcoming for these users; list these specifically with date/time and status):\n${JSON.stringify(appointmentsForUsers)}`;
+      } else if (/appointment/.test(questionLower) && userIds.length > 0) {
+        userContent += `\n\nAppointments: none upcoming found for these users.`;
+      }
+      if (assetsForUsers.length > 0) {
+        userContent += `\n\nAssets (for these users; list each with description and market value):\n${JSON.stringify(assetsForUsers)}`;
+      } else if (/asset/.test(questionLower) && userIds.length > 0) {
+        userContent += `\n\nAssets: none found for these users.`;
+      }
+
+      const summaryCompletion = await client.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a helpful assistant. The user asked a question about the database. You will receive the question, the query results (JSON), and optionally "Resolved users" (userId -> full name), "Appointments" (upcoming), and/or "Assets" (affidavit assets for those users). Use Resolved users to state person full names. When appointment data is provided, list each appointment with date/time, status, and duration. When asset data is provided, list each asset with description and market value (e.g. "[Description]: $[marketValue]" or "Total: $X across N assets"). If "Assets: none found" is given, say the person has no assets on file. Do not say "information is not available" or "please clarify" when Assets or Appointments data is provided—use that data to give a specific answer. Respond in 2-4 clear, concise sentences or a short list. Do not use markdown or code blocks.
+
+CRITICAL: A person's full name comes from the users collection (firstName, lastName). In the employment collection, "name" is the EMPLOYER or organization name (e.g. "McDonald's"), and "occupation" is the job title (e.g. "Manager"). Never report employment.name or employment.occupation as a person's full name. When "Resolved users" is provided, use it to give the person's full name. When "Appointments" or "Assets" is provided, give a specific answer from that data—list them or state there are none.`,
+          },
+          {
+            role: 'user',
+            content: userContent,
+          },
+        ],
+        max_tokens: 300,
+      });
+
+      const summary =
+        summaryCompletion.choices?.[0]?.message?.content?.trim() ??
+        (count === 0 ? 'No documents match your question.' : `${count} document(s) found.`);
+
+      res.json({ summary, count, results });
     } catch (e) {
       const err = e as { status?: number; message?: string };
       if (err?.status === 429 || err?.status === 402) {

@@ -76,20 +76,20 @@
         </ul>
       </div>
 
-      <div class="sendBox">
+      <div class="sendBox" [class.sendBoxDisabled]="!canReply">
         <textarea
           [(ngModel)]="sendBody"
           class="sendInput"
           rows="2"
           placeholder="Type a message…"
-          [disabled]="sendBusy"
+          [disabled]="sendBusy || !canReply"
           (keydown.enter)="$event.preventDefault(); send()"
        ></textarea>
         <button
           type="button"
           class="submit"
           (click)="send()"
-          [disabled]="sendBusy || !sendBody.trim()"
+          [disabled]="sendBusy || !sendBody.trim() || !canReply"
         >
           {{ sendBusy ? 'Sending…' : 'Send' }}
         </button>

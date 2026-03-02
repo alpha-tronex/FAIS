@@ -1,5 +1,5 @@
 <main class="page homePage">
-  <h1>Home</h1>
+  <h1 class="homeTitle">Home</h1>
   <p class="homeIntro">Choose an option below to get started.</p>
 
   <div class="tileGrid" role="list">
@@ -11,6 +11,12 @@
         routerLinkActive="tileActive"
         role="listitem"
       >
+        <span *ngIf="getBadgeCount(tile) > 0" class="tileBadgeCount" [attr.aria-label]="tile.route === '/upcoming-events' ? 'You have ' + getBadgeCount(tile) + ' pending action(s)' : 'You have ' + getBadgeCount(tile) + ' unread message(s)'">{{ getBadgeCount(tile) }}</span>
+        <span class="tileIconWrap" aria-hidden="true">
+          <svg class="tileIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path [attr.d]="getIconPath(tile.icon)" />
+          </svg>
+        </span>
         <span class="tileLabel">{{ tile.label }}</span>
       </a>
       <div
@@ -19,6 +25,11 @@
         role="listitem"
         aria-disabled="true"
       >
+        <span class="tileIconWrap" aria-hidden="true">
+          <svg class="tileIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path [attr.d]="getIconPath(tile.icon)" />
+          </svg>
+        </span>
         <span class="tileLabel">{{ tile.label }}</span>
         <span class="tileBadge">Coming soon</span>
       </div>

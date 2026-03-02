@@ -4,8 +4,9 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export type AdminQueryResponse = {
-  results: unknown[];
+  summary: string;
   count: number;
+  results: unknown[];
 };
 
 @Injectable({ providedIn: 'root' })

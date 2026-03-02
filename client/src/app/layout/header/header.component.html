@@ -10,7 +10,7 @@
       <span class="sep">|</span>
       <a routerLink="/admin/affidavit" class="navLink" routerLinkActive="navLinkActive">Affidavit</a>
       <span class="sep">|</span>
-      <a routerLink="/admin/query" class="navLink" routerLinkActive="navLinkActive">Query</a>
+      <a routerLink="/admin/query" class="navLink" routerLinkActive="navLinkActive">AI Query</a>
       <ng-container *ngIf="showUpcomingEventsLink">
         <span class="sep">|</span>
         <span class="navLinkWrap">
@@ -24,12 +24,6 @@
           <a routerLink="/messages" class="navLink" routerLinkActive="navLinkActive">Messages</a>
           <span *ngIf="unreadMessagesCount > 0" class="navBadge" [attr.aria-label]="'You have ' + unreadMessagesCount + ' unread message(s)'">{{ unreadMessagesCount }}</span>
         </span>
-      </ng-container>
-      <ng-container *ngIf="showReportsLink">
-        <span class="sep">|</span>
-        <a routerLink="/reports/structured" class="navLink" routerLinkActive="navLinkActive">Report (Structured)</a>
-        <span class="sep">|</span>
-        <a routerLink="/reports/natural" class="navLink" routerLinkActive="navLinkActive">Report (Natural)</a>
       </ng-container>
     </ng-container>
     <ng-container *ngIf="!showAdminNav">
@@ -51,12 +45,6 @@
           <a routerLink="/messages" class="navLink" routerLinkActive="navLinkActive">Messages</a>
           <span *ngIf="unreadMessagesCount > 0" class="navBadge" [attr.aria-label]="'You have ' + unreadMessagesCount + ' unread message(s)'">{{ unreadMessagesCount }}</span>
         </span>
-      </ng-container>
-      <ng-container *ngIf="showReportsLink">
-        <span class="sep">|</span>
-        <a routerLink="/reports/structured" class="navLink" routerLinkActive="navLinkActive">Report (Structured)</a>
-        <span class="sep">|</span>
-        <a routerLink="/reports/natural" class="navLink" routerLinkActive="navLinkActive">Report (Natural)</a>
       </ng-container>
     </ng-container>
     <span class="sep">|</span>

@@ -12,7 +12,6 @@ export type AuthMiddlewares = {
   requireAuth: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
   requireAdmin: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
   requireStaffOrAdmin: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
-  requireReportAccess: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
 };
 
 function getBearerToken(req: express.Request): string | null {
@@ -48,12 +47,5 @@ export function createAuthMiddlewares(jwtSecret: string): AuthMiddlewares {
     return requireAdmin(req, res, next);
   }
 
-  /** Petitioner Attorney (3), Legal Assistant (6), or Administrator (5) may access report endpoints. */
-  function requireReportAccess(req: express.Request, res: express.Response, next: express.NextFunction) {
-    const auth = (req as any).auth as AuthPayload | undefined;
-    if (auth?.roleTypeId === 3 || auth?.roleTypeId === 5 || auth?.roleTypeId === 6) return next();
-    return sendErrorWithMessage(res, 'Forbidden', 403);
-  }
-
-  return { requireAuth, requireAdmin, requireStaffOrAdmin, requireReportAccess };
+  return { requireAuth, requireAdmin, requireStaffOrAdmin };
 }

@@ -46,7 +46,7 @@ Collection: users
 - uname: string
 - email: string
 - firstName: string
-- lastName: string
+- lastName: string (person's full name = firstName + lastName from this collection)
 - addressLine1, addressLine2, city, state, zipCode, phone: string
 - roleTypeId: number (1=Petitioner, 2=Respondent, 3=Petitioner Attorney, 5=Administrator, 6=Legal Assistant)
 - createdAt, updatedAt: Date (ISODate)
@@ -103,12 +103,13 @@ Collection: assets
 Collection: employment
 - _id: ObjectId
 - userId: ObjectId (ref users; rows are per-user affidavit data)
-- name: string (employer or "Self" etc.)
-- occupation: string (optional)
+- name: string (EMPLOYER or organization name, e.g. "McDonald's", "Self" — NOT the person's name)
+- occupation: string (optional; job title e.g. "Manager" — NOT the person's full name)
 - payRate: number
 - payFrequencyTypeId: number (lookup_pay_frequency_types id: 1–999)
 - payFrequencyIfOther: string (optional)
 - retired: boolean (optional)
+To get a person's full name, query the users collection (firstName, lastName). employment.name is never the respondent/petitioner name.
 
 For date filters use ISO strings with $gte, $lte, $gt, $lt. For ObjectId filters use the string representation.
 Use projection to limit returned fields when the user asks for specific columns or "just names", etc.

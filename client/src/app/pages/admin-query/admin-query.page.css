@@ -11,6 +11,24 @@
   max-width: 32rem;
   box-sizing: border-box;
 }
+.summary .summaryText {
+  margin: 0.5rem 0 0 0;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.linkBtn {
+  background: none;
+  border: none;
+  color: var(--link-color, #0066cc);
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+}
+.linkBtn:hover {
+  color: var(--link-hover, #004499);
+}
 .resultsJson {
   margin: 0.5rem 0 0 0;
   padding: 1rem;

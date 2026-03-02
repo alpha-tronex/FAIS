@@ -24,11 +24,17 @@
     </div>
   </section>
 
-  <section *ngIf="!busy && count > 0" class="mt16">
-    <h2>Results ({{ count }})</h2>
-    <pre class="resultsJson">{{ results | json }}</pre>
+  <section *ngIf="!busy && ranOnce && summary" class="mt16 summary">
+    <h2>Answer</h2>
+    <p class="summaryText">{{ summary }}</p>
   </section>
 
-  <p *ngIf="!busy && ranOnce && count === 0 && !error" class="mt16">No documents match.</p>
+  <section *ngIf="!busy && ranOnce && (count > 0 || results.length > 0)" class="mt16">
+    <button type="button" class="linkBtn" (click)="showRawResults = !showRawResults">
+      {{ showRawResults ? 'Hide' : 'Show' }} raw results ({{ count }})
+    </button>
+    <pre *ngIf="showRawResults" class="resultsJson">{{ results | json }}</pre>
+  </section>
+
   <p *ngIf="!busy && !ranOnce && !error" class="mt16 hint">Enter a question and click Run query.</p>
 </main>

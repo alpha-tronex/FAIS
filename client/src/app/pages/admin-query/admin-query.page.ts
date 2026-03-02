@@ -13,10 +13,13 @@ export class AdminQueryPage {
   question = '';
   busy = false;
   error: string | null = null;
+  summary: string | null = null;
   results: unknown[] = [];
   count = 0;
   /** True after at least one successful response (so we can show "No documents match" vs initial hint). */
   ranOnce = false;
+  /** Toggle to show/hide raw JSON results. */
+  showRawResults = false;
 
   constructor(
     private readonly adminQuery: AdminQueryService,
@@ -42,12 +45,14 @@ export class AdminQueryPage {
     }
     this.busy = true;
     this.error = null;
+    this.summary = null;
     this.results = [];
     this.count = 0;
     this.adminQuery
       .query(this.question)
       .then((res) => {
         this.ranOnce = true;
+        this.summary = res.summary ?? null;
         this.results = res.results ?? [];
         this.count = res.count ?? 0;
       })

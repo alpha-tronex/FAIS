@@ -105,13 +105,32 @@ export function createMessagesRouter(
           userId,
           authPayload.roleTypeId
         );
-        const allowedOids = Array.from(allowedIds).map((id) => new mongoose.Types.ObjectId(id));
+        // Only show conversations where I am a participant and the other party is in this set
+        // (avoids showing third-party threads e.g. John–Christophe to admin)
+        const [sendersWhenIAmRecipient, recipientsWhenIAmSender] = await Promise.all([
+          MessageModel.distinct('senderId', { recipientId: myOid }),
+          MessageModel.distinct('recipientId', { senderId: myOid }),
+        ]);
+        const conversationPartnerIds = new Set<string>(allowedIds);
+        for (const oid of sendersWhenIAmRecipient) {
+          if (oid) conversationPartnerIds.add(oid.toString());
+        }
+        for (const oid of recipientsWhenIAmSender) {
+          if (oid) conversationPartnerIds.add(oid.toString());
+        }
+        const partnerOids = Array.from(conversationPartnerIds)
+          .filter((id) => mongoose.isValidObjectId(id))
+          .map((id) => new mongoose.Types.ObjectId(id));
+        if (partnerOids.length === 0) {
+          res.json([]);
+          return;
+        }
         const agg = await MessageModel.aggregate([
           {
             $match: {
               $or: [
-                { senderId: myOid, recipientId: { $in: allowedOids } },
-                { recipientId: myOid, senderId: { $in: allowedOids } },
+                { senderId: myOid, recipientId: { $in: partnerOids } },
+                { recipientId: myOid, senderId: { $in: partnerOids } },
               ],
             },
           },
@@ -200,16 +219,24 @@ export function createMessagesRouter(
     }
 
     try {
+      const myOid = new mongoose.Types.ObjectId(userId);
+      const otherOid = new mongoose.Types.ObjectId(withUserId);
+
       const allowedIds = await getAllowedRecipientIds(
         userId,
         authPayload.roleTypeId
       );
-      if (!allowedIds.has(withUserId)) {
+      const canMessage = allowedIds.has(withUserId);
+      const hasConversation = await MessageModel.exists({
+        $or: [
+          { senderId: myOid, recipientId: otherOid },
+          { senderId: otherOid, recipientId: myOid },
+        ],
+      });
+      if (!canMessage && !hasConversation) {
         return res.status(403).json({ error: 'Forbidden' });
       }
 
-      const myOid = new mongoose.Types.ObjectId(userId);
-      const otherOid = new mongoose.Types.ObjectId(withUserId);
 
       const filter: Record<string, unknown> = {
         $or: [
@@ -276,13 +303,31 @@ export function createMessagesRouter(
         authPayload.roleTypeId
       );
       if (!allowedIds.has(recipientId)) {
+        const recipient = await User.findById(recipientId)
+          .select({ roleTypeId: 1 })
+          .lean();
+        const isPetitioner = authPayload.roleTypeId === 1;
+        const isRecipientAdmin = (recipient as any)?.roleTypeId === 5;
+        if (isPetitioner && isRecipientAdmin) {
+          return res.status(403).json({
+            error:
+              'Admins do not accept messages; these messages are informational only. Please contact your attorney or legal assistant.',
+          });
+        }
         return res.status(403).json({ error: 'Forbidden' });
       }
+
+      const recipient = await User.findById(recipientId).select({ roleTypeId: 1 }).lean();
+      const isAdminToPetitioner =
+        authPayload.roleTypeId === 5 && (recipient as any)?.roleTypeId === 1;
+      const bodyToSave = isAdminToPetitioner
+        ? body.trim() + '\n\n\nThis is informational only. You cannot reply to this message.'
+        : body.trim();
 
       const doc = await MessageModel.create({
         senderId: new mongoose.Types.ObjectId(authPayload.sub),
         recipientId: new mongoose.Types.ObjectId(recipientId),
-        body: body.trim(),
+        body: bodyToSave,
         readAt: null,
       });
 
@@ -290,7 +335,7 @@ export function createMessagesRouter(
         id: doc._id.toString(),
         senderId: doc.senderId.toString(),
         recipientId: doc.recipientId.toString(),
-        body: doc.body,
+        body: bodyToSave,
         readAt: null,
         createdAt: doc.createdAt ? doc.createdAt.toISOString() : null,
       });

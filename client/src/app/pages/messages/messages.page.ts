@@ -197,4 +197,11 @@ export class MessagesPage implements OnInit, OnDestroy {
   isFromMe(msg: Message): boolean {
     return msg.senderId === this.myUserId;
   }
+
+  /** False when current user is a petitioner (1) and the selected conversation is with an admin (5) — cannot reply. */
+  get canReply(): boolean {
+    const myRole = this.auth.getRoleTypeIdFromToken();
+    const otherRole = this.selectedUser?.roleTypeId;
+    return !(myRole === 1 && otherRole === 5);
+  }
 }
