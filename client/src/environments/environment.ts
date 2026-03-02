@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  theme: 'b' as const,
+  theme: 'style_fiori' as const,
   apiUrl: '/api',
   /** Seconds before token expiry to show "Session expiring" modal (countdown length). Default 120. */
   sessionWarningBeforeExpirySec: 120,

@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminChildGuard, adminGuard } from './core/admin.guard';
-import { landingGuard } from './core/landing.guard';
+import { splashLandingGuard } from './core/splash-landing.guard';
 import { homeGuard } from './core/home.guard';
 import { myCasesGuard } from './core/my-cases.guard';
 import { registerGuard } from './core/register.guard';
@@ -12,8 +12,8 @@ export const routes: Routes = [
 	{
 		path: '',
 		pathMatch: 'full',
-		canActivate: [landingGuard],
-		loadChildren: () => import('./pages/login/login.module').then((m) => m.LoginModule)
+		canActivate: [splashLandingGuard],
+		loadChildren: () => import('./pages/landing/landing.module').then((m) => m.LandingModule)
 	},
 	{
 		path: 'home',

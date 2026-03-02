@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Law Office of Christophe Fiori | Family Law • Mediation • Evictions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1a2744;
+      --gold: #b8860b;
+      --sand: #f5f0e8;
+      --charcoal: #2c3e50;
+      --white: #fff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      color: var(--charcoal);
+      background: var(--sand);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .logo span {
+      color: var(--gold);
+    }
+
+    nav a {
+      color: var(--white);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      color: var(--gold);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .hero {
+      max-width: 720px;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      color: var(--charcoal);
+      margin-bottom: 2rem;
+      letter-spacing: 0.02em;
+    }
+
+    .tagline .dot {
+      color: var(--gold);
+      margin: 0 0.35em;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .service-card {
+      background: var(--white);
+      padding: 1.75rem 1.25rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(26, 39, 68, 0.08);
+      border: 1px solid rgba(26, 39, 68, 0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(26, 39, 68, 0.12);
+    }
+
+    .service-card h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .service-card p {
+      font-size: 0.9rem;
+      color: var(--charcoal);
+      margin-bottom: 1rem;
+      line-height: 1.45;
+    }
+
+    .service-card a {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--navy);
+      color: var(--white);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .service-card a:hover {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    .contact-bar {
+      margin-top: 3rem;
+      padding: 1rem 1.5rem;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .contact-bar a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .contact-bar a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--charcoal);
+      border-top: 1px solid rgba(26, 39, 68, 0.1);
+    }
+
+    @media (max-width: 600px) {
+      nav a {
+        margin-left: 0;
+        margin-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Law Office of <span>Christophe Fiori</span>, PLLC</div>
+    <nav>
+      <a href="#family">Family Law</a>
+      <a href="#mediation">Mediation</a>
+      <a href="#evictions">Evictions</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Practical Legal Help • Clear Next Steps</h1>
+      <p class="tagline">Family Law <span class="dot">•</span> Mediation <span class="dot">•</span> Evictions (Florida)</p>
+
+      <div class="services">
+        <div class="service-card">
+          <h2>Family Law</h2>
+          <p>Divorce, paternity, timesharing, support, and injunctions—clear advice and practical solutions.</p>
+          <a href="https://chrisfiori.com/">Request Consultation</a>
+        </div>
+        <div class="service-card">
+          <h2>Mediation</h2>
+          <p>Resolve disputes outside of court with remote or in-person mediation. Efficient scheduling and a structured process.</p>
+          <a href="https://chrisfiori.com/">Schedule Mediation</a>
+        </div>
+        <div class="service-card">
+          <h2>Evictions</h2>
+          <p>Fast, straightforward eviction filings for Florida landlords—nonpayment, lease violations, holdover, and unlawful detainer.</p>
+          <a href="https://chrisfiori.com/">Start an Eviction</a>
+        </div>
+      </div>
+
+      <div class="contact-bar" id="contact">
+        Family Law • Mediation • Evictions — Call <a href="tel:+18133331660">(813) 333-1660</a> — Tampa, FL
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © Law Office of Christophe Fiori, PLLC — 607-A W Martin Luther King Jr Blvd, Tampa, Florida 33603
+  </footer>
+</body>
+</html>

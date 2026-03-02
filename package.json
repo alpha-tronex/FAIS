@@ -8,6 +8,7 @@
     "mongo:status": "node scripts/check-mongo.mjs",
     "setup:dev": "node scripts/setup-dev.mjs",
     "db:reset:clean": "npm --prefix server run migrate:reset:clean -- --drop",
+    "seed:stress": "npm --prefix server run seed:stress",
     "dev": "npm run setup:dev && npm run mongo:status && concurrently -n SERVER,CLIENT -c blue,green \"npm --prefix server run dev\" \"npm --prefix client start\"",
     "dev:nocheck": "npm run setup:dev && concurrently -n SERVER,CLIENT -c blue,green \"npm --prefix server run dev\" \"npm --prefix client start\"",
     "build": "npm --prefix server run build && npm --prefix client run build && node scripts/copy-client-to-server.mjs",

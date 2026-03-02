@@ -6,7 +6,7 @@
  */
 export const environment = {
   production: false,
-  theme: 'b' as const,
+  theme: 'style_fiori' as const,
   apiUrl: '/api',
   sessionWarningBeforeExpirySec: 15,
   sessionCheckIntervalMs: 2000

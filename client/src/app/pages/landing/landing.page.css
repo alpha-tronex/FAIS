@@ -1,0 +1,192 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.landing {
+  font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  color: #2c3e50;
+  background: #f5f0e8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.landingHeader {
+  background: #1a2744;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.logo span {
+  color: #b8860b;
+}
+
+.landingNav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.landingNav a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.landingNav a:hover {
+  color: #b8860b;
+}
+
+.btnLogin {
+  margin-left: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: #b8860b;
+  color: #fff;
+  border-radius: 4px;
+}
+
+.btnLogin:hover {
+  background: #9a7209;
+  color: #fff;
+}
+
+.landingMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.hero {
+  max-width: 720px;
+}
+
+.hero h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 600;
+  color: #1a2744;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  letter-spacing: 0.02em;
+}
+
+.tagline .dot {
+  color: #b8860b;
+  margin: 0 0.35em;
+}
+
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 720px;
+}
+
+.service-card {
+  background: #fff;
+  padding: 1.75rem 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(26, 39, 68, 0.08);
+  border: 1px solid rgba(26, 39, 68, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(26, 39, 68, 0.12);
+}
+
+.service-card h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.35rem;
+  color: #1a2744;
+  margin-bottom: 0.5rem;
+}
+
+.service-card p {
+  font-size: 0.9rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  line-height: 1.45;
+}
+
+.service-card a {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #1a2744;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.service-card a:hover {
+  background: #b8860b;
+  color: #fff;
+}
+
+.contact-bar {
+  margin-top: 3rem;
+  padding: 1rem 1.5rem;
+  background: #1a2744;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.contact-bar a {
+  color: #b8860b;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.contact-bar a:hover {
+  text-decoration: underline;
+}
+
+.landingFooter {
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #2c3e50;
+  border-top: 1px solid rgba(26, 39, 68, 0.1);
+}
+
+@media (max-width: 600px) {
+  .landingNav a {
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+  .btnLogin {
+    margin-left: 0;
+  }
+}

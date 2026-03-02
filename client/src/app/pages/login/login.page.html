@@ -27,7 +27,7 @@
         </div>
       </label>
 
-      <button type="submit" [disabled]="busy" class="submit">Log in</button>
+      <button type="submit" [disabled]="busy || !uname.trim() || !password" class="submit">Log in</button>
 
       <p class="mt10">
         <a routerLink="/forgot-password" class="link">Forgot password?</a>

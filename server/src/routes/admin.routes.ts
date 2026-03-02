@@ -26,13 +26,22 @@ async function resolveUsers(
   );
 }
 
-/** Get user ObjectIds from results: from userId field, or from _id when collection is users. */
+const CASE_USER_FIELDS = [
+  'petitionerId',
+  'respondentId',
+  'petitionerAttId',
+  'respondentAttId',
+  'legalAssistantId',
+] as const;
+
+/** Get user ObjectIds from results: from userId field, from _id when collection is users, or from case user fields when collection is case. */
 function getUserIdsForLookup(
   results: unknown[],
   collection: string
 ): mongoose.Types.ObjectId[] {
   const ids = new Set<string>();
   const isUsersCollection = collection === 'users';
+  const isCaseCollection = collection === 'case';
   for (const doc of results) {
     if (!doc || typeof doc !== 'object') continue;
     const d = doc as Record<string, unknown>;
@@ -40,6 +49,12 @@ function getUserIdsForLookup(
       const v = d._id;
       if (v instanceof mongoose.Types.ObjectId) ids.add(v.toString());
       else if (typeof v === 'string' && mongoose.isValidObjectId(v)) ids.add(v);
+    } else if (isCaseCollection) {
+      for (const key of CASE_USER_FIELDS) {
+        const v = d[key];
+        if (v instanceof mongoose.Types.ObjectId) ids.add(v.toString());
+        else if (typeof v === 'string' && mongoose.isValidObjectId(v)) ids.add(v);
+      }
     } else if (d.userId) {
       const v = d.userId;
       if (v instanceof mongoose.Types.ObjectId) ids.add(v.toString());
@@ -107,6 +122,45 @@ const QUERY_TOOL = {
   },
 };
 
+/** If the question asks for a specific user role, return the roleTypeId to enforce on users queries (1–6). */
+function getRequiredRoleTypeIdFromQuestion(question: string): number | null {
+  const q = question.toLowerCase();
+  // Check compound roles first so "petitioner attorneys" → 3, not 1
+  if (/\bpetitioner\s+attorney(s)?\b/.test(q)) return 3;
+  if (/\brespondent\s+attorney(s)?\b/.test(q)) return 4;
+  if (/\b(administrator|admin)s?\b/.test(q) && !q.includes('attorney')) return 5;
+  if (/\blegal\s+assistant(s)?\b/.test(q)) return 6;
+  const asksPetitioners = q.includes('petitioner');
+  const asksRespondents = q.includes('respondent');
+  if (asksPetitioners && !asksRespondents) return 1;
+  if (asksRespondents && !asksPetitioners) return 2;
+  return null;
+}
+
+/** Resolve a county name mentioned in the question to lookup_counties id. Returns null if none or ambiguous. */
+async function resolveCountyFromQuestion(
+  question: string
+): Promise<{ id: number; name: string } | null> {
+  const counties = await mongoose.connection
+    .collection('lookup_counties')
+    .find({})
+    .project({ id: 1, name: 1 })
+    .toArray();
+  const q = question.toLowerCase().trim();
+  const matches: { id: number; name: string }[] = [];
+  for (const row of counties as { id?: number; name?: string }[]) {
+    const name = row.name?.trim();
+    if (!name || typeof row.id !== 'number') continue;
+    const nameLower = name.toLowerCase();
+    const withCounty = `${nameLower} county`;
+    if (q.includes(nameLower) || q.includes(withCounty)) {
+      matches.push({ id: row.id, name });
+    }
+  }
+  if (matches.length !== 1) return null;
+  return matches[0]!;
+}
+
 export function createAdminRouter(
   auth: Pick<AuthMiddlewares, 'requireAuth' | 'requireAdmin'>
 ): express.Router {
@@ -129,59 +183,102 @@ export function createAdminRouter(
     }
 
     try {
-      const completion = await client.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `${MONGO_QUERY_SCHEMA_DESCRIPTION}\n\nOutput only by calling the query_mongodb tool. Do not explain.`,
-          },
-          { role: 'user', content: question },
-        ],
-        tools: [QUERY_TOOL],
-        tool_choice: { type: 'function', function: { name: 'query_mongodb' } },
-        max_tokens: 500,
-      });
+      const countyHint = await resolveCountyFromQuestion(question);
+      const questionLower = question.toLowerCase();
+      const asksForPartyInCounty =
+        countyHint &&
+        (questionLower.includes('petitioner') || questionLower.includes('respondent'));
 
-      const choice = completion.choices?.[0];
-      const toolCall = choice?.message?.tool_calls?.[0];
-      if (
-        !toolCall ||
-        toolCall.function?.name !== 'query_mongodb'
-      ) {
-        return res.status(400).json({
-          error: 'Could not generate a query. Try rephrasing.',
-          raw: choice?.message?.content ?? null,
+      let results: unknown[];
+      let queryCollection: string;
+
+      if (asksForPartyInCounty && countyHint) {
+        // Bypass LLM: run case query by county ourselves so we always get cases, not lookup_counties.
+        const caseDocs = await mongoose.connection
+          .collection('case')
+          .find({ countyId: countyHint.id })
+          .limit(500)
+          .toArray();
+        results = caseDocs as unknown[];
+        queryCollection = 'case';
+      } else {
+        let systemContent = `${MONGO_QUERY_SCHEMA_DESCRIPTION}\n\nOutput only by calling the query_mongodb tool. Do not explain.`;
+        if (countyHint) {
+          systemContent += `\n\nCOUNTY ID FOR THIS QUESTION: The user asked about ${countyHint.name} county. You MUST query the case collection (not lookup_counties) with this filter: { "countyId": ${countyHint.id} }. That returns cases filed in ${countyHint.name}; petitionerId and respondentId on each case are the people. Do NOT query lookup_counties—that would return county names only, not petitioners or respondents.`;
+        }
+
+        const completion = await client.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemContent },
+            { role: 'user', content: question },
+          ],
+          tools: [QUERY_TOOL],
+          tool_choice: { type: 'function', function: { name: 'query_mongodb' } },
+          max_tokens: 500,
         });
+
+        const choice = completion.choices?.[0];
+        const toolCall = choice?.message?.tool_calls?.[0];
+        if (
+          !toolCall ||
+          toolCall.function?.name !== 'query_mongodb'
+        ) {
+          return res.status(400).json({
+            error: 'Could not generate a query. Try rephrasing.',
+            raw: choice?.message?.content ?? null,
+          });
+        }
+
+        let args: {
+          collection?: string;
+          filter?: Record<string, unknown>;
+          projection?: Record<string, unknown>;
+          limit?: number;
+        };
+        try {
+          args = JSON.parse(toolCall.function.arguments ?? '{}');
+        } catch {
+          return res.status(400).json({ error: 'Invalid query from AI.' });
+        }
+
+        const sanitized = validateAndSanitizeQuery({
+          collection: args.collection ?? '',
+          filter: args.filter,
+          projection: args.projection,
+          limit: args.limit,
+        });
+
+        const requiredRole = getRequiredRoleTypeIdFromQuestion(question);
+
+        // When the question asks for a specific role (e.g. "list all petitioner attorneys"), always query users
+        // with that roleTypeId so we don't depend on the LLM choosing the right collection (e.g. it might query case and return parties).
+        if (requiredRole != null) {
+          const f = sanitized.collection === 'users' ? (sanitized.filter as Record<string, unknown>) : {};
+          const baseFilter = Array.isArray(f.$and)
+            ? { $and: [...(f.$and as object[]).filter((c) => (c as Record<string, unknown>).roleTypeId === undefined), { roleTypeId: requiredRole }] }
+            : { ...f, roleTypeId: requiredRole };
+          const userQuery = validateAndSanitizeQuery({
+            collection: 'users',
+            filter: baseFilter,
+            projection: sanitized.collection === 'users' ? sanitized.projection : undefined,
+            limit: sanitized.limit,
+          });
+          results = await runMongoFind(userQuery);
+          queryCollection = 'users';
+        } else {
+          results = await runMongoFind(sanitized);
+          queryCollection = sanitized.collection;
+        }
       }
 
-      let args: {
-        collection?: string;
-        filter?: Record<string, unknown>;
-        projection?: Record<string, unknown>;
-        limit?: number;
-      };
-      try {
-        args = JSON.parse(toolCall.function.arguments ?? '{}');
-      } catch {
-        return res.status(400).json({ error: 'Invalid query from AI.' });
-      }
-
-      const sanitized = validateAndSanitizeQuery({
-        collection: args.collection ?? '',
-        filter: args.filter,
-        projection: args.projection,
-        limit: args.limit,
-      });
-      const results = await runMongoFind(sanitized);
       const count = results.length;
 
       // User IDs for lookups: from userId in results, or from _id when the query was on users collection.
-      const userIds = getUserIdsForLookup(results, sanitized.collection);
+      const userIds = getUserIdsForLookup(results, queryCollection);
       const resolvedUsers = await resolveUsers(userIds);
 
       // If the question is about appointments or assets and we have user IDs, fetch related data.
-      const questionLower = question.toLowerCase();
       let appointmentsForUsers: unknown[] = [];
       let assetsForUsers: unknown[] = [];
       if (/appointment/.test(questionLower) && userIds.length > 0) {
@@ -225,7 +322,7 @@ export function createAdminRouter(
             role: 'system',
             content: `You are a helpful assistant. The user asked a question about the database. You will receive the question, the query results (JSON), and optionally "Resolved users" (userId -> full name), "Appointments" (upcoming), and/or "Assets" (affidavit assets for those users). Use Resolved users to state person full names. When appointment data is provided, list each appointment with date/time, status, and duration. When asset data is provided, list each asset with description and market value (e.g. "[Description]: $[marketValue]" or "Total: $X across N assets"). If "Assets: none found" is given, say the person has no assets on file. Do not say "information is not available" or "please clarify" when Assets or Appointments data is provided—use that data to give a specific answer. Respond in 2-4 clear, concise sentences or a short list. Do not use markdown or code blocks.
 
-CRITICAL: A person's full name comes from the users collection (firstName, lastName). In the employment collection, "name" is the EMPLOYER or organization name (e.g. "McDonald's"), and "occupation" is the job title (e.g. "Manager"). Never report employment.name or employment.occupation as a person's full name. When "Resolved users" is provided, use it to give the person's full name. When "Appointments" or "Assets" is provided, give a specific answer from that data—list them or state there are none.`,
+CRITICAL: A person's full name comes from the users collection (firstName, lastName). In the employment collection, "name" is the EMPLOYER or organization name (e.g. "McDonald's"), and "occupation" is the job title (e.g. "Manager"). Never report employment.name or employment.occupation as a person's full name. When "Resolved users" is provided, use it to give the person's full name. When "Appointments" or "Assets" is provided, give a specific answer from that data—list them or state there are none. When the question asks for "petitioners" (or "respondents", etc.) and the results are from the case collection, list only the people in that role: use petitionerId for petitioners, respondentId for respondents, petitionerAttId for petitioner attorneys, respondentAttId for respondent attorneys, legalAssistantId for legal assistants. Do not list other parties on the case.`,
           },
           {
             role: 'user',

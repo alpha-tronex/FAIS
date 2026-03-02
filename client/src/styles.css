@@ -1,5 +1,5 @@
-/* Global theme (A/B/C) controlled by html[data-theme].
-	 Default is Option B (compact data grid). */
+/* Global theme (a/b/c/style_fiori) controlled by html[data-theme].
+	 style_fiori = Fiori/law office (navy, gold, sand). */
 :root {
 	--radius: 10px;
 
@@ -117,6 +117,34 @@ html[data-theme='c'] {
 	--panelBorderWidth: 2px;
 	--tableBorderWidth: 2px;
 	--tableHeaderBg: #f5f5f4;
+}
+
+/* style_fiori - Fiori landing / law office (navy, gold, sand) */
+html[data-theme='style_fiori'] {
+	--bodyFontSize: 15px;
+	--pageMaxWidth: 1200px;
+	--pageMarginY: 24px;
+	--panelPadding: 16px;
+
+	--controlHeight: 36px;
+	--controlPaddingY: 7px;
+	--controlPaddingX: 12px;
+	--controlFontSize: 0.93rem;
+	--buttonFontWeight: 600;
+
+	--bg: #f5f0e8;
+	--surface: #fafaf8;
+	--text: #1a2744;
+	--muted: #475569;
+	--border: #d4c9b8;
+	--border2: #e8e0d5;
+	--accent: #1a2744;
+	--accentAlt: #b8860b;
+	--danger: #b42318;
+	--focus: color-mix(in srgb, #b8860b 35%, transparent);
+	--panelBorderWidth: 1px;
+	--tableBorderWidth: 1px;
+	--tableHeaderBg: #f0ebe3;
 }
 
 html,
@@ -238,6 +266,92 @@ button[disabled] {
 html[data-theme='c'] .submit {
 	border-color: var(--accent);
 	background: #e8f0ff;
+}
+
+html[data-theme='style_fiori'] .submit {
+	border-color: #1a2744;
+	background: #1a2744;
+	color: #fff;
+}
+
+html[data-theme='style_fiori'] .submit:hover {
+	background: #2a3764;
+	border-color: #2a3764;
+}
+
+html[data-theme='style_fiori'] .link {
+	color: #b8860b;
+}
+
+html[data-theme='style_fiori'] .table {
+	border-collapse: collapse;
+	border-radius: 8px;
+	border-color: #d4c9b8;
+}
+
+html[data-theme='style_fiori'] .th {
+	background: #f0ebe3;
+	color: #1a2744;
+}
+
+html[data-theme='style_fiori'] tbody tr:hover .td {
+	background: #f5f0e8;
+}
+
+html[data-theme='style_fiori'] .confirmButton {
+	border-color: #1a2744;
+	background: #1a2744;
+	color: #fff;
+}
+
+html[data-theme='style_fiori'] .confirmButton:hover {
+	background: #2a3764;
+	border-color: #2a3764;
+	color: #fff;
+}
+
+html[data-theme='style_fiori'] .confirmButtonDanger {
+	border-color: #b42318;
+	background: #b42318;
+	color: #fff;
+}
+
+html[data-theme='style_fiori'] .confirmButtonDanger:hover {
+	background: #c92a1e;
+	border-color: #c92a1e;
+	color: #fff;
+}
+
+/* Fiori: navy header/footer to match landing */
+html[data-theme='style_fiori'] .headerBar {
+	background: #1a2744;
+	border-bottom-color: #1a2744;
+}
+
+html[data-theme='style_fiori'] .headerBar .welcome,
+html[data-theme='style_fiori'] .headerBar .navLink,
+html[data-theme='style_fiori'] .headerBar .navBtn {
+	color: #fff;
+}
+
+html[data-theme='style_fiori'] .headerBar .navLink:hover,
+html[data-theme='style_fiori'] .headerBar .navLink.navLinkActive,
+html[data-theme='style_fiori'] .headerBar .navBtn:hover {
+	color: #b8860b;
+}
+
+html[data-theme='style_fiori'] .headerBar .sep {
+	color: rgba(255, 255, 255, 0.75);
+}
+
+html[data-theme='style_fiori'] .footerBar {
+	background: #1a2744;
+	border-top-color: #1a2744;
+}
+
+html[data-theme='style_fiori'] .footerBar .footerText,
+html[data-theme='style_fiori'] .footerBar .footerMuted {
+	color: rgba(255, 255, 255, 0.9);
 }
 
 .table {

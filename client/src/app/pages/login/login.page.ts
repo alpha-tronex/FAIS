@@ -32,11 +32,17 @@ export class LoginPage implements OnInit {
   async onSubmit() {
     if (this.busy) return;
 
+    const trimmedUname = this.uname.trim();
+    if (!trimmedUname || !this.password) {
+      this.error = 'Please enter both username and password.';
+      return;
+    }
+
     this.busy = true;
     this.error = null;
 
     try {
-      const res = await this.auth.login(this.uname.trim(), this.password);
+      const res = await this.auth.login(trimmedUname, this.password);
       if (res.mustResetPassword) {
         this.router.navigateByUrl('/register');
       } else {

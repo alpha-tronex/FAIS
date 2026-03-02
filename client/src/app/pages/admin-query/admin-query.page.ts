@@ -20,6 +20,8 @@ export class AdminQueryPage {
   ranOnce = false;
   /** Toggle to show/hide raw JSON results. */
   showRawResults = false;
+  /** True briefly after copying answer to clipboard. */
+  copied = false;
 
   constructor(
     private readonly adminQuery: AdminQueryService,
@@ -80,5 +82,16 @@ export class AdminQueryPage {
       .finally(() => {
         this.busy = false;
       });
+  }
+
+  copyAnswer(): void {
+    if (!this.summary) return;
+    navigator.clipboard.writeText(this.summary).then(
+      () => {
+        this.copied = true;
+        setTimeout(() => (this.copied = false), 2000);
+      },
+      () => {}
+    );
   }
 }
