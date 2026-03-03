@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { StandardFonts } from 'pdf-lib';
 import { CaseModel, User } from '../models.js';
 import { asFiniteNumber } from './number.js';
 import {
@@ -113,6 +114,14 @@ function sumLiabilitiesByTypeId(rows: any[] | null | undefined): Map<number, num
   const m = new Map<number, number>();
   withFlags.forEach((f, id) => m.set(id, f.value));
   return m;
+}
+
+/** Uppercase all letters; leave digits and other characters unchanged. Used for caption/header fields. */
+function toFormalCaps(s: string): string {
+  return String(s ?? '')
+    .split('')
+    .map((c) => (/[a-z]/i.test(c) ? c.toUpperCase() : c))
+    .join('');
 }
 
 export async function fillOfficialAffidavitPdf(params: FillOfficialAffidavitParams): Promise<Buffer> {
@@ -309,14 +318,14 @@ export async function fillOfficialAffidavitPdf(params: FillOfficialAffidavitPara
       if (loaded) petitionerContactUser = loaded;
     }
 
-    setTextIfExists(form, 'Case No', String(caseDoc?.caseNumber ?? '').trim());
-    setTextIfExists(form, 'Division', String(caseDoc?.division ?? '').trim());
-    if (circuitName) setTextIfExists(form, 'Circuit No', circuitName);
-    if (countyName) setTextIfExists(form, 'county', countyName);
-    if (circuitName) setTextIfExists(form, 'IN THE CIRCUIT COURT OF THE', circuitName);
-    if (countyName) setTextIfExists(form, 'IN AND FOR', countyName);
-    if (finalPetitionerName) setTextIfExists(form, 'Petitioner', finalPetitionerName);
-    if (finalRespondentName) setTextIfExists(form, 'Respondent', finalRespondentName);
+    setTextIfExists(form, 'Case No', toFormalCaps(String(caseDoc?.caseNumber ?? '').trim()));
+    setTextIfExists(form, 'Division', toFormalCaps(String(caseDoc?.division ?? '').trim()));
+    if (circuitName) setTextIfExists(form, 'Circuit No', toFormalCaps(circuitName));
+    if (countyName) setTextIfExists(form, 'county', toFormalCaps(countyName));
+    if (circuitName) setTextIfExists(form, 'IN THE CIRCUIT COURT OF THE', toFormalCaps(circuitName));
+    if (countyName) setTextIfExists(form, 'IN AND FOR', toFormalCaps(countyName));
+    if (finalPetitionerName) setTextIfExists(form, 'Petitioner', toFormalCaps(finalPetitionerName));
+    if (finalRespondentName) setTextIfExists(form, 'Respondent', toFormalCaps(finalRespondentName));
   }
 
   if (formKey === 'short') {
@@ -813,11 +822,82 @@ export async function fillOfficialAffidavitPdf(params: FillOfficialAffidavitPara
     }
   }
 
-  // Update appearances so set values are visible before we strip or flatten
+  // Update appearances so set values are visible before we strip or flatten.
+  // Set font size on all text fields to match the document's text (10pt typical for court forms).
+  const formFontSize = 10;
+  const captionNeedles = ['Petitioner', 'Respondent', 'Case No', 'Division', 'Circuit No', 'county', 'IN THE CIRCUIT COURT OF THE', 'IN AND FOR'];
+  for (const { field } of allFormFields) {
+    if (typeof (field as { setFontSize?: (n: number) => void }).setFontSize === 'function') {
+      try {
+        (field as { setFontSize: (n: number) => void }).setFontSize(formFontSize);
+      } catch {
+        // Some fields may lack default appearance; skip
+      }
+    }
+  }
+  // Ensure caption fields (Petitioner, Respondent, etc.) use the same font size; some templates
+  // give Respondent a smaller DA, or setFontSize throws when DA has no Tf — set DA explicitly.
+  const defaultDa = `/Helvetica ${formFontSize} Tf 0 g`;
+  for (const needle of captionNeedles) {
+    const name = findFieldName(needle);
+    if (!name) continue;
+    try {
+      const textField = form.getTextField(name);
+      if (typeof (textField as { setFontSize?: (n: number) => void }).setFontSize === 'function') {
+        (textField as { setFontSize: (n: number) => void }).setFontSize(formFontSize);
+      }
+    } catch {
+      try {
+        const textField = form.getTextField(name) as { acroField?: { setDefaultAppearance?: (da: string) => void } };
+        if (textField?.acroField?.setDefaultAppearance) {
+          textField.acroField.setDefaultAppearance(defaultDa);
+        }
+      } catch {
+        // Ignore
+      }
+    }
+  }
+  // County field: use a larger font size. pdf-lib uses the *widget* DA for font size when
+  // present, so we must set DA on the field's widget(s), not just the field.
+  const countyFontSize = 12;
+  const countyFieldName = findFieldName('county');
+  if (countyFieldName) {
+    const countyDa = `/Helvetica ${countyFontSize} Tf 0 g`;
+    try {
+      const countyField = form.getTextField(countyFieldName) as {
+        setFontSize?: (n: number) => void;
+        acroField?: { getWidgets?: () => { setDefaultAppearance?: (da: string) => void }[] };
+      };
+      if (typeof countyField.setFontSize === 'function') {
+        countyField.setFontSize(countyFontSize);
+      }
+      const widgets = countyField?.acroField?.getWidgets?.();
+      if (Array.isArray(widgets)) {
+        for (const w of widgets) {
+          if (w?.setDefaultAppearance) w.setDefaultAppearance(countyDa);
+        }
+      }
+    } catch {
+      try {
+        const countyField = form.getTextField(countyFieldName) as {
+          acroField?: { getWidgets?: () => { setDefaultAppearance?: (da: string) => void }[] };
+        };
+        const widgets = countyField?.acroField?.getWidgets?.();
+        if (Array.isArray(widgets)) {
+          for (const w of widgets) {
+            if (w?.setDefaultAppearance) w.setDefaultAppearance(countyDa);
+          }
+        }
+      } catch {
+        // Ignore
+      }
+    }
+  }
   try {
-    form.updateFieldAppearances();
+    const formFont = await pdf.embedFont(StandardFonts.Helvetica);
+    form.updateFieldAppearances(formFont);
   } catch {
-    // Non-fatal; save() will try again
+    form.updateFieldAppearances();
   }
 
   stripLeadingInstructionPages(pdf, 3);

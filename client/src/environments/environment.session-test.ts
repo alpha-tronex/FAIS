@@ -1,13 +1,13 @@
 /**
- * Use this only for testing the session-expiry popup.
+ * Use this only for testing the session-expiry popup (idle-based).
  * Run: ng serve --configuration=session-test
- * And start the server with: JWT_EXPIRES_IN=25s npm start
- * Then: login → Profile → wait ~15 seconds → popup appears with countdown.
+ * Then: login → do not touch the page → after ~15s idle the popup appears with countdown.
  */
 export const environment = {
   production: false,
   theme: 'style_fiori' as const,
   apiUrl: '/api',
-  sessionWarningBeforeExpirySec: 15,
+  sessionIdleTimeoutMs: 25_000,
+  sessionIdleWarningSec: 15,
   sessionCheckIntervalMs: 2000
 };

@@ -1,4 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { SessionIdleService } from '../services/session-idle.service';
 
 const TOKEN_KEY = 'fais_token';
 const MUST_RESET_PASSWORD_KEY = 'fais_must_reset_password';
@@ -6,6 +8,9 @@ const MUST_RESET_PASSWORD_KEY = 'fais_must_reset_password';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem(TOKEN_KEY);
   if (!token) return next(req);
+
+  const sessionIdle = inject(SessionIdleService);
+  sessionIdle.recordActivity();
 
   return next(
     req.clone({

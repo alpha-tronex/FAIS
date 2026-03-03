@@ -54,6 +54,12 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Session (idle-based timeout)
+
+The app logs users out after a period of **inactivity** (default 15 minutes). Activity (clicks, keystrokes, navigation, API requests) resets the timer. Before the timeout, a "Session expiring" modal appears so the user can stay logged in or log out.
+
+Environment options: `sessionIdleTimeoutMs`, `sessionIdleWarningSec`, `sessionCheckIntervalMs` (see `src/environments/environment.ts`). To test the session-expiry popup quickly, see [TESTING-SESSION-EXPIRY.md](TESTING-SESSION-EXPIRY.md).
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

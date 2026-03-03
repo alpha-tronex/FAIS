@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 
 export type SessionModalState = {
   visible: boolean;
-  /** Seconds remaining until auto-logout. */
+  /** Seconds remaining until auto-logout (idle countdown). */
   countdownSeconds: number;
 };
 
@@ -14,6 +14,11 @@ export type SessionModalState = {
 export class SessionIdleService implements OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private countdownIntervalId: ReturnType<typeof setInterval> | null = null;
+
+  /** Last time the user was considered active (ms). Reset on click, keydown, navigation, API request. */
+  private lastActivityAt = 0;
+  /** Throttle: only try token refresh at most once per 60s when token is close to expiring. */
+  private lastTokenRefreshAt = 0;
 
   readonly state$ = new BehaviorSubject<SessionModalState>({
     visible: false,
@@ -24,44 +29,96 @@ export class SessionIdleService implements OnDestroy {
     private readonly auth: AuthService,
     private readonly router: Router
   ) {
+    const idleTimeoutMs = environment.sessionIdleTimeoutMs ?? 15 * 60 * 1000;
+    const warningSec = environment.sessionIdleWarningSec ?? 120;
     const checkIntervalMs = environment.sessionCheckIntervalMs ?? 30_000;
+
+    if (this.auth.isLoggedIn()) {
+      this.lastActivityAt = Date.now();
+    }
+
+    // Reset idle timer on user interaction
+    if (typeof document !== 'undefined') {
+      const events = ['click', 'keydown', 'mousedown', 'touchstart', 'scroll'];
+      events.forEach((ev) => {
+        document.addEventListener(ev, this.handleActivity);
+      });
+    }
+    this.router.events.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.recordActivity();
+    });
+
     interval(checkIntervalMs)
       .pipe(
         filter(() => this.auth.isLoggedIn()),
         takeUntil(this.destroy$)
       )
-      .subscribe(() => this.checkAndMaybeShowWarning());
+      .subscribe(() => this.checkIdleAndMaybeShowWarning(idleTimeoutMs, warningSec));
 
-    // Run one check soon after init (when logged in)
     if (this.auth.isLoggedIn()) {
-      setTimeout(() => this.checkAndMaybeShowWarning(), 1000);
+      setTimeout(() => this.checkIdleAndMaybeShowWarning(idleTimeoutMs, warningSec), 1000);
     }
   }
 
+  private handleActivity = (): void => {
+    this.recordActivity();
+  };
+
   ngOnDestroy(): void {
+    if (typeof document !== 'undefined') {
+      const events = ['click', 'keydown', 'mousedown', 'touchstart', 'scroll'];
+      events.forEach((ev) => {
+        document.removeEventListener(ev, this.handleActivity);
+      });
+    }
     this.destroy$.next();
     this.destroy$.complete();
     this.stopCountdown();
   }
 
-  private checkAndMaybeShowWarning(): void {
+  /**
+   * Call when the user is active (click, keydown, navigation, or authenticated API request).
+   * Resets the idle timer. Optionally refreshes the token if it is close to expiring.
+   */
+  recordActivity(): void {
+    if (!this.auth.isLoggedIn()) return;
+    this.lastActivityAt = Date.now();
+
+    // Optional: keep token alive when user is active and token is close to expiring
+    const exp = this.auth.getTokenExpiryTime();
+    if (exp != null) {
+      const nowSec = Math.floor(Date.now() / 1000);
+      const remainingSec = exp - nowSec;
+      const refreshThresholdSec = 120;
+      const throttleMs = 60_000;
+      if (remainingSec < refreshThresholdSec && Date.now() - this.lastTokenRefreshAt > throttleMs) {
+        this.lastTokenRefreshAt = Date.now();
+        this.auth.refreshToken().catch(() => {});
+      }
+    }
+  }
+
+  private checkIdleAndMaybeShowWarning(idleTimeoutMs: number, warningSec: number): void {
     if (!this.auth.isLoggedIn()) return;
 
-    const exp = this.auth.getTokenExpiryTime();
-    if (exp == null) return;
+    if (this.lastActivityAt === 0) {
+      this.lastActivityAt = Date.now();
+      return;
+    }
 
-    const nowSec = Math.floor(Date.now() / 1000);
-    const remainingSec = exp - nowSec;
+    const idleMs = Date.now() - this.lastActivityAt;
+    const idleSec = idleMs / 1000;
+    const idleTimeoutSec = idleTimeoutMs / 1000;
 
-    if (remainingSec <= 0) {
+    if (idleSec >= idleTimeoutSec) {
       this.auth.logout();
       void this.router.navigateByUrl('/login?session=expired');
       return;
     }
 
-    const warningSec = environment.sessionWarningBeforeExpirySec ?? 120;
-    if (remainingSec <= warningSec && !this.state$.value.visible) {
-      this.showModal(Math.min(remainingSec, warningSec));
+    const remainingUntilTimeoutSec = idleTimeoutSec - idleSec;
+    if (remainingUntilTimeoutSec <= warningSec && !this.state$.value.visible) {
+      this.showModal(Math.min(Math.floor(remainingUntilTimeoutSec), warningSec));
     }
   }
 
@@ -101,10 +158,11 @@ export class SessionIdleService implements OnDestroy {
     void this.router.navigateByUrl('/login?session=expired');
   }
 
-  /** User chose "Stay logged in" – refresh token and close modal. */
+  /** User chose "Stay logged in" – refresh token, reset idle timer, and close modal. */
   async stayLoggedIn(): Promise<void> {
     try {
       await this.auth.refreshToken();
+      this.recordActivity();
       this.stopCountdown();
       this.state$.next({ visible: false, countdownSeconds: 0 });
     } catch {

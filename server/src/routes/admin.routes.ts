@@ -137,6 +137,72 @@ function getRequiredRoleTypeIdFromQuestion(question: string): number | null {
   return null;
 }
 
+/** Detect "cases/case numbers involving [username]" and resolve that username to a user _id. */
+async function resolveCasesInvolvingUser(
+  question: string
+): Promise<{ userId: mongoose.Types.ObjectId; uname: string } | null> {
+  const lower = question.toLowerCase().trim();
+  const involvingMatch = lower.match(/\b(?:involving|for)\s+([a-zA-Z0-9_.-]+)/);
+  const candidate = involvingMatch?.[1]?.trim();
+  if (!candidate || !/\b(?:case numbers?|cases?)\b/.test(lower)) return null;
+  const doc = await mongoose.connection
+    .collection('users')
+    .findOne({ uname: candidate }, { projection: { _id: 1, uname: 1 } });
+  if (!doc || !doc._id) return null;
+  return {
+    userId: doc._id as mongoose.Types.ObjectId,
+    uname: String((doc as { uname?: string }).uname ?? candidate),
+  };
+}
+
+/** Affidavit collections keyed by userId (employment, monthlyincome, assets). */
+const AFFIDAVIT_COLLECTIONS = ['employment', 'monthlyincome', 'assets'] as const;
+
+/**
+ * Detect "employment/income/assets/affidavit info for [username]" and resolve that username.
+ * Returns the user and which collection to query (or null for "all affidavit" — we'll query all three).
+ */
+async function resolveAffidavitDataTargetUser(
+  question: string
+): Promise<{
+  userId: mongoose.Types.ObjectId;
+  uname: string;
+  collection: (typeof AFFIDAVIT_COLLECTIONS)[number] | null;
+} | null> {
+  const lower = question.toLowerCase().trim();
+  const hasEmployment = /\b(employment|employer|job|occupation|pay\s*rate|work)\b/.test(lower);
+  const hasIncome = /\b(monthly\s*income|income)\b/.test(lower);
+  const hasAssets = /\bassets?\b/.test(lower);
+  const hasAffidavit = /\b(affidavit|deduction|expense|financial)\b/.test(lower);
+  if (!hasEmployment && !hasIncome && !hasAssets && !hasAffidavit) return null;
+
+  // Extract username: "for X", "on X", "X's", or "X employment" (X at start)
+  let candidate: string | undefined;
+  const forOn = lower.match(/\b(?:for|on)\s+([a-zA-Z0-9_.-]+)/);
+  const possessive = lower.match(/([a-zA-Z0-9_.-]+)'s\s+(?:employment|income|assets|affidavit)/);
+  const leading = lower.match(/^([a-zA-Z0-9_.-]+)\s+(?:employment|income|assets|affidavit)/);
+  candidate = forOn?.[1] ?? possessive?.[1] ?? leading?.[1];
+  if (!candidate) return null;
+
+  const doc = await mongoose.connection
+    .collection('users')
+    .findOne({ uname: candidate }, { projection: { _id: 1, uname: 1 } });
+  if (!doc || !doc._id) return null;
+
+  const uname = String((doc as { uname?: string }).uname ?? candidate);
+  let collection: (typeof AFFIDAVIT_COLLECTIONS)[number] | null = null;
+  if (hasEmployment && !hasIncome && !hasAssets) collection = 'employment';
+  else if (hasIncome && !hasEmployment && !hasAssets) collection = 'monthlyincome';
+  else if (hasAssets && !hasEmployment && !hasIncome) collection = 'assets';
+  // else: "affidavit" or multiple topics → null (query all three)
+
+  return {
+    userId: doc._id as mongoose.Types.ObjectId,
+    uname,
+    collection,
+  };
+}
+
 /** Resolve a county name mentioned in the question to lookup_counties id. Returns null if none or ambiguous. */
 async function resolveCountyFromQuestion(
   question: string
@@ -183,7 +249,11 @@ export function createAdminRouter(
     }
 
     try {
-      const countyHint = await resolveCountyFromQuestion(question);
+      const [countyHint, casesInvolvingUser, affidavitTargetUser] = await Promise.all([
+        resolveCountyFromQuestion(question),
+        resolveCasesInvolvingUser(question),
+        resolveAffidavitDataTargetUser(question),
+      ]);
       const questionLower = question.toLowerCase();
       const asksForPartyInCounty =
         countyHint &&
@@ -201,6 +271,51 @@ export function createAdminRouter(
           .toArray();
         results = caseDocs as unknown[];
         queryCollection = 'case';
+      } else if (casesInvolvingUser) {
+        // Bypass LLM: run case query by user involvement so we return cases, not users.
+        const oid = casesInvolvingUser.userId;
+        const caseDocs = await mongoose.connection
+          .collection('case')
+          .find({
+            $or: [
+              { petitionerId: oid },
+              { respondentId: oid },
+              { petitionerAttId: oid },
+              { respondentAttId: oid },
+              { legalAssistantId: oid },
+            ],
+          })
+          .project({ caseNumber: 1, division: 1, _id: 1 })
+          .limit(500)
+          .toArray();
+        results = caseDocs as unknown[];
+        queryCollection = 'case';
+      } else if (affidavitTargetUser) {
+        // Bypass LLM: run affidavit collection(s) for this user so we return employment/income/assets, not users.
+        const oid = affidavitTargetUser.userId;
+        const coll = affidavitTargetUser.collection;
+        if (coll) {
+          const docs = await mongoose.connection
+            .collection(coll)
+            .find({ userId: oid })
+            .limit(500)
+            .toArray();
+          results = docs as unknown[];
+          queryCollection = coll;
+        } else {
+          // "Affidavit" generally: run all three and combine with __collection tag for summary.
+          const [emp, inc, ast] = await Promise.all([
+            mongoose.connection.collection('employment').find({ userId: oid }).limit(200).toArray(),
+            mongoose.connection.collection('monthlyincome').find({ userId: oid }).limit(200).toArray(),
+            mongoose.connection.collection('assets').find({ userId: oid }).limit(200).toArray(),
+          ]);
+          results = [
+            ...(emp as object[]).map((d) => ({ ...d, __collection: 'employment' })),
+            ...(inc as object[]).map((d) => ({ ...d, __collection: 'monthlyincome' })),
+            ...(ast as object[]).map((d) => ({ ...d, __collection: 'assets' })),
+          ] as unknown[];
+          queryCollection = 'employment';
+        }
       } else {
         let systemContent = `${MONGO_QUERY_SCHEMA_DESCRIPTION}\n\nOutput only by calling the query_mongodb tool. Do not explain.`;
         if (countyHint) {
@@ -250,10 +365,13 @@ export function createAdminRouter(
         });
 
         const requiredRole = getRequiredRoleTypeIdFromQuestion(question);
+        const isAffidavitCollection = AFFIDAVIT_COLLECTIONS.includes(
+          sanitized.collection as (typeof AFFIDAVIT_COLLECTIONS)[number]
+        );
 
-        // When the question asks for a specific role (e.g. "list all petitioner attorneys"), always query users
-        // with that roleTypeId so we don't depend on the LLM choosing the right collection (e.g. it might query case and return parties).
-        if (requiredRole != null) {
+        // When the question asks for a specific role (e.g. "list all petitioner attorneys"), query users with that roleTypeId —
+        // but do NOT override when the LLM chose an affidavit collection (employment, monthlyincome, assets); that's likely "employment for X" etc.
+        if (requiredRole != null && !isAffidavitCollection) {
           const f = sanitized.collection === 'users' ? (sanitized.filter as Record<string, unknown>) : {};
           const baseFilter = Array.isArray(f.$and)
             ? { $and: [...(f.$and as object[]).filter((c) => (c as Record<string, unknown>).roleTypeId === undefined), { roleTypeId: requiredRole }] }
@@ -322,7 +440,7 @@ export function createAdminRouter(
             role: 'system',
             content: `You are a helpful assistant. The user asked a question about the database. You will receive the question, the query results (JSON), and optionally "Resolved users" (userId -> full name), "Appointments" (upcoming), and/or "Assets" (affidavit assets for those users). Use Resolved users to state person full names. When appointment data is provided, list each appointment with date/time, status, and duration. When asset data is provided, list each asset with description and market value (e.g. "[Description]: $[marketValue]" or "Total: $X across N assets"). If "Assets: none found" is given, say the person has no assets on file. Do not say "information is not available" or "please clarify" when Assets or Appointments data is provided—use that data to give a specific answer. Respond in 2-4 clear, concise sentences or a short list. Do not use markdown or code blocks.
 
-CRITICAL: A person's full name comes from the users collection (firstName, lastName). In the employment collection, "name" is the EMPLOYER or organization name (e.g. "McDonald's"), and "occupation" is the job title (e.g. "Manager"). Never report employment.name or employment.occupation as a person's full name. When "Resolved users" is provided, use it to give the person's full name. When "Appointments" or "Assets" is provided, give a specific answer from that data—list them or state there are none. When the question asks for "petitioners" (or "respondents", etc.) and the results are from the case collection, list only the people in that role: use petitionerId for petitioners, respondentId for respondents, petitionerAttId for petitioner attorneys, respondentAttId for respondent attorneys, legalAssistantId for legal assistants. Do not list other parties on the case.`,
+CRITICAL: A person's full name comes from the users collection (firstName, lastName). In the employment collection, "name" is the EMPLOYER or organization name (e.g. "McDonald's"), and "occupation" is the job title (e.g. "Manager"). Never report employment.name or employment.occupation as a person's full name. When "Resolved users" is provided, use it to give the person's full name. When "Appointments" or "Assets" is provided, give a specific answer from that data—list them or state there are none. When the question asks for "petitioners" (or "respondents", etc.) and the results are from the case collection, list only the people in that role: use petitionerId for petitioners, respondentId for respondents, petitionerAttId for petitioner attorneys, respondentAttId for respondent attorneys, legalAssistantId for legal assistants. Do not list other parties on the case. When the question asks for case numbers (or cases) and the results are from the case collection, list each case number (the caseNumber field) explicitly; do not say results were truncated—list every case number in the results. When results include a __collection field (employment, monthlyincome, assets), group your answer by that: e.g. "Employment: ... Monthly income: ... Assets: ..." and list the relevant fields (e.g. employer name, occupation, pay rate for employment; type and amount for income; description and market value for assets).`,
           },
           {
             role: 'user',

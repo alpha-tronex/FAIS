@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { SessionIdleService } from '../../services/session-idle.service';
 
 @Component({
   standalone: false,
@@ -19,13 +20,14 @@ export class LoginPage implements OnInit {
   constructor(
     private readonly auth: AuthService,
     private readonly router: Router,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly sessionIdle: SessionIdleService
   ) {}
 
   ngOnInit(): void {
     this.resetSuccess = this.route.snapshot.queryParamMap.get('reset') === 'success';
     if (this.route.snapshot.queryParamMap.get('session') === 'expired') {
-      this.error = 'Your session expired. Please sign in again.';
+      this.error = 'Your session expired due to inactivity. Please sign in again.';
     }
   }
 
@@ -43,6 +45,7 @@ export class LoginPage implements OnInit {
 
     try {
       const res = await this.auth.login(trimmedUname, this.password);
+      this.sessionIdle.recordActivity();
       if (res.mustResetPassword) {
         this.router.navigateByUrl('/register');
       } else {

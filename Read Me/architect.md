@@ -12,7 +12,7 @@
 - Generic admin collection manager (e.g. `/admin/collections`) is **not implemented**; admin UI is domain-specific (Users, Cases, Affidavit).
 
 ## Security Model
-- **Authentication:** JWT (short-lived access token, 15m). Token stored client-side; `AuthService` calls `/me`, handles logout on 401.
+- **Authentication:** JWT (short-lived access token, 15m from server). Session is **idle-based** on the client: user is logged out after a period of inactivity (default 15 min); activity (clicks, navigation, API requests) resets the timer. Token stored client-side; `AuthService` calls `/me`, handles logout on 401.
 - **Authorization:**
   - **Admin (roleTypeId = 5):** Full access to admin area (users, cases, affidavit on behalf of users).
   - **Staff:** Currently treated same as admin via `requireStaffOrAdmin`.

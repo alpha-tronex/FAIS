@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { SessionIdleService } from '../../services/session-idle.service';
 import { LookupsService, LookupItem } from '../../services/lookups.service';
 import { validateRegistration } from '../../validation/registration.validation';
 
@@ -45,7 +46,8 @@ export class RegisterPage {
   constructor(
     private readonly auth: AuthService,
     private readonly lookups: LookupsService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly sessionIdle: SessionIdleService
   ) {
     this.finishMode = this.auth.mustCompleteRegistration();
     if (this.finishMode) {
@@ -129,7 +131,7 @@ export class RegisterPage {
 
         await this.auth.updateMySsn({ ssn: this.ssn.trim(), confirmSsn: this.confirmSsn.trim() });
         await this.auth.changePassword(this.password);
-
+        this.sessionIdle.recordActivity();
         await this.router.navigateByUrl(this.auth.isAdmin() ? '/admin/users' : '/my-cases');
         return;
       }
@@ -150,6 +152,7 @@ export class RegisterPage {
         phone: this.phone.trim(),
         ssn: this.ssn.trim()
       });
+      this.sessionIdle.recordActivity();
       if (res.mustResetPassword) {
         await this.router.navigateByUrl('/register');
       } else if (res.user?.roleTypeId === 5) {

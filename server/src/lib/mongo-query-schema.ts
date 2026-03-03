@@ -119,4 +119,8 @@ Use projection to limit returned fields when the user asks for specific columns 
 Default limit to 100 unless the user asks for more (max 500).
 
 Rule: "petitioners/respondents in [county name]" → query CASE with countyId. The system message will give you the exact countyId when a county is mentioned. Use it. Never answer that question by querying lookup_counties (you would get county rows, not people).
+
+CRITICAL — "case numbers involving [username]" or "cases for [username]": You MUST query the CASE collection (not users). The system message may provide the user's ObjectId; use filter { $or: [ { petitionerId: <that ObjectId> }, { respondentId: <that ObjectId> }, { petitionerAttId: <that ObjectId> }, { respondentAttId: <that ObjectId> }, { legalAssistantId: <that ObjectId> } ] }. Use projection { caseNumber: 1, division: 1, _id: 1 } to return case numbers. Do NOT query the users collection for this—that returns people, not cases.
+
+CRITICAL — "employment/income/assets/affidavit for [username]" or "employment on [username]": You MUST query the employment, monthlyincome, or assets collection (not users) with filter { "userId": <that user's ObjectId> }. employment = jobs/employer/occupation/payRate; monthlyincome = income types/amounts; assets = descriptions/marketValue. To get the user's ObjectId from a username (uname), the system may provide it; otherwise the question refers to a specific person and you must filter by that userId. Do NOT query the users collection for employment/income/assets—that returns the person record, not their affidavit data.
 `.trim();
