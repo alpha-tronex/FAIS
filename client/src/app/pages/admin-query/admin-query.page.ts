@@ -23,6 +23,17 @@ export class AdminQueryPage {
   /** True briefly after copying answer to clipboard. */
   copied = false;
 
+  readonly suggestedQuestions = [
+    'List all the case numbers involving stress-petitioner-1',
+    'List all petitioners',
+    'List all liabilities for stress-petitioner-35',
+    'Employment information for stress-petitioner-1',
+    'List monthly income for stress-petitioner-10',
+    'Assets for stress-petitioner-5',
+    'Show the last 20 cases',
+    'List upcoming appointments',
+  ];
+
   constructor(
     private readonly adminQuery: AdminQueryService,
     private readonly auth: AuthService,
@@ -93,5 +104,10 @@ export class AdminQueryPage {
       },
       () => {}
     );
+  }
+
+  useSuggestion(q: string): void {
+    this.question = q;
+    this.error = null;
   }
 }

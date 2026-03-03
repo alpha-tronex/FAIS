@@ -15,6 +15,7 @@ export const ALLOWED_COLLECTIONS = [
   'monthlyincome',
   'assets',
   'employment',
+  'liabilities',
 ] as const;
 
 export type AllowedCollection = (typeof ALLOWED_COLLECTIONS)[number];
@@ -114,6 +115,16 @@ Collection: employment
 - retired: boolean (optional)
 To get a person's full name, query the users collection (firstName, lastName). employment.name is never the respondent/petitioner name.
 
+Collection: liabilities
+- _id: ObjectId
+- userId: ObjectId (ref users; rows are per-user affidavit data)
+- liabilitiesTypeId: number (lookup_liabilities_types id: 1–999)
+- description: string
+- amountOwed: number
+- userOwes: boolean (optional)
+- nonMaritalTypeId: number (optional)
+- createdAt, updatedAt: Date (ISODate)
+
 For date filters use ISO strings with $gte, $lte, $gt, $lt. For ObjectId filters use the string representation.
 Use projection to limit returned fields when the user asks for specific columns or "just names", etc.
 Default limit to 100 unless the user asks for more (max 500).
@@ -122,5 +133,5 @@ Rule: "petitioners/respondents in [county name]" → query CASE with countyId. T
 
 CRITICAL — "case numbers involving [username]" or "cases for [username]": You MUST query the CASE collection (not users). The system message may provide the user's ObjectId; use filter { $or: [ { petitionerId: <that ObjectId> }, { respondentId: <that ObjectId> }, { petitionerAttId: <that ObjectId> }, { respondentAttId: <that ObjectId> }, { legalAssistantId: <that ObjectId> } ] }. Use projection { caseNumber: 1, division: 1, _id: 1 } to return case numbers. Do NOT query the users collection for this—that returns people, not cases.
 
-CRITICAL — "employment/income/assets/affidavit for [username]" or "employment on [username]": You MUST query the employment, monthlyincome, or assets collection (not users) with filter { "userId": <that user's ObjectId> }. employment = jobs/employer/occupation/payRate; monthlyincome = income types/amounts; assets = descriptions/marketValue. To get the user's ObjectId from a username (uname), the system may provide it; otherwise the question refers to a specific person and you must filter by that userId. Do NOT query the users collection for employment/income/assets—that returns the person record, not their affidavit data.
+CRITICAL — "employment/income/assets/liabilities/affidavit for [username]" or "employment on [username]": You MUST query the employment, monthlyincome, assets, or liabilities collection (not users) with filter { "userId": <that user's ObjectId> }. employment = jobs/employer/occupation/payRate; monthlyincome = income types/amounts; assets = descriptions/marketValue; liabilities = description/amountOwed (debts). To get the user's ObjectId from a username (uname), the system may provide it; otherwise the question refers to a specific person and you must filter by that userId. Do NOT query the users collection for employment/income/assets/liabilities—that returns the person record, not their affidavit data.
 `.trim();

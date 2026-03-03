@@ -1,8 +1,19 @@
 <main class="page">
   <h1>Admin data query</h1>
   <p class="description">
-    Ask a question in plain language. The AI will turn it into a read-only MongoDB query over cases, users, appointments, employment, assets, and other allowed collections.
+    Ask a question in plain language. The AI will turn it into a read-only MongoDB query over cases, users, appointments, employment, assets, liabilities, and other allowed collections.
   </p>
+
+  <section class="mt16 suggested">
+    <h2 class="suggestedTitle">Suggested questions</h2>
+    <ul class="suggestedList">
+      <li *ngFor="let q of suggestedQuestions">
+        <button type="button" class="suggestedBtn" (click)="useSuggestion(q)">
+          {{ q }}
+        </button>
+      </li>
+    </ul>
+  </section>
 
   <p *ngIf="error" class="error">{{ error }}</p>
 

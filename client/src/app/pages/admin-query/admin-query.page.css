@@ -2,6 +2,44 @@
   margin-top: 0.5rem;
   color: var(--text-secondary, #555);
 }
+
+.suggested {
+  margin-top: 1rem;
+}
+
+.suggestedTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-secondary, #555);
+}
+
+.suggestedList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.suggestedBtn {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-secondary, #f0f0f0);
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  color: var(--accent, #0066cc);
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: left;
+  max-width: 100%;
+}
+
+.suggestedBtn:hover {
+  background: color-mix(in srgb, var(--accent, #0066cc) 12%, transparent);
+  border-color: var(--accent, #0066cc);
+}
 .formRow label {
   display: block;
   margin-bottom: 0.25rem;
