@@ -1,17 +1,32 @@
 /**
- * Schema description for the admin ad-hoc Mongo query tool.
- * Sent to the LLM so it generates valid collection/filter/projection/limit only.
+ * Schema and allowed collections for the admin ad-hoc Mongo query tool.
  */
+
+/** Short schema for RAG prompt: collections and one-line descriptions. */
+export const MONGO_QUERY_SCHEMA_SHORT = `
+Allowed collections: case, users, appointments, lookup_role_types, lookup_counties, lookup_states, lookup_divisions, lookup_circuits, monthlyincome, assets, employment, liabilities.
+- case: caseNumber, countyId, petitionerId, respondentId, petitionerAttId, respondentAttId, legalAssistantId, etc.
+- users: uname, firstName, lastName, roleTypeId (1=Petitioner, 2=Respondent, 3=Petitioner Attorney, 4=Respondent Attorney, 5=Admin, 6=Legal Assistant), state, etc.
+- appointments: caseId, petitionerId, scheduledAt, durationMinutes, status (pending, accepted, rejected, cancelled).
+- monthlyincome, assets, employment, liabilities: userId, amount/description/marketValue etc. (affidavit data per user).
+To associate any affidavit data (liabilities, assets, monthlyincome, employment) with county: link via case—case has countyId, petitionerId, respondentId. $lookup from the affidavit collection to case where petitionerId or respondentId equals userId, then $unwind (preserveNullAndEmptyArrays: false) and $group by userCase.countyId. Use the same pattern for "which counties have the most X" or "which counties have the highest average Y".
+Use type "find" for simple filters; use type "aggregate" for grouping, sorting, or averaging. Use $lookup + $unwind when joining affidavit data to county via case.
+When the user asks for a specific number (e.g. "which 3 counties", "list top 3 counties", "top 5", "first 10"), add a $limit stage with that number after $sort so the pipeline returns exactly that many results. For "list top N counties with highest income/most assets/most liabilities/most employment", use $limit: N in the aggregation pipeline.
+In a $group stage, every field except _id must be an accumulator (e.g. $sum, $avg, $first, $last, $max, $min, $push). Do not use plain field references like "fullName": "$firstName". To include names or other fields from grouped documents, either use $first/$last (e.g. firstName: { $first: "$firstName" }) or $lookup the users collection after $group and $project the needed fields.
+For "counties with most/highest amount of liabilities": $group by countyId with totalLiabilities: { $sum: 1 }, totalAmount: { $sum: '$amountOwed' }, items: { $push: { description: '$description', amount: '$amountOwed' } }; then $project with items: { $slice: ['$items', 10] } so the result includes type (description) and amount per liability.
+For "counties with highest income": include income type names by $lookup from lookup_monthly_income_types (match id to typeId) first, then $lookup case for county; $group with avgIncome, totalIncome, items: { $push: { typeName: '$incomeTypeDoc.name', amount: '$amount' } }; $project with items: { $slice: ['$items', 10] } so the result includes income type description and amount.
+`.trim();
 
 export const ALLOWED_COLLECTIONS = [
   'case',
   'users',
   'appointments',
-  'roletype',
+  'lookup_role_types',
   'lookup_counties',
   'lookup_states',
   'lookup_divisions',
   'lookup_circuits',
+  'lookup_monthly_income_types',
   'monthlyincome',
   'assets',
   'employment',
@@ -66,7 +81,7 @@ Collection: appointments
 - createdBy: ObjectId
 - createdAt, updatedAt: Date (ISODate)
 
-Collection: roletype
+Collection: lookup_role_types
 - id: number
 - name: string (e.g. "Administrator", "Petitioner Attorney")
 
@@ -134,4 +149,6 @@ Rule: "petitioners/respondents in [county name]" → query CASE with countyId. T
 CRITICAL — "case numbers involving [username]" or "cases for [username]": You MUST query the CASE collection (not users). The system message may provide the user's ObjectId; use filter { $or: [ { petitionerId: <that ObjectId> }, { respondentId: <that ObjectId> }, { petitionerAttId: <that ObjectId> }, { respondentAttId: <that ObjectId> }, { legalAssistantId: <that ObjectId> } ] }. Use projection { caseNumber: 1, division: 1, _id: 1 } to return case numbers. Do NOT query the users collection for this—that returns people, not cases.
 
 CRITICAL — "employment/income/assets/liabilities/affidavit for [username]" or "employment on [username]": You MUST query the employment, monthlyincome, assets, or liabilities collection (not users) with filter { "userId": <that user's ObjectId> }. employment = jobs/employer/occupation/payRate; monthlyincome = income types/amounts; assets = descriptions/marketValue; liabilities = description/amountOwed (debts). To get the user's ObjectId from a username (uname), the system may provide it; otherwise the question refers to a specific person and you must filter by that userId. Do NOT query the users collection for employment/income/assets/liabilities—that returns the person record, not their affidavit data.
+
+CRITICAL — "who has the least/highest income in [county name]" or "least/highest income in [county]": You MUST use an aggregate on monthlyincome. $lookup case with let: { userId: '$userId' }, subpipeline with $match that BOTH (1) $expr $or petitionerId/respondentId equals $$userId AND (2) countyId: <resolved countyId from system>. Then $unwind the lookup result (path must be prefixed with $ e.g. path: '$userCase'), $group by userId with totalIncome: { $sum: '$amount' }, $sort by totalIncome 1 for least or -1 for highest, $limit 1, then $lookup users to get firstName/lastName, $unwind that (path: '$userDoc'), $project firstName, lastName, totalIncome. Use the exact countyId number the system message provides for that county.
 `.trim();

@@ -12,6 +12,8 @@ export type AuthMiddlewares = {
   requireAuth: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
   requireAdmin: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
   requireStaffOrAdmin: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
+  /** Admin (5), Petitioner Attorney (3), or Legal Assistant (6) — for AI query and document query. */
+  requireAdminOrAiStaff: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
 };
 
 function getBearerToken(req: express.Request): string | null {
@@ -47,5 +49,13 @@ export function createAuthMiddlewares(jwtSecret: string): AuthMiddlewares {
     return requireAdmin(req, res, next);
   }
 
-  return { requireAuth, requireAdmin, requireStaffOrAdmin };
+  /** Allow Administrator (5), Petitioner Attorney (3), Legal Assistant (6) for AI and document query. */
+  function requireAdminOrAiStaff(req: express.Request, res: express.Response, next: express.NextFunction) {
+    const auth = (req as any).auth as AuthPayload | undefined;
+    const id = auth?.roleTypeId;
+    if (id === 5 || id === 3 || id === 6) return next();
+    return sendErrorWithMessage(res, 'Forbidden', 403);
+  }
+
+  return { requireAuth, requireAdmin, requireStaffOrAdmin, requireAdminOrAiStaff };
 }

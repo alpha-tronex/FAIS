@@ -5,7 +5,12 @@
   </p>
 
   <section class="mt16 suggested">
-    <h2 class="suggestedTitle">Suggested questions</h2>
+    <div class="suggestedHeader">
+      <h2 class="suggestedTitle">Suggested questions</h2>
+      <button type="button" class="refreshSuggestionsBtn" (click)="refreshSuggestions()" title="Show 5 different suggestions">
+        Show different suggestions
+      </button>
+    </div>
     <ul class="suggestedList">
       <li *ngFor="let q of suggestedQuestions">
         <button type="button" class="suggestedBtn" (click)="useSuggestion(q)">
@@ -35,10 +40,11 @@
     </div>
   </section>
 
-  <section *ngIf="!busy && ranOnce && summary" class="mt16 summary">
+  <section *ngIf="!busy && ranOnce && summary" class="mt16 summary" [class.clarification]="clarification">
     <div class="summaryHeader">
-      <h2>Answer</h2>
+      <h2>{{ clarification ? 'Clarification needed' : 'Answer' }}</h2>
       <button
+        *ngIf="!clarification"
         type="button"
         class="copyBtn"
         (click)="copyAnswer()"
@@ -52,10 +58,37 @@
         <span class="copyLabel">{{ copied ? 'Copied!' : 'Copy' }}</span>
       </button>
     </div>
-    <p class="summaryText">{{ summary }}</p>
+    <ng-container *ngIf="summarySections.length > 0">
+      <div *ngFor="let section of summarySections" class="summarySection">
+        <h3 class="summarySectionTitle">{{ section.title }}</h3>
+        <ul class="summaryList">
+          <li *ngFor="let item of section.items">{{ item }}</li>
+        </ul>
+      </div>
+    </ng-container>
+    <ul *ngIf="summarySections.length === 0 && summaryList.length > 0" class="summaryList">
+      <li *ngFor="let item of summaryList">{{ item }}</li>
+    </ul>
+    <p *ngIf="summarySections.length === 0 && summaryList.length === 0" class="summaryText">{{ summary }}</p>
+    <div *ngIf="clarification" class="clarificationFollowUp mt12">
+      <label for="clarification-response">Your answer</label>
+      <div class="clarificationInputRow">
+        <input
+          id="clarification-response"
+          type="text"
+          [(ngModel)]="clarificationResponse"
+          placeholder="e.g. Miami-Dade county"
+          [disabled]="busy"
+          (keydown.enter)="submitClarification()"
+        />
+        <button type="button" class="submitClarificationBtn" (click)="submitClarification()" [disabled]="busy || !clarificationResponse.trim()">
+          Send
+        </button>
+      </div>
+    </div>
   </section>
 
-  <section *ngIf="!busy && ranOnce && (count > 0 || results.length > 0)" class="mt16">
+  <section *ngIf="!busy && ranOnce && !clarification && (count > 0 || results.length > 0)" class="mt16">
     <button type="button" class="linkBtn" (click)="showRawResults = !showRawResults">
       {{ showRawResults ? 'Hide' : 'Show' }} raw results ({{ count }})
     </button>

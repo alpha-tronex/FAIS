@@ -11,7 +11,7 @@ export function createRoleTypesRouter(auth: Pick<AuthMiddlewares, 'requireAuth'>
     try {
       const rows = await mongoose
         .connection
-        .collection('roletype')
+        .collection('lookup_role_types')
         .find({})
         .project({ id: 1, name: 1 })
         .sort({ id: 1 })

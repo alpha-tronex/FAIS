@@ -1,5 +1,5 @@
-/* Global theme (a/b/c/style_fiori) controlled by html[data-theme].
-	 style_fiori = Fiori/law office (navy, gold, sand). */
+/* Global theme (fais_default/style_fiori) controlled by html[data-theme].
+	 fais_default = default FAIS; style_fiori = Fiori/law office (navy, gold, sand). */
 :root {
 	--radius: 10px;
 
@@ -21,7 +21,7 @@
 	--tdPaddingY: 7px;
 	--tdPaddingX: 10px;
 
-	/* Default palette = Option B */
+	/* Default palette = fais_default */
 	--bodyFontSize: 14px;
 	--pageMaxWidth: 1200px;
 	--pageMarginY: 18px;
@@ -52,28 +52,8 @@
 	--tableHeaderBg: #fafaf8;
 }
 
-/* Option A - Clean Gov/Admin */
-html[data-theme='a'] {
-	--bodyFontSize: 16px;
-	--pageMaxWidth: 1024px;
-	--pageMarginY: 36px;
-
-	--bg: #f2f2f1;
-	--surface: #fafaf9;
-	--text: #111827;
-	--muted: #6b7280;
-	--border: #e5e7eb;
-	--border2: #eef2f7;
-	--accent: #1f6feb;
-	--danger: #b42318;
-	--focus: color-mix(in srgb, var(--accent) 25%, transparent);
-	--panelBorderWidth: 1px;
-	--tableBorderWidth: 1px;
-	--tableHeaderBg: #f8f8f7;
-}
-
-/* Option B - Compact Data Grid */
-html[data-theme='b'] {
+/* fais_default - default FAIS theme */
+html[data-theme='fais_default'] {
 	--bodyFontSize: 14px;
 	--pageMaxWidth: 1200px;
 	--pageMarginY: 18px;
@@ -97,26 +77,6 @@ html[data-theme='b'] {
 	--panelBorderWidth: 1px;
 	--tableBorderWidth: 1px;
 	--tableHeaderBg: #fafaf8;
-}
-
-/* Option C - High Contrast */
-html[data-theme='c'] {
-	--bodyFontSize: 16px;
-	--pageMaxWidth: 980px;
-	--pageMarginY: 28px;
-
-	--bg: #f0f0ef;
-	--surface: #f5f5f4;
-	--text: #000000;
-	--muted: #1f2937;
-	--border: #111827;
-	--border2: #374151;
-	--accent: #003b9e;
-	--danger: #8a0000;
-	--focus: #ffbf47;
-	--panelBorderWidth: 2px;
-	--tableBorderWidth: 2px;
-	--tableHeaderBg: #f5f5f4;
 }
 
 /* style_fiori - Fiori landing / law office (navy, gold, sand) */
@@ -263,11 +223,6 @@ button[disabled] {
 	background: color-mix(in srgb, var(--accent) 10%, var(--surface));
 }
 
-html[data-theme='c'] .submit {
-	border-color: var(--accent);
-	background: #e8f0ff;
-}
-
 html[data-theme='style_fiori'] .submit {
 	border-color: #1a2744;
 	background: #1a2744;
@@ -387,12 +342,12 @@ tbody tr:hover .td {
 	background: var(--surface);
 }
 
-html[data-theme='b'] .table {
+html[data-theme='fais_default'] .table {
 	border-collapse: collapse;
 	border-radius: 0;
 }
 
-html[data-theme='b'] tbody tr:hover {
+html[data-theme='fais_default'] tbody tr:hover {
 	background: var(--surface);
 }
 

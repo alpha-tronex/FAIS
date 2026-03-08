@@ -21,6 +21,7 @@ import { ADMIN_ROUTES } from './admin.routes';
     AffidavitEditModule,
     SharedModule,
     RouterModule.forChild(ADMIN_ROUTES)
-  ]
+  ],
+  exports: [AdminQueryPage]
 })
 export class AdminModule {}

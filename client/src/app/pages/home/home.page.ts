@@ -124,7 +124,7 @@ export class HomePage implements OnInit, OnDestroy {
           { label: 'Appointments', route: '/upcoming-events', icon: 'calendar' },
           { label: 'Messages', route: '/messages', icon: 'messages' },
           { label: 'AI Query', route: '/admin/query', icon: 'reports' },
-          { label: 'Documents', route: null, comingSoon: true, icon: 'documents' }
+          { label: 'Documents', route: '/documents', icon: 'documents' }
         ];
       case 1:
         return [
@@ -133,7 +133,7 @@ export class HomePage implements OnInit, OnDestroy {
           { label: 'Appointments', route: '/upcoming-events', icon: 'calendar' },
           { label: 'Messages', route: '/messages', icon: 'messages' },
           { label: 'Pay a Bill', route: null, comingSoon: true, icon: 'currency' },
-          { label: 'Documents', route: null, comingSoon: true, icon: 'documents' }
+          { label: 'Documents', route: '/documents', icon: 'documents' }
         ];
       case 3:
       case 6:
@@ -142,7 +142,8 @@ export class HomePage implements OnInit, OnDestroy {
           { label: 'My cases', route: '/my-cases', icon: 'cases' },
           { label: 'Appointments', route: '/upcoming-events', icon: 'calendar' },
           { label: 'Messages', route: '/messages', icon: 'messages' },
-          { label: 'Documents', route: null, comingSoon: true, icon: 'documents' }
+          { label: 'AI Query', route: '/query', icon: 'reports' },
+          { label: 'Documents', route: '/documents', icon: 'documents' }
         ];
       case 2:
       case 4:

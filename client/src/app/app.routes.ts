@@ -7,6 +7,7 @@ import { registerGuard } from './core/register.guard';
 import { affidavitEditGuard } from './core/affidavit-edit.guard';
 import { upcomingEventsGuard } from './core/upcoming-events.guard';
 import { messagesGuard } from './core/messages.guard';
+import { queryGuard } from './core/query.guard';
 
 export const routes: Routes = [
 	{
@@ -75,6 +76,18 @@ export const routes: Routes = [
 		canActivate: [messagesGuard],
 		loadChildren: () =>
 			import('./pages/messages/messages.module').then((m) => m.MessagesModule)
+	},
+	{
+		path: 'documents',
+		canActivate: [homeGuard],
+		loadChildren: () =>
+			import('./pages/documents/documents.module').then((m) => m.DocumentsModule)
+	},
+	{
+		path: 'query',
+		canActivate: [queryGuard],
+		loadChildren: () =>
+			import('./pages/query/query.module').then((m) => m.QueryModule)
 	},
 	{
 		path: 'admin',

@@ -1,0 +1,130 @@
+<main class="page">
+  <h1>AI Document analysis</h1>
+  <p class="description">
+    Upload PDFs for a case; they are processed in the background and become searchable. Admins can ask questions across all documents.
+  </p>
+
+  <section class="section">
+    <h2>Case & documents</h2>
+    <div class="caseRow">
+      <label for="caseSelect">Case</label>
+      <select
+        id="caseSelect"
+        [ngModel]="selectedCaseId"
+        (ngModelChange)="selectedCaseId = $event; onCaseChange()"
+        [disabled]="listBusy || cases.length === 0"
+      >
+        <option [ngValue]="null">Select a case</option>
+        <option *ngFor="let c of cases" [ngValue]="c.id">
+          {{ c.caseNumber }} – {{ c.division }}
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="selectedCaseId && canUpload" class="uploadRow">
+      <div
+        class="dropZone"
+        [class.dragOver]="dragOver"
+        [class.disabled]="uploadBusy"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <p class="dropZoneText">
+          {{ dragOver ? 'Drop PDF here' : 'Drag and drop PDFs here, or' }}
+        </p>
+        <label class="fileLabel">
+          <span class="fileBtn" [class.busy]="uploadBusy">{{ uploadBusy ? 'Uploading…' : 'choose file' }}</span>
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            (change)="onFileSelected($event)"
+            [disabled]="uploadBusy"
+            hidden
+          />
+        </label>
+      </div>
+      <p *ngIf="uploadError" class="error">{{ uploadError }}</p>
+    </div>
+
+    <p *ngIf="listError" class="error">{{ listError }}</p>
+
+    <div *ngIf="listBusy" class="busyMsg">Loading documents…</div>
+
+    <table *ngIf="!listBusy && selectedCaseId && documents.length > 0" class="docTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Error</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let doc of documents">
+          <td>{{ doc.originalName }}</td>
+          <td>{{ statusLabel(doc.status) }}</td>
+          <td class="errorCell">{{ doc.errorMessage ?? '—' }}</td>
+          <td class="actionsCell">
+            <button type="button" class="actionBtn" (click)="download(doc)" [disabled]="doc.status !== 'ready'">
+              Download
+            </button>
+            <button
+              *ngIf="doc.status === 'failed'"
+              type="button"
+              class="actionBtn"
+              (click)="retry(doc)"
+              [disabled]="retryBusy[doc.id]"
+            >
+              {{ retryBusy[doc.id] ? 'Retrying…' : 'Retry' }}
+            </button>
+            <button
+              type="button"
+              class="actionBtn danger"
+              (click)="deleteDoc(doc)"
+              [disabled]="deleteBusy[doc.id]"
+            >
+              {{ deleteBusy[doc.id] ? 'Deleting…' : 'Delete' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="!listBusy && selectedCaseId && documents.length === 0 && !listError" class="hint">
+      No documents yet. Select a case and upload a PDF (petitioner only).
+    </p>
+  </section>
+
+  <section *ngIf="canRunDocumentQuery" class="section querySection">
+    <h2>Ask a question</h2>
+    <p class="queryDesc">Search across all uploaded documents and get an answer with sources.</p>
+    <div class="queryRow">
+      <textarea
+        [(ngModel)]="question"
+        rows="3"
+        placeholder="e.g. What is the total income reported across all affidavits?"
+        [disabled]="queryBusy"
+        class="queryInput"
+      ></textarea>
+    </div>
+    <div class="queryActions">
+      <button type="button" (click)="runQuery()" [disabled]="queryBusy">
+        {{ queryBusy ? 'Searching…' : 'Ask' }}
+      </button>
+    </div>
+    <p *ngIf="queryError" class="error">{{ queryError }}</p>
+    <div *ngIf="queryResult" class="queryResult">
+      <h3>Answer</h3>
+      <p class="answerText">{{ queryResult.answer }}</p>
+      <div *ngIf="queryResult.sources.length > 0" class="sources">
+        <h4>Sources</h4>
+        <ul>
+          <li *ngFor="let s of queryResult.sources">
+            {{ s.documentName }}<span *ngIf="s.page != null"> (page {{ s.page }})</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>

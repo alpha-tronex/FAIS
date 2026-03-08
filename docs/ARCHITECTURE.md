@@ -32,7 +32,7 @@ FAIS is a **full-stack web application** that replaces a legacy .NET Web Forms s
                                 │
                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  MongoDB (users, case, roletype, lookups, affidavit collections) │
+│  MongoDB (users, case, lookup_role_types, lookups, affidavit collections) │
 │  Optional: node-cron (appointment reminders), OpenAI (reports)   │
 └─────────────────────────────────────────────────────────────────┘
 ```

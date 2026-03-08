@@ -97,13 +97,14 @@ async function seedCollectionFromJson(db: mongoose.mongo.Db, spec: JsonSeedSpec,
 }
 
 async function seedRoleTypes(db: mongoose.mongo.Db): Promise<void> {
-  const col = db.collection('roletype');
+  const col = db.collection('lookup_role_types');
   const seed = [
     { id: 1, name: 'Petitioner' },
     { id: 2, name: 'Respondent' },
     { id: 3, name: 'Petitioner Attorney' },
     { id: 4, name: 'Respondent Attorney' },
-    { id: 5, name: 'Administrator' }
+    { id: 5, name: 'Administrator' },
+    { id: 6, name: 'Legal Assistant' },
   ];
 
   for (const row of seed) {
@@ -117,7 +118,7 @@ async function seedRoleTypes(db: mongoose.mongo.Db): Promise<void> {
   }
 
   // eslint-disable-next-line no-console
-  console.log(`[reset-clean-fais] roletype: ensured ${seed.length} role types`);
+  console.log(`[reset-clean-fais] lookup_role_types: ensured ${seed.length} role types`);
 }
 
 async function seedInitialAdminUser(db: mongoose.mongo.Db): Promise<void> {

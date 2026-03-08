@@ -96,7 +96,7 @@ Backend maps these to Mongo collections (e.g. `lookup_divisions`, `lookup_circui
 - Uses `case` collection; user references by ObjectId.
 
 **Role types**
-- `GET /role-types` — returns list `{ id, name }` from `roletype` collection or in-code fallback.
+- `GET /role-types` — returns list `{ id, name }` from `lookup_role_types` collection or in-code fallback.
 
 **Affidavit API**
 - **Summary:** `GET /affidavit/summary` — short vs long form threshold (e.g. $50k), gross income; optional `?userId=` for admin.

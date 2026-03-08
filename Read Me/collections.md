@@ -40,7 +40,7 @@ These are used as dropdown/reference data in domain pages.
 - `lookup_assets_types`
 - `lookup_liabilities_types`
 - `lookup_non_marital_types`
-- `roletype` (role dropdown; create defaults to 1)
+- `lookup_role_types` (role dropdown; create defaults to 1)
 
 **Case page lookups**
 - `lookup_divisions`

@@ -1,7 +1,7 @@
 /**
  * Stress-test seed: 50 petitioners (with affidavit data), 50 respondents,
  * 5 petitioner attorneys, 5 respondent attorneys, and 50 cases linking them.
- * All user passwords: local123.
+ * All user emails: {uname}@mailsac.com. All user passwords: local123.
  * Run after lookups are seeded (e.g. migrate:reset:clean or migrate:seed:lookups).
  * Usage: npm run seed:stress (from server dir), with MONGODB_URI in env.
  */
@@ -55,7 +55,7 @@ async function main(): Promise<void> {
     }
     const u = await User.create({
       uname,
-      email: `${uname}@stress.local`,
+      email: `${uname}@mailsac.com`,
       firstName: `Petitioner`,
       lastName: `Stress${i}`,
       roleTypeId: 1,
@@ -79,10 +79,12 @@ async function main(): Promise<void> {
     }
     const u = await User.create({
       uname,
-      email: `${uname}@stress.local`,
+      email: `${uname}@mailsac.com`,
       firstName: `Respondent`,
       lastName: `Stress${i}`,
       roleTypeId: 2,
+      passwordHash,
+      mustResetPassword: false,
       createdBy: adminId,
       updatedBy: adminId,
     });
@@ -101,7 +103,7 @@ async function main(): Promise<void> {
     }
     const u = await User.create({
       uname,
-      email: `${uname}@stress.local`,
+      email: `${uname}@mailsac.com`,
       firstName: `PetAttorney`,
       lastName: `Stress${i}`,
       roleTypeId: 3,
@@ -125,10 +127,12 @@ async function main(): Promise<void> {
     }
     const u = await User.create({
       uname,
-      email: `${uname}@stress.local`,
+      email: `${uname}@mailsac.com`,
       firstName: `RespAttorney`,
       lastName: `Stress${i}`,
       roleTypeId: 4,
+      passwordHash,
+      mustResetPassword: false,
       createdBy: adminId,
       updatedBy: adminId,
     });
@@ -136,21 +140,32 @@ async function main(): Promise<void> {
   }
   console.log('[seed-stress] Respondent attorneys:', respondentAttIds.length);
 
-  // 5. Get one county for cases (countyId + circuitId must match)
-  const county = await db.collection('lookup_counties').findOne({});
-  if (!county || typeof (county as any).id !== 'number' || typeof (county as any).circuitId !== 'number') {
+  // 5. Get multiple counties for cases (distribute across counties for realistic queries)
+  const counties = await db
+    .collection('lookup_counties')
+    .find({})
+    .limit(10)
+    .toArray();
+  if (
+    counties.length === 0 ||
+    typeof (counties[0] as any).id !== 'number' ||
+    typeof (counties[0] as any).circuitId !== 'number'
+  ) {
     throw new Error('lookup_counties is empty or invalid. Run migrate:seed:lookups or migrate:reset:clean first.');
   }
-  const countyId = (county as any).id as number;
-  const circuitId = (county as any).circuitId as number;
-  console.log('[seed-stress] Using countyId:', countyId, 'circuitId:', circuitId);
+  console.log('[seed-stress] Using', counties.length, 'counties for case distribution');
 
-  // 6. Create 50 cases (petitioner i + respondent i; spread attorneys)
+  // 6. Create 50 cases (petitioner i + respondent i; spread attorneys and counties)
   const casesCol = db.collection('case');
   for (let i = 0; i < NUM_PETITIONERS; i++) {
     const caseNumber = `STRESS-2025-${String(i + 1).padStart(5, '0')}`;
     const existing = await casesCol.findOne({ caseNumber });
     if (existing) continue;
+
+    // Distribute cases across available counties
+    const county = counties[i % counties.length] as unknown as { id: number; circuitId: number };
+    const countyId = county.id;
+    const circuitId = county.circuitId;
 
     const petitionerAttIndex = i % NUM_PETITIONER_ATTORNEYS;
     const respondentAttIndex = i % NUM_RESPONDENT_ATTORNEYS;
@@ -172,7 +187,7 @@ async function main(): Promise<void> {
       updatedAt: now,
     });
   }
-  console.log('[seed-stress] Cases: 50');
+  console.log('[seed-stress] Cases: 50 (distributed across', counties.length, 'counties)');
 
   // 7. Affidavit data for each petitioner: employment, income, expenses, assets, liabilities
   const payFrequencyTypeId = 3; // Monthly

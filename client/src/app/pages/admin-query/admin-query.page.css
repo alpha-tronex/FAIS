@@ -7,11 +7,33 @@
   margin-top: 1rem;
 }
 
+.suggestedHeader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
 .suggestedTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   color: var(--text-secondary, #555);
+}
+
+.refreshSuggestionsBtn {
+  padding: 0.35rem 0.6rem;
+  background: transparent;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  color: var(--accent, #0066cc);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.refreshSuggestionsBtn:hover {
+  background: color-mix(in srgb, var(--accent, #0066cc) 10%, transparent);
 }
 
 .suggestedList {
@@ -90,6 +112,84 @@
   margin: 0.5rem 0 0 0;
   white-space: pre-wrap;
   line-height: 1.5;
+}
+
+.summaryList {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+  line-height: 1.6;
+}
+
+.summaryList li {
+  margin-bottom: 0.25rem;
+}
+
+.summarySection {
+  margin-top: 1rem;
+}
+
+.summarySection:first-child {
+  margin-top: 0.5rem;
+}
+
+.summarySectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem 0;
+  color: var(--text-primary, #111);
+}
+
+.clarificationFollowUp label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #555);
+}
+
+.clarificationInputRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.clarificationInputRow input {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.clarificationInputRow input:focus {
+  outline: none;
+  border-color: var(--accent, #0066cc);
+}
+
+.submitClarificationBtn {
+  padding: 0.5rem 1rem;
+  background: var(--accent, #0066cc);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submitClarificationBtn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.submitClarificationBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mt12 {
+  margin-top: 0.75rem;
 }
 .linkBtn {
   background: none;

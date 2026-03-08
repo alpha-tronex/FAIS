@@ -4,7 +4,13 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export type AdminQueryResponse = {
-  summary: string;
+  /** When present, the question was ambiguous; show this and do not show results. */
+  clarification?: string;
+  summary: string | null;
+  /** When present, render summary as a ul/li list (e.g. counties with income). */
+  summaryList?: string[];
+  /** When present, render as sections with title + ul/li (e.g. affidavit data grouped by petitioner). */
+  summarySections?: { title: string; items: string[] }[];
   count: number;
   results: unknown[];
 };
@@ -15,10 +21,11 @@ export class AdminQueryService {
 
   constructor(private readonly http: HttpClient) {}
 
-  query(question: string): Promise<AdminQueryResponse> {
+  query(question: string, options?: { skipClarification?: boolean }): Promise<AdminQueryResponse> {
     return firstValueFrom(
       this.http.post<AdminQueryResponse>(`${this.apiBase}/admin/query`, {
         question: question.trim(),
+        skipClarification: options?.skipClarification === true,
       })
     );
   }

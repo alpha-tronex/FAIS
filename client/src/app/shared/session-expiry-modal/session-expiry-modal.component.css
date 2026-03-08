@@ -39,7 +39,3 @@
   background: color-mix(in srgb, var(--accent) 10%, #fff);
 }
 
-html[data-theme='c'] .confirmButton {
-  border-color: var(--accent);
-  background: #e8f0ff;
-}

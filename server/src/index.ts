@@ -16,6 +16,8 @@ import { createLookupsRouter } from './routes/lookups.routes.js';
 import { createAffidavitRouter } from './routes/affidavit.routes.js';
 import { createAppointmentsRouter } from './routes/appointments.routes.js';
 import { createAdminRouter } from './routes/admin.routes.js';
+import { createDocumentsRouter } from './routes/documents.routes.js';
+import { refreshDiscoveredSchema } from './lib/ai-query-schema-discovery.js';
 import { createMessagesRouter } from './routes/messages.routes.js';
 import { scheduleAppointmentReminderJob } from './jobs/appointment-reminder.job.js';
 
@@ -85,7 +87,7 @@ app.use(
   })
 );
 
-const { requireAuth, requireAdmin, requireStaffOrAdmin } = createAuthMiddlewares(jwtSecret);
+const { requireAuth, requireAdmin, requireStaffOrAdmin, requireAdminOrAiStaff } = createAuthMiddlewares(jwtSecret);
 
 // Mount all API routes under /api for production (client calls /api/...)
 const apiRouter = express.Router();
@@ -93,11 +95,12 @@ apiRouter.use(createHealthRouter());
 apiRouter.use(createRoleTypesRouter({ requireAuth }));
 apiRouter.use(createAuthRouter({ jwtSecret, jwtExpiresIn, requireAuth }));
 apiRouter.use(createUsersRouter({ requireAuth, requireAdmin }));
+apiRouter.use(createDocumentsRouter({ requireAuth, requireAdminOrAiStaff }));
 apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
 apiRouter.use(createLookupsRouter({ requireAuth }));
 apiRouter.use(createAffidavitRouter({ requireAuth }));
 apiRouter.use(createAppointmentsRouter({ requireAuth }));
-apiRouter.use(createAdminRouter({ requireAuth, requireAdmin }));
+apiRouter.use(createAdminRouter({ requireAuth, requireAdmin, requireAdminOrAiStaff }));
 apiRouter.use(createMessagesRouter({ requireAuth }));
 app.use('/api', apiRouter);
 
@@ -137,12 +140,12 @@ async function main() {
   }
 
   try {
-    const roleTypeCount = await mongoose.connection.collection('roletype').countDocuments({});
+    const roleTypeCount = await mongoose.connection.collection('lookup_role_types').countDocuments({});
     if (roleTypeCount === 0) {
       // eslint-disable-next-line no-console
       console.warn(
-        `WARNING: Collection 'roletype' is empty or missing. ` +
-          `Run: npm run migrate:seed:role-types (with correct MONGODB_URI).`
+        `WARNING: Collection 'lookup_role_types' is empty or missing. ` +
+          `Run: npm run migrate:seed:role-types (with correct MONGODB_URI) to seed lookup_role_types.`
       );
     }
   } catch {
@@ -166,6 +169,14 @@ async function main() {
     }
   } catch {
     // ignore
+  }
+
+  // AI Query: refresh discovered schema for admin query prompt (best-effort, non-blocking)
+  try {
+    await refreshDiscoveredSchema();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('AI query schema discovery failed (will use static schema):', (err as Error).message);
   }
 
   app.listen(PORT, () => {

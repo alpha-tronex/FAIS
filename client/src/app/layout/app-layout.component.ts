@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 export class AppLayoutComponent {
   constructor(private readonly router: Router) {}
 
-  /** Show header and footer only when not on login/register/reset/forgot-password/reset-password (or root redirect). */
+  /** Show header and footer only when not on login/register/reset/forgot-password/reset-password or splash (root). */
   get showChrome(): boolean {
     const url = this.router.url;
     const path = url.split('?')[0];
@@ -20,7 +20,8 @@ export class AppLayoutComponent {
       path !== '/reset' &&
       path !== '/forgot-password' &&
       path !== '/reset-password' &&
-      path !== ''
+      path !== '' &&
+      path !== '/'
     );
   }
 }

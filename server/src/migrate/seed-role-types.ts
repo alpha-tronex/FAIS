@@ -14,7 +14,7 @@ async function main() {
   await mongoose.connect(mongoUri);
 
   // Use a dedicated collection for role types.
-  const col = mongoose.connection.collection('roletype');
+  const col = mongoose.connection.collection('lookup_role_types');
 
   const seed = [
     { id: 1, name: 'Petitioner' },
@@ -35,7 +35,7 @@ async function main() {
     // Ignore if duplicates exist; seed remains usable.
   }
 
-  console.log(`Seeded ${seed.length} role types into collection 'roletype'.`);
+  console.log(`Seeded ${seed.length} role types into collection 'lookup_role_types'.`);
 }
 
 main()
