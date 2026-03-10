@@ -29,6 +29,8 @@ export class MessagesPage implements OnInit, OnDestroy {
   sendBusy = false;
   error: string | null = null;
   markReadBusy = false;
+  /** Search filter for Start new recipient list (admins, petitioner attorneys, legal assistants). */
+  recipientSearch = '';
 
   private sub: Subscription | null = null;
   /** Current user id for template (isFromMe, read label). */
@@ -59,6 +61,23 @@ export class MessagesPage implements OnInit, OnDestroy {
     if (!u) return '—';
     const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim();
     return name || u.uname || u.id || '—';
+  }
+
+  /** True for admin (5), petitioner attorney (3), legal assistant (6) — show recipient search. */
+  get showRecipientSearch(): boolean {
+    return this.auth.hasRole(3, 5, 6);
+  }
+
+  /** Recipients filtered by recipientSearch (name or uname); full list when search empty or not shown. */
+  get filteredRecipients(): MessageRecipient[] {
+    if (!this.showRecipientSearch) return this.recipients;
+    const q = this.recipientSearch.trim().toLowerCase();
+    if (!q) return this.recipients;
+    return this.recipients.filter((r) => {
+      const name = this.displayName(r).toLowerCase();
+      const uname = (r.uname ?? '').toLowerCase();
+      return name.includes(q) || uname.includes(q);
+    });
   }
 
   selectConversation(item: ConversationItem): void {

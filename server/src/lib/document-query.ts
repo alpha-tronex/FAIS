@@ -6,7 +6,7 @@
 import mongoose from 'mongoose';
 import OpenAI from 'openai';
 import { OpenAIEmbeddings } from '@langchain/openai';
-import { DocumentChunkModel } from '../models/document.model.js';
+import { DocumentChunkModel, DocumentModel } from '../models/document.model.js';
 import { getOpenAIClient } from './openai.js';
 
 const EMBEDDING_MODEL = 'text-embedding-3-small';
@@ -39,7 +39,7 @@ export type DocumentQueryResult = {
 async function vectorSearchChunks(
   queryVector: number[],
   limit: number = TOP_K
-): Promise<{ text: string; documentName: string; page?: number }[]> {
+): Promise<{ text: string; documentName: string; page?: number; documentId: mongoose.Types.ObjectId }[]> {
   const coll = mongoose.connection.collection('document_chunks');
   const cursor = coll.aggregate([
     {
@@ -56,14 +56,16 @@ async function vectorSearchChunks(
         text: 1,
         documentName: 1,
         page: 1,
+        documentId: 1,
       },
     },
   ]);
   const docs = await cursor.toArray();
-  return (docs as { text?: string; documentName?: string; page?: number }[]).map((d) => ({
+  return (docs as { text?: string; documentName?: string; page?: number; documentId?: unknown }[]).map((d) => ({
     text: d.text ?? '',
     documentName: d.documentName ?? 'document',
     page: d.page ?? undefined,
+    documentId: d.documentId as mongoose.Types.ObjectId,
   }));
 }
 
@@ -73,9 +75,9 @@ async function vectorSearchChunks(
 async function vectorSearchChunksFallback(
   queryVector: number[],
   limit: number = TOP_K
-): Promise<{ text: string; documentName: string; page?: number }[]> {
+): Promise<{ text: string; documentName: string; page?: number; documentId: mongoose.Types.ObjectId }[]> {
   const chunks = await DocumentChunkModel.find({})
-    .select({ text: 1, documentName: 1, page: 1, embedding: 1 })
+    .select({ text: 1, documentName: 1, page: 1, embedding: 1, documentId: 1 })
     .lean();
   if (chunks.length === 0) return [];
 
@@ -93,11 +95,16 @@ async function vectorSearchChunksFallback(
     return denom === 0 ? 0 : dot / denom;
   }
 
-  const withScore = (chunks as { text: string; documentName: string; page?: number; embedding: number[] }[]).map(
-    (c) => ({ ...c, score: cosineSimilarity(c.embedding, queryVector) })
-  );
+  const withScore = (
+    chunks as { text: string; documentName: string; page?: number; embedding: number[]; documentId: mongoose.Types.ObjectId }[]
+  ).map((c) => ({ ...c, score: cosineSimilarity(c.embedding, queryVector) }));
   withScore.sort((a, b) => b.score - a.score);
-  return withScore.slice(0, limit).map(({ text, documentName, page }) => ({ text, documentName, page }));
+  return withScore.slice(0, limit).map(({ text, documentName, page, documentId }) => ({
+    text,
+    documentName,
+    page,
+    documentId,
+  }));
 }
 
 export async function queryDocuments(question: string): Promise<DocumentQueryResult> {
@@ -107,12 +114,25 @@ export async function queryDocuments(question: string): Promise<DocumentQueryRes
     return { answer: 'No embedding could be generated for the question.', sources: [] };
   }
 
-  let chunks: { text: string; documentName: string; page?: number }[];
+  let chunks: { text: string; documentName: string; page?: number; documentId: mongoose.Types.ObjectId }[];
   try {
     chunks = await vectorSearchChunks(queryVector, TOP_K);
   } catch {
     chunks = await vectorSearchChunksFallback(queryVector, TOP_K);
   }
+
+  const deletedDocumentIds = new Set<string>();
+  if (chunks.length > 0) {
+    const documentIds = [...new Set(chunks.map((c) => c.documentId.toString()))];
+    const deleted = await DocumentModel.find({
+      _id: { $in: documentIds.map((id) => new mongoose.Types.ObjectId(id)) },
+      deletedAt: { $exists: true, $ne: null },
+    })
+      .select({ _id: 1 })
+      .lean();
+    for (const d of deleted) deletedDocumentIds.add(d._id.toString());
+  }
+  chunks = chunks.filter((c) => !deletedDocumentIds.has(c.documentId.toString()));
 
   if (chunks.length === 0) {
     return {

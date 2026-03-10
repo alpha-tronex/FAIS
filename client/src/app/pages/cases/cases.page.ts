@@ -53,6 +53,11 @@ export class CasesPage implements OnInit, OnDestroy {
 
   canCreate = false;
 
+  /** Current sort column for All cases table. */
+  casesSortColumn: 'caseNumber' | 'division' | 'petitioner' | 'respondent' = 'caseNumber';
+  /** Sort direction for All cases table. */
+  casesSortDirection: 'asc' | 'desc' = 'asc';
+
   subscription: Subscription | null = null;
 
   constructor(
@@ -82,6 +87,66 @@ export class CasesPage implements OnInit, OnDestroy {
     return name ? `${name} (${u.uname})` : u.uname;
   }
 
+  /** Petitioner display for table cell (lastName, firstName). */
+  petitionerLabel(c: CaseListItem): string {
+    if (!c.petitioner) return '';
+    return `${c.petitioner.lastName ?? ''}, ${c.petitioner.firstName ?? ''}`.trim();
+  }
+
+  /** Respondent display for table cell (lastName, firstName). */
+  respondentLabel(c: CaseListItem): string {
+    if (!c.respondent) return '';
+    return `${c.respondent.lastName ?? ''}, ${c.respondent.firstName ?? ''}`.trim();
+  }
+
+  /** Cases sorted by current casesSortColumn and casesSortDirection. */
+  get sortedCases(): CaseListItem[] {
+    const col = this.casesSortColumn;
+    const dir = this.casesSortDirection === 'asc' ? 1 : -1;
+    return [...this.cases].sort((a, b) => {
+      let aVal: string | number;
+      let bVal: string | number;
+      switch (col) {
+        case 'caseNumber':
+          aVal = a.caseNumber ?? '';
+          bVal = b.caseNumber ?? '';
+          break;
+        case 'division':
+          aVal = a.division ?? '';
+          bVal = b.division ?? '';
+          break;
+        case 'petitioner':
+          aVal = this.petitionerLabel(a);
+          bVal = this.petitionerLabel(b);
+          break;
+        case 'respondent':
+          aVal = this.respondentLabel(a);
+          bVal = this.respondentLabel(b);
+          break;
+        default:
+          return 0;
+      }
+      const aStr = String(aVal);
+      const bStr = String(bVal);
+      return dir * (aStr === bStr ? 0 : aStr < bStr ? -1 : 1);
+    });
+  }
+
+  /** Toggle sort on column: same column flips direction, new column sets asc. */
+  setCasesSort(column: 'caseNumber' | 'division' | 'petitioner' | 'respondent'): void {
+    if (this.casesSortColumn === column) {
+      this.casesSortDirection = this.casesSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.casesSortColumn = column;
+      this.casesSortDirection = 'asc';
+    }
+  }
+
+  /** True if the given column is the current sort column. */
+  isCasesSortColumn(column: 'caseNumber' | 'division' | 'petitioner' | 'respondent'): boolean {
+    return this.casesSortColumn === column;
+  }
+
   private applyUserTypeFilters() {
     // Create-case dropdowns are filtered by the simplified RoleType IDs.
     // 1 Petitioner, 2 Respondent, 3 Petitioner Attorney, 4 Respondent Attorney, 5 Administrator, 6 Legal Assistant
@@ -106,9 +171,6 @@ export class CasesPage implements OnInit, OnDestroy {
   }
 
   private loadAll() {
-
-      console.log('this.cases', this.cases);
-
     return forkJoin({
       users: from(this.usersApi.list()),
       cases: from(this.casesApi.list()),

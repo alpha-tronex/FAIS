@@ -79,9 +79,10 @@
               {{ retryBusy[doc.id] ? 'Retrying…' : 'Retry' }}
             </button>
             <button
+              *ngIf="canDeleteDocuments"
               type="button"
               class="actionBtn danger"
-              (click)="deleteDoc(doc)"
+              (click)="openDeleteConfirm(doc)"
               [disabled]="deleteBusy[doc.id]"
             >
               {{ deleteBusy[doc.id] ? 'Deleting…' : 'Delete' }}
@@ -127,4 +128,15 @@
       </div>
     </div>
   </section>
+
+  <app-confirm-popup
+    [open]="showDeleteConfirm"
+    [title]="deleteConfirmTitle"
+    [message]="deleteConfirmMessage"
+    confirmText="Delete"
+    cancelText="Cancel"
+    [danger]="true"
+    (confirm)="onConfirmDeleteDoc()"
+    (cancel)="onCancelDeleteConfirm()"
+  />
 </main>

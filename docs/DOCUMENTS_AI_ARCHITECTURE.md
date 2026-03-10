@@ -19,7 +19,7 @@ Admin: Vector Search → LLM Q&A with citations
 - **Ownership:** Documents are tied to a **case**. Only **petitioners** (roleTypeId 1) can upload; only **admins** (roleTypeId 5) can run the global Q&A.
 - **Query scope:** **Global** — admin searches across all documents in the system.
 - **Download:** Users with access to the document's case get a **presigned URL** (Option B) to download the original PDF from B2.
-- **Deletion:** **Hard delete** — remove object from B2 and delete all chunks for that document; no orphan data.
+- **Deletion:** **Soft delete** — only administrators may delete; the document is marked as deleted (retention for compliance). The file remains in B2; chunks remain but are excluded from search. Each deletion is recorded in an audit log.
 
 ---
 
@@ -28,11 +28,20 @@ Admin: Vector Search → LLM Q&A with citations
 | Action           | Who can do it |
 |-----------------|----------------|
 | Upload document | Petitioner for that case (`case.petitionerId === auth.sub`) |
-| List documents  | User with access to the case (petitioner, respondent, attorneys, admin) |
-| Download        | User with access to the case |
-| Retry processing| Petitioner for that case or admin |
-| Delete document | Petitioner for that case or admin |
-| Query (Q&A)     | Admin only |
+| List documents  | User with access to the case (petitioner, respondent, attorneys, admin). Only non–soft-deleted documents are listed. |
+| Download        | User with access to the case. Soft-deleted documents return 410 unless the user is an admin (for compliance access). |
+| Retry processing| Petitioner for that case or admin (not allowed for soft-deleted documents). |
+| Delete document | **Administrator only** (e.g. when petitioner is unavailable). Soft delete + audit log. |
+| Query (Q&A)     | Admin only. Results exclude soft-deleted documents. |
+
+### Admin document deletion policy
+
+Administrators may delete a petitioner's documents only when:
+
+- The petitioner is no longer available to log in (e.g. incapacitated, deceased, or no longer involved), or
+- The petitioner or a legal authority has requested deletion.
+
+Deletions are **soft deletes**: the document record is marked with `deletedAt` and `deletedBy`; the file is retained in B2 for a configurable retention period. Each deletion is logged in `document_deletion_audit` (userId, documentId, caseId, documentOriginalName, timestamp). Obtain legal/HR sign-off for your retention and deletion policy as needed.
 
 Case access reuses the existing `canSeeCase`-style logic (petitioner, respondent, petitioner/respondent attorney, legal assistant, admin).
 
@@ -53,12 +62,27 @@ Case access reuses the existing `canSeeCase`-style logic (petitioner, respondent
 | `size`         | number   | File size in bytes |
 | `status`       | string   | `uploaded` \| `processing` \| `ready` \| `failed` |
 | `errorMessage` | string?  | Set when `status === 'failed'` (for UI + Retry) |
+| `deletedAt`    | Date?    | Set when document is soft-deleted (admin only). |
+| `deletedBy`    | ObjectId?| User who soft-deleted (admin). |
 | `createdAt`    | Date     | |
 | `updatedAt`    | Date     | |
 
-Indexes: `caseId`, `status`, `uploadedBy`.
+Indexes: `caseId`, `status`, `uploadedBy`, `deletedAt`.
 
-### 3.2 `document_chunks` (MongoDB collection)
+### 3.2 `document_deletion_audit` (MongoDB collection)
+
+Audit log for document soft-deletes. Supports compliance and “who deleted what” questions.
+
+| Field                   | Type     | Description |
+|-------------------------|----------|-------------|
+| `_id`                   | ObjectId | |
+| `userId`                | ObjectId | Admin who performed the delete. |
+| `documentId`            | ObjectId | Ref `documents`. |
+| `caseId`                | ObjectId | Ref `case`. |
+| `documentOriginalName`  | string   | Original filename at time of delete. |
+| `createdAt`             | Date     | Timestamp of the deletion. |
+
+### 3.3 `document_chunks` (MongoDB collection)
 
 | Field         | Type     | Description |
 |---------------|----------|-------------|
@@ -84,7 +108,7 @@ Indexes: `caseId`, `status`, `uploadedBy`.
 
 - **Key format:** `documents/{documentId}.pdf` (unique per document; easy delete).
 
-- **Operations:** upload buffer, get object (for processing), delete object, presigned GET URL for download.
+- **Operations:** upload buffer, get object (for processing), presigned GET URL for download. Soft-deleted documents are not removed from B2; a separate retention job may hard-delete after the retention period.
 
 ---
 
@@ -96,7 +120,7 @@ Indexes: `caseId`, `status`, `uploadedBy`.
 | GET    | `/api/cases/:caseId/documents` | Can see case | List documents for case |
 | GET    | `/api/cases/:caseId/documents/:documentId/download` | Can see case | Return `{ url }` presigned GET URL |
 | POST   | `/api/cases/:caseId/documents/:documentId/retry` | Petitioner or admin | Set status to `uploaded`, trigger processing |
-| DELETE | `/api/cases/:caseId/documents/:documentId` | Petitioner or admin | Delete from B2, delete chunks, delete document |
+| DELETE | `/api/cases/:caseId/documents/:documentId` | **Admin only** | Soft delete (set deletedAt/deletedBy), write audit log; file and chunks retained for retention period |
 | POST   | `/api/documents/query` | Admin | Body `{ question }` → vector search → LLM → `{ answer, sources }` |
 
 ---

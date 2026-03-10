@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { SharedModule } from '../../shared/shared.module';
 import { DocumentsPage } from './documents.page';
 import { DOCUMENTS_ROUTES } from './documents.routes';
 
@@ -10,7 +11,8 @@ import { DOCUMENTS_ROUTES } from './documents.routes';
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule.forChild(DOCUMENTS_ROUTES)
+    RouterModule.forChild(DOCUMENTS_ROUTES),
+    SharedModule
   ]
 })
 export class DocumentsModule {}

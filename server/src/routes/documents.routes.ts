@@ -6,8 +6,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
-import { CaseModel, DocumentModel, DocumentChunkModel } from '../models.js';
-import { uploadBuffer, getObject, deleteObject, getPresignedGetUrl, isB2Configured } from '../lib/b2-storage.js';
+import { CaseModel, DocumentModel, DocumentDeletionAuditModel } from '../models.js';
+import { uploadBuffer, getPresignedGetUrl, isB2Configured } from '../lib/b2-storage.js';
 import { processDocument } from '../lib/document-processing.js';
 import { queryDocuments } from '../lib/document-query.js';
 import { sendError, sendErrorWithMessage } from './error.js';
@@ -42,8 +42,13 @@ function isPetitionerForCase(c: { petitionerId?: unknown }, auth: AuthPayload): 
   return toIdStr(c.petitionerId) === auth.sub;
 }
 
-function canDeleteOrRetry(c: { petitionerId?: unknown }, auth: AuthPayload): boolean {
+function canRetry(c: { petitionerId?: unknown }, auth: AuthPayload): boolean {
   return auth.roleTypeId === 5 || isPetitionerForCase(c, auth);
+}
+
+/** Only admins may delete documents (e.g. when petitioner is unavailable). */
+function isAdmin(auth: AuthPayload): boolean {
+  return auth.roleTypeId === 5;
 }
 
 const upload = multer({
@@ -51,8 +56,11 @@ const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE },
 });
 
+/** Filter for documents that are not soft-deleted. */
+const notDeletedFilter = { $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] };
+
 export function createDocumentsRouter(
-  auth: Pick<AuthMiddlewares, 'requireAuth' | 'requireAdminOrAiStaff'>
+  auth: Pick<AuthMiddlewares, 'requireAuth' | 'requireAdminOrAiStaff' | 'requireAdmin'>
 ): express.Router {
   const router = express.Router();
 
@@ -66,7 +74,10 @@ export function createDocumentsRouter(
     if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
     if (!canSeeCase(authPayload, caseDoc)) return res.status(403).json({ error: 'Forbidden' });
 
-    const docs = await DocumentModel.find({ caseId: new mongoose.Types.ObjectId(caseId) })
+    const docs = await DocumentModel.find({
+      caseId: new mongoose.Types.ObjectId(caseId),
+      ...notDeletedFilter,
+    })
       .sort({ createdAt: -1 })
       .lean();
     res.json(
@@ -159,6 +170,9 @@ export function createDocumentsRouter(
       caseId: new mongoose.Types.ObjectId(caseId),
     }).lean();
     if (!doc) return res.status(404).json({ error: 'Document not found' });
+    if (doc.deletedAt && !isAdmin(authPayload)) {
+      return res.status(410).json({ error: 'Document has been deleted.' });
+    }
 
     try {
       const url = await getPresignedGetUrl(doc.b2Key);
@@ -177,13 +191,16 @@ export function createDocumentsRouter(
     }
     const caseDoc = await CaseModel.findById(caseId).lean();
     if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
-    if (!canDeleteOrRetry(caseDoc, authPayload)) return res.status(403).json({ error: 'Forbidden' });
+    if (!canRetry(caseDoc, authPayload)) return res.status(403).json({ error: 'Forbidden' });
 
     const doc = await DocumentModel.findOne({
       _id: new mongoose.Types.ObjectId(documentId),
       caseId: new mongoose.Types.ObjectId(caseId),
     });
     if (!doc) return res.status(404).json({ error: 'Document not found' });
+    if (doc.deletedAt) {
+      return res.status(410).json({ error: 'Document has been deleted and cannot be retried.' });
+    }
     if (doc.status !== 'failed') {
       return sendErrorWithMessage(res, 'Only failed documents can be retried.', 400);
     }
@@ -202,7 +219,7 @@ export function createDocumentsRouter(
     });
   });
 
-  router.delete('/cases/:caseId/documents/:documentId', auth.requireAuth, async (req, res) => {
+  router.delete('/cases/:caseId/documents/:documentId', auth.requireAuth, auth.requireAdmin, async (req, res) => {
     const authPayload = (req as express.Request & { auth: AuthPayload }).auth;
     const caseId = typeof req.params.caseId === 'string' ? req.params.caseId : undefined;
     const documentId = typeof req.params.documentId === 'string' ? req.params.documentId : undefined;
@@ -211,21 +228,27 @@ export function createDocumentsRouter(
     }
     const caseDoc = await CaseModel.findById(caseId).lean();
     if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
-    if (!canDeleteOrRetry(caseDoc, authPayload)) return res.status(403).json({ error: 'Forbidden' });
 
     const doc = await DocumentModel.findOne({
       _id: new mongoose.Types.ObjectId(documentId),
       caseId: new mongoose.Types.ObjectId(caseId),
     });
     if (!doc) return res.status(404).json({ error: 'Document not found' });
-
-    try {
-      await deleteObject(doc.b2Key);
-    } catch (e) {
-      console.error('[documents] B2 delete failed', doc.b2Key, e);
+    if (doc.deletedAt) {
+      return res.status(410).json({ error: 'Document is already deleted.' });
     }
-    await DocumentChunkModel.deleteMany({ documentId: doc._id });
-    await DocumentModel.findByIdAndDelete(doc._id);
+
+    const now = new Date();
+    doc.deletedAt = now;
+    doc.deletedBy = new mongoose.Types.ObjectId(authPayload.sub);
+    await doc.save();
+
+    await DocumentDeletionAuditModel.create({
+      userId: doc.deletedBy,
+      documentId: doc._id,
+      caseId: new mongoose.Types.ObjectId(caseId),
+      documentOriginalName: doc.originalName,
+    });
 
     res.status(204).send();
   });

@@ -29,14 +29,23 @@
 
       <section class="panel">
         <h2 class="panelTitle">Start new</h2>
+        <input
+          *ngIf="showRecipientSearch"
+          type="search"
+          class="recipientSearch"
+          [(ngModel)]="recipientSearch"
+          placeholder="Search recipients…"
+          aria-label="Search recipients"
+        />
         <ul class="recipientList" *ngIf="recipients.length > 0">
-          <li *ngFor="let r of recipients">
+          <li *ngFor="let r of filteredRecipients">
             <button type="button" class="recipientBtn" (click)="selectRecipient(r)">
               {{ displayName(r) }}
             </button>
           </li>
         </ul>
         <p *ngIf="recipients.length === 0" class="muted">No recipients available.</p>
+        <p *ngIf="recipients.length > 0 && filteredRecipients.length === 0" class="muted">No recipients match your search.</p>
       </section>
     </aside>
 

@@ -13,3 +13,19 @@
 .mini {
   padding: 6px 10px;
 }
+
+.thSortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.thSortable:hover {
+  text-decoration: underline;
+}
+
+.sortIndicator {
+  margin-left: 4px;
+  font-weight: bold;
+  opacity: 0.9;
+}

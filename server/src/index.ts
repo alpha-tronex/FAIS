@@ -95,7 +95,7 @@ apiRouter.use(createHealthRouter());
 apiRouter.use(createRoleTypesRouter({ requireAuth }));
 apiRouter.use(createAuthRouter({ jwtSecret, jwtExpiresIn, requireAuth }));
 apiRouter.use(createUsersRouter({ requireAuth, requireAdmin }));
-apiRouter.use(createDocumentsRouter({ requireAuth, requireAdminOrAiStaff }));
+apiRouter.use(createDocumentsRouter({ requireAuth, requireAdminOrAiStaff, requireAdmin }));
 apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
 apiRouter.use(createLookupsRouter({ requireAuth }));
 apiRouter.use(createAffidavitRouter({ requireAuth }));

@@ -31,6 +31,8 @@ export class DocumentsPage implements OnInit, OnDestroy {
   deleteBusy: Record<string, boolean> = {};
   retryBusy: Record<string, boolean> = {};
   dragOver = false;
+  showDeleteConfirm = false;
+  documentToDelete: DocumentListItem | null = null;
   private pollTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -88,9 +90,23 @@ export class DocumentsPage implements OnInit, OnDestroy {
     return this.auth.hasRole(3, 5, 6);
   }
 
+  /** Only administrators may delete documents (e.g. when petitioner is unavailable). */
+  get canDeleteDocuments(): boolean {
+    return this.auth.isAdmin();
+  }
+
   get selectedCase(): CaseListItem | null {
     if (!this.selectedCaseId) return null;
     return this.cases.find((c) => c.id === this.selectedCaseId) ?? null;
+  }
+
+  get deleteConfirmTitle(): string {
+    const name = this.documentToDelete?.originalName ?? 'document';
+    return `Delete "${name}"?`;
+  }
+
+  get deleteConfirmMessage(): string {
+    return 'This cannot be undone.';
   }
 
   get canUpload(): boolean {
@@ -266,19 +282,36 @@ export class DocumentsPage implements OnInit, OnDestroy {
     }
   }
 
-  async deleteDoc(doc: DocumentListItem): Promise<void> {
+  openDeleteConfirm(doc: DocumentListItem): void {
     if (!this.selectedCaseId) return;
-    if (!confirm(`Delete "${doc.originalName}"? This cannot be undone.`)) return;
-    this.deleteBusy[doc.id] = true;
-    try {
-      await this.documentsApi.delete(this.selectedCaseId, doc.id);
-      void this.loadDocuments();
-    } catch (e: unknown) {
-      const err = e as { error?: { error?: string } };
-      alert(err?.error?.error ?? 'Delete failed');
-    } finally {
-      this.deleteBusy[doc.id] = false;
+    this.documentToDelete = doc;
+    this.showDeleteConfirm = true;
+  }
+
+  onCancelDeleteConfirm(): void {
+    this.showDeleteConfirm = false;
+    this.documentToDelete = null;
+  }
+
+  onConfirmDeleteDoc(): void {
+    const doc = this.documentToDelete;
+    if (!doc || !this.selectedCaseId) {
+      this.onCancelDeleteConfirm();
+      return;
     }
+    this.showDeleteConfirm = false;
+    this.documentToDelete = null;
+    this.deleteBusy[doc.id] = true;
+    this.documentsApi
+      .delete(this.selectedCaseId, doc.id)
+      .then(() => void this.loadDocuments())
+      .catch((e: unknown) => {
+        const err = e as { error?: { error?: string } };
+        alert(err?.error?.error ?? 'Delete failed');
+      })
+      .finally(() => {
+        this.deleteBusy[doc.id] = false;
+      });
   }
 
   runQuery(): void {

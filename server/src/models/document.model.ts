@@ -13,9 +13,13 @@ const documentSchema = new mongoose.Schema(
     size: { type: Number, required: true },
     status: { type: String, required: true, enum: DOCUMENT_STATUS, default: 'uploaded', index: true },
     errorMessage: { type: String, default: null },
+    deletedAt: { type: Date, default: null },
+    deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   },
   { timestamps: true, collection: 'documents', strict: true }
 );
+
+documentSchema.index({ deletedAt: 1 });
 
 export type DocumentDoc = mongoose.InferSchemaType<typeof documentSchema>;
 export const DocumentModel = mongoose.model('Document', documentSchema);

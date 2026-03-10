@@ -4,3 +4,4 @@ export * from './case.model.js';
 export * from './appointment.model.js';
 export * from './message.model.js';
 export * from './document.model.js';
+export * from './document-deletion-audit.model.js';

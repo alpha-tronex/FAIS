@@ -51,6 +51,7 @@ async function chunkText(text: string): Promise<{ text: string; page: number | n
 export async function processDocument(documentId: mongoose.Types.ObjectId): Promise<void> {
   const doc = await DocumentModel.findById(documentId).lean();
   if (!doc) throw new Error('Document not found');
+  if (doc.deletedAt) return;
   if (doc.status !== 'uploaded') return;
 
   await DocumentModel.findByIdAndUpdate(documentId, {

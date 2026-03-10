@@ -104,24 +104,32 @@
     <table *ngIf="cases.length > 0" class="table">
       <thead>
         <tr>
-          <th class="th">Case #</th>
-          <th class="th">Division</th>
-          <th class="th">Petitioner</th>
-          <th class="th">Respondent</th>
+          <th class="th thSortable" (click)="setCasesSort('caseNumber')" role="button" tabindex="0" (keydown.enter)="setCasesSort('caseNumber')" (keydown.space)="$event.preventDefault(); setCasesSort('caseNumber')">
+            Case #
+            <span *ngIf="isCasesSortColumn('caseNumber')" class="sortIndicator" aria-label="Sorted {{ casesSortDirection === 'asc' ? 'ascending' : 'descending' }}">{{ casesSortDirection === 'asc' ? '↑' : '↓' }}</span>
+          </th>
+          <th class="th thSortable" (click)="setCasesSort('division')" role="button" tabindex="0" (keydown.enter)="setCasesSort('division')" (keydown.space)="$event.preventDefault(); setCasesSort('division')">
+            Division
+            <span *ngIf="isCasesSortColumn('division')" class="sortIndicator" aria-label="Sorted {{ casesSortDirection === 'asc' ? 'ascending' : 'descending' }}">{{ casesSortDirection === 'asc' ? '↑' : '↓' }}</span>
+          </th>
+          <th class="th thSortable" (click)="setCasesSort('petitioner')" role="button" tabindex="0" (keydown.enter)="setCasesSort('petitioner')" (keydown.space)="$event.preventDefault(); setCasesSort('petitioner')">
+            Petitioner
+            <span *ngIf="isCasesSortColumn('petitioner')" class="sortIndicator" aria-label="Sorted {{ casesSortDirection === 'asc' ? 'ascending' : 'descending' }}">{{ casesSortDirection === 'asc' ? '↑' : '↓' }}</span>
+          </th>
+          <th class="th thSortable" (click)="setCasesSort('respondent')" role="button" tabindex="0" (keydown.enter)="setCasesSort('respondent')" (keydown.space)="$event.preventDefault(); setCasesSort('respondent')">
+            Respondent
+            <span *ngIf="isCasesSortColumn('respondent')" class="sortIndicator" aria-label="Sorted {{ casesSortDirection === 'asc' ? 'ascending' : 'descending' }}">{{ casesSortDirection === 'asc' ? '↑' : '↓' }}</span>
+          </th>
           <th class="th">Edit</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let c of cases">
+        <tr *ngFor="let c of sortedCases">
           <td class="td">{{ c.caseNumber }}</td>
           <td class="td">{{ c.division }}</td>
-          <td class="td">
-            {{ c.petitioner ? ((c.petitioner.lastName || '') + ', ' + (c.petitioner.firstName || '')) : '' }}
-          </td>
-          <td class="td">
-            {{ c.respondent ? ((c.respondent.lastName || '') + ', ' + (c.respondent.firstName || '')) : '' }}
-          </td>
+          <td class="td">{{ petitionerLabel(c) }}</td>
+          <td class="td">{{ respondentLabel(c) }}</td>
           <td class="td">
             <button type="button" (click)="editCase(c.id)" [disabled]="busy" class="submit">Edit</button>
           </td>
