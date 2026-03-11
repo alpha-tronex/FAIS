@@ -15,6 +15,9 @@ export type UserDTO = {
   ssnLast4?: string;
   roleTypeId: number;
   mustResetPassword: boolean;
+  /** Set when user is archived (soft delete). */
+  archivedAt?: string | null;
+  archivedBy?: string | null;
 };
 
 export type UserSummaryDTO = {

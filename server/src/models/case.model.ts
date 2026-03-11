@@ -17,6 +17,9 @@ export const caseSchema = new mongoose.Schema(
     legalAssistantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
     createdByUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    /** Soft delete: when set, case is archived and excluded from default lists. */
+    archivedAt: { type: Date, default: null },
+    archivedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   },
   {
     timestamps: true,
@@ -27,6 +30,8 @@ export const caseSchema = new mongoose.Schema(
     strictQuery: true
   }
 );
+
+caseSchema.index({ archivedAt: 1 });
 
 export type CaseDoc = mongoose.InferSchemaType<typeof caseSchema>;
 export const CaseModel = mongoose.model('Case', caseSchema);

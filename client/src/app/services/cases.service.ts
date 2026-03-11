@@ -18,6 +18,9 @@ export type CaseListItem = {
   childSupportWorksheetFiled?: boolean;
   formTypeId?: number;
   createdAt: string | null;
+  /** Set when case is archived. */
+  archivedAt?: string | null;
+  archivedBy?: string | null;
 };
 
 export type CaseDetail = {
@@ -34,6 +37,8 @@ export type CaseDetail = {
   petitionerAttId: string | null;
   respondentAttId: string | null;
   legalAssistantId: string | null;
+  archivedAt?: string | null;
+  archivedBy?: string | null;
 };
 
 export type CreateCaseRequest = {
@@ -56,8 +61,12 @@ export class CasesService {
 
   constructor(private readonly http: HttpClient) {}
 
-  async list(userId?: string): Promise<CaseListItem[]> {
-    const qs = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+  /** @param archived When true, returns only archived cases (admin only). */
+  async list(userId?: string, archived?: boolean): Promise<CaseListItem[]> {
+    const params = new URLSearchParams();
+    if (userId) params.set('userId', userId);
+    if (archived === true) params.set('archived', 'true');
+    const qs = params.toString() ? `?${params.toString()}` : '';
     return await firstValueFrom(this.http.get<CaseListItem[]>(`${this.apiBase}/cases${qs}`));
   }
 
@@ -71,5 +80,15 @@ export class CasesService {
 
   async update(caseId: string, req: Partial<CreateCaseRequest>): Promise<{ ok: true } | { ok: boolean }> {
     return await firstValueFrom(this.http.patch<{ ok: boolean }>(`${this.apiBase}/cases/${caseId}`, req));
+  }
+
+  /** Archive case (soft delete). Staff or admin only. */
+  async archive(caseId: string): Promise<{ ok: boolean; archivedAt?: string }> {
+    return await firstValueFrom(this.http.post<{ ok: boolean; archivedAt?: string }>(`${this.apiBase}/cases/${caseId}/archive`, {}));
+  }
+
+  /** Restore archived case. Staff or admin only. */
+  async restore(caseId: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(this.http.post<{ ok: boolean }>(`${this.apiBase}/cases/${caseId}/restore`, {}));
   }
 }

@@ -14,6 +14,9 @@ export type CaseListItemDTO = {
   petitionerAttorney: UserSummaryDTO | null;
   respondentAttorney: UserSummaryDTO | null;
   createdAt: string | null;
+  /** Set when case is archived (soft delete). */
+  archivedAt?: string | null;
+  archivedBy?: string | null;
 };
 
 export type CaseDTO = {
@@ -29,4 +32,7 @@ export type CaseDTO = {
   respondentId: string | null;
   petitionerAttId: string | null;
   respondentAttId: string | null;
+  /** Set when case is archived (soft delete). */
+  archivedAt?: string | null;
+  archivedBy?: string | null;
 };

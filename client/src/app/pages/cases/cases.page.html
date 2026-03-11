@@ -1,10 +1,16 @@
 <div>
   <h1>Cases</h1>
 
+  <p *ngIf="success" class="success" role="status" aria-live="polite">{{ success }}</p>
   <p *ngIf="error" class="error" role="alert" aria-live="polite">{{ error }}</p>
 
   <section *ngIf="canCreate" class="panel">
     <h2 class="panelTitle">{{ editingCaseId ? 'Edit case' : 'Create case' }}</h2>
+
+    <div *ngIf="editingCaseArchivedAt" class="archivedBanner" role="status">
+      <strong>This case is archived.</strong> It is hidden from the active list. You can restore it to make it visible again.
+      <button type="button" (click)="requestRestoreCaseBeingEdited()" [disabled]="archiveRestoreBusy" class="submit mt8">Restore case</button>
+    </div>
 
     <form (ngSubmit)="create()" class="gridForm">
       <label>
@@ -98,7 +104,31 @@
   <p *ngIf="!canCreate" class="mt16">You can view cases, but you don’t have permission to create them.</p>
 
   <section class="mt16">
-    <h2>All cases</h2>
+    <div class="rowActions" style="align-items: center; gap: 1rem;">
+      <h2 class="m0">All cases</h2>
+      <nav *ngIf="canCreate" class="tabRow" role="tablist" aria-label="Cases view">
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="casesView === 'active'"
+          [class.active]="casesView === 'active'"
+          (click)="setCasesView('active')"
+          [disabled]="busy"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="casesView === 'archived'"
+          [class.active]="casesView === 'archived'"
+          (click)="setCasesView('archived')"
+          [disabled]="busy"
+        >
+          Archived
+        </button>
+      </nav>
+    </div>
     <p *ngIf="busy && cases.length === 0">Loading…</p>
 
     <table *ngIf="cases.length > 0" class="table">
@@ -120,7 +150,8 @@
             Respondent
             <span *ngIf="isCasesSortColumn('respondent')" class="sortIndicator" aria-label="Sorted {{ casesSortDirection === 'asc' ? 'ascending' : 'descending' }}">{{ casesSortDirection === 'asc' ? '↑' : '↓' }}</span>
           </th>
-          <th class="th">Edit</th>
+          <th class="th" *ngIf="casesView === 'archived'">Archived</th>
+          <th class="th">Actions</th>
         </tr>
       </thead>
 
@@ -130,11 +161,38 @@
           <td class="td">{{ c.division }}</td>
           <td class="td">{{ petitionerLabel(c) }}</td>
           <td class="td">{{ respondentLabel(c) }}</td>
+          <td class="td" *ngIf="casesView === 'archived'">{{ formatArchivedAt(c.archivedAt) }}</td>
           <td class="td">
-            <button type="button" (click)="editCase(c.id)" [disabled]="busy" class="submit">Edit</button>
+            <span *ngIf="canCreate" class="rowActions" style="gap: 0.5rem;">
+              <button *ngIf="casesView === 'active'" type="button" (click)="editCase(c.id)" [disabled]="busy || archiveRestoreBusy" class="submit">Edit</button>
+              <button *ngIf="casesView === 'active'" type="button" (click)="requestArchiveCase(c)" [disabled]="busy || archiveRestoreBusy" class="dangerBtn">Archive</button>
+              <button *ngIf="casesView === 'archived'" type="button" (click)="requestRestoreCase(c)" [disabled]="busy || archiveRestoreBusy" class="submit">Restore</button>
+              <button *ngIf="casesView === 'archived'" type="button" (click)="editCase(c.id)" [disabled]="busy || archiveRestoreBusy" class="submit">Edit</button>
+            </span>
           </td>
         </tr>
       </tbody>
     </table>
   </section>
+
+  <app-confirm-popup
+    [open]="showArchiveConfirm"
+    title="Archive this case?"
+    message="This case will be hidden from the active list. You can restore it later from the Archived tab."
+    confirmText="Archive"
+    cancelText="Cancel"
+    [danger]="true"
+    (confirm)="confirmArchiveCase()"
+    (cancel)="cancelArchiveCase()"
+  />
+
+  <app-confirm-popup
+    [open]="showRestoreConfirm"
+    title="Restore this case?"
+    message="The case will appear in the active list again."
+    confirmText="Restore"
+    cancelText="Cancel"
+    (confirm)="confirmRestoreCase()"
+    (cancel)="cancelRestoreCase()"
+  />
 </div>

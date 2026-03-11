@@ -92,11 +92,15 @@ export function createCasesRouter(
 ): express.Router {
   const router = express.Router();
 
-  router.get('/cases', auth.requireAuth, async (_req, res) => {
-    const authPayload = (_req as any).auth as AuthPayload;
+  router.get('/cases', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
 
-    const queryUserIdRaw = String(((_req as any)?.query?.userId ?? '') as any).trim();
+    const queryUserIdRaw = String((req?.query?.userId ?? '') as string).trim();
     const queryUserId = queryUserIdRaw.length > 0 ? queryUserIdRaw : null;
+    const queryArchived = String((req?.query?.archived ?? '') as string).toLowerCase() === 'true';
+    if (queryArchived && authPayload.roleTypeId !== 5) {
+      return res.status(403).json({ error: 'Only administrators can list archived cases.' });
+    }
 
     const filter: Record<string, any> = {};
     if (authPayload.roleTypeId !== 5) {
@@ -121,7 +125,12 @@ export function createCasesRouter(
       ];
     }
 
-    const cases = await CaseModel.find(filter).sort({ createdAt: -1, _id: -1 }).lean<any[]>();
+    const archiveFilter = queryArchived
+      ? { archivedAt: { $ne: null, $exists: true } }
+      : { $or: [{ archivedAt: null }, { archivedAt: { $exists: false } }] };
+    const fullFilter = Object.keys(filter).length > 0 ? { $and: [filter, archiveFilter] } : archiveFilter;
+
+    const cases = await CaseModel.find(fullFilter).sort({ createdAt: -1, _id: -1 }).lean<any[]>();
 
     const { byObjectId } = await hydrateUsersForCases(cases);
 
@@ -160,7 +169,9 @@ export function createCasesRouter(
           if (id && byObjectId.has(id)) return toUserSummary(byObjectId.get(id));
           return null;
         })(),
-        createdAt: c.createdAt ?? null
+        createdAt: c.createdAt ?? null,
+        archivedAt: c.archivedAt instanceof Date ? c.archivedAt.toISOString() : (c.archivedAt ?? null),
+        archivedBy: c.archivedBy?._id?.toString?.() ?? (typeof c.archivedBy === 'string' ? c.archivedBy : null) ?? null
       }))
     );
   });
@@ -246,8 +257,40 @@ export function createCasesRouter(
       respondentId: (c.respondentId?._id?.toString?.() ?? c.respondentId?.toString?.()) ?? null,
       petitionerAttId: (c.petitionerAttId?._id?.toString?.() ?? c.petitionerAttId?.toString?.()) ?? null,
       respondentAttId: (c.respondentAttId?._id?.toString?.() ?? c.respondentAttId?.toString?.()) ?? null,
-      legalAssistantId: (c.legalAssistantId?._id?.toString?.() ?? c.legalAssistantId?.toString?.()) ?? null
+      legalAssistantId: (c.legalAssistantId?._id?.toString?.() ?? c.legalAssistantId?.toString?.()) ?? null,
+      archivedAt: c.archivedAt instanceof Date ? c.archivedAt.toISOString() : (c.archivedAt ?? null),
+      archivedBy: c.archivedBy?._id?.toString?.() ?? (typeof c.archivedBy === 'string' ? c.archivedBy : null) ?? null
     });
+  });
+
+  /** Archive a case (soft delete). Staff or admin only. */
+  router.post('/cases/:id/archive', auth.requireAuth, auth.requireStaffOrAdmin, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
+    const c = await CaseModel.findById(req.params.id).select({ archivedAt: 1 }).lean();
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    if ((c as any).archivedAt) {
+      return res.status(400).json({ error: 'Case is already archived.' });
+    }
+    const now = new Date();
+    await CaseModel.updateOne(
+      { _id: req.params.id },
+      { $set: { archivedAt: now, archivedBy: new mongoose.Types.ObjectId(authPayload.sub) } }
+    );
+    return res.json({ ok: true, archivedAt: now.toISOString() });
+  });
+
+  /** Restore an archived case. Staff or admin only. */
+  router.post('/cases/:id/restore', auth.requireAuth, auth.requireStaffOrAdmin, async (req, res) => {
+    const c = await CaseModel.findById(req.params.id).select({ archivedAt: 1 }).lean();
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    if (!(c as any).archivedAt) {
+      return res.status(400).json({ error: 'Case is not archived.' });
+    }
+    await CaseModel.updateOne(
+      { _id: req.params.id },
+      { $set: { archivedAt: null, archivedBy: null } }
+    );
+    return res.json({ ok: true });
   });
 
   router.patch('/cases/:id', auth.requireAuth, auth.requireStaffOrAdmin, async (req, res) => {

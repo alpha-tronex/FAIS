@@ -56,6 +56,17 @@ export class UsersPage implements OnInit, OnDestroy {
   /** Filter by role type; null = show all. */
   roleFilter: number | null = null;
 
+  /** 'active' = active users (default), 'archived' = archived only (admin). */
+  usersView: 'active' | 'archived' = 'active';
+
+  /** Archive confirm: user to archive. */
+  showArchiveConfirm = false;
+  userToArchive: UserListItem | null = null;
+  /** Restore confirm: user to restore. */
+  showRestoreConfirm = false;
+  userToRestore: UserListItem | null = null;
+  archiveRestoreBusy = false;
+
   constructor(
     private readonly auth: AuthService,
     private readonly roleTypesApi: RoleTypesService,
@@ -92,7 +103,8 @@ export class UsersPage implements OnInit, OnDestroy {
         // role types are used for display only; keep page usable if unavailable
       });
 
-    this.subscription = from(this.usersApi.list())
+    const showArchived = this.usersView === 'archived';
+    this.subscription = from(this.usersApi.list(showArchived))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -110,6 +122,85 @@ export class UsersPage implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  setUsersView(view: 'active' | 'archived') {
+    this.usersView = view;
+    this.refresh();
+  }
+
+  requestArchiveUser(u: UserListItem) {
+    this.userToArchive = u;
+    this.showArchiveConfirm = true;
+  }
+
+  confirmArchiveUser() {
+    const u = this.userToArchive;
+    this.showArchiveConfirm = false;
+    this.userToArchive = null;
+    if (!u || !this.canCreate) return;
+    this.archiveRestoreBusy = true;
+    this.error = null;
+    this.usersApi
+      .archive(u.id)
+      .then(() => {
+        const name = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || u.uname;
+        this.success = name ? `${name} has been archived.` : 'User has been archived.';
+        this.refresh();
+      })
+      .catch((e: { error?: { error?: string } }) => {
+        this.error = e?.error?.error ?? 'Failed to archive user.';
+      })
+      .finally(() => {
+        this.archiveRestoreBusy = false;
+      });
+  }
+
+  cancelArchiveUser() {
+    this.showArchiveConfirm = false;
+    this.userToArchive = null;
+  }
+
+  requestRestoreUser(u: UserListItem) {
+    this.userToRestore = u;
+    this.showRestoreConfirm = true;
+  }
+
+  confirmRestoreUser() {
+    const u = this.userToRestore;
+    this.showRestoreConfirm = false;
+    this.userToRestore = null;
+    if (!u || !this.canCreate) return;
+    this.archiveRestoreBusy = true;
+    this.error = null;
+    this.usersApi
+      .restore(u.id)
+      .then(() => {
+        const name = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || u.uname;
+        this.success = name ? `${name} has been restored.` : 'User has been restored.';
+        this.refresh();
+      })
+      .catch((e: { error?: { error?: string } }) => {
+        this.error = e?.error?.error ?? 'Failed to restore user.';
+      })
+      .finally(() => {
+        this.archiveRestoreBusy = false;
+      });
+  }
+
+  cancelRestoreUser() {
+    this.showRestoreConfirm = false;
+    this.userToRestore = null;
+  }
+
+  formatArchivedAt(archivedAt?: string | null): string {
+    if (!archivedAt) return '';
+    try {
+      const d = new Date(archivedAt);
+      return d.toLocaleDateString(undefined, { dateStyle: 'short' });
+    } catch {
+      return archivedAt;
+    }
   }
 
   roleTypeName(roleTypeId: number): string {

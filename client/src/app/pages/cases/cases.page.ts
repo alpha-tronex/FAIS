@@ -47,9 +47,12 @@ export class CasesPage implements OnInit, OnDestroy {
   legalAssistantId = '';
 
   editingCaseId: string | null = null;
+  /** When editing a case, true if that case is archived (show banner + restore). */
+  editingCaseArchivedAt: string | null = null;
 
   busy = false;
   error: string | null = null;
+  success: string | null = null;
 
   canCreate = false;
 
@@ -57,6 +60,15 @@ export class CasesPage implements OnInit, OnDestroy {
   casesSortColumn: 'caseNumber' | 'division' | 'petitioner' | 'respondent' = 'caseNumber';
   /** Sort direction for All cases table. */
   casesSortDirection: 'asc' | 'desc' = 'asc';
+
+  /** 'active' = active cases (default), 'archived' = archived only (admin). */
+  casesView: 'active' | 'archived' = 'active';
+
+  showArchiveConfirm = false;
+  caseToArchive: CaseListItem | null = null;
+  showRestoreConfirm = false;
+  caseToRestore: CaseListItem | null = null;
+  archiveRestoreBusy = false;
 
   subscription: Subscription | null = null;
 
@@ -170,10 +182,10 @@ export class CasesPage implements OnInit, OnDestroy {
     if (this.legalAssistantId && !this.legalAssistants.some((u) => u.id === this.legalAssistantId)) this.legalAssistantId = '';
   }
 
-  private loadAll() {
+  private loadAll(showArchivedCases?: boolean) {
     return forkJoin({
       users: from(this.usersApi.list()),
-      cases: from(this.casesApi.list()),
+      cases: from(this.casesApi.list(undefined, showArchivedCases === true)),
       circuits: from(this.lookups.list('circuits')),
       counties: from(this.lookups.list('counties')),
       divisions: from(this.lookups.list('divisions'))
@@ -210,6 +222,7 @@ export class CasesPage implements OnInit, OnDestroy {
     this.respondentAttId = '';
     this.legalAssistantId = '';
     this.editingCaseId = null;
+    this.editingCaseArchivedAt = null;
 
     if (this.circuits.length > 0) {
       this.circuitId = this.circuits[0]!.id;
@@ -225,8 +238,10 @@ export class CasesPage implements OnInit, OnDestroy {
 
     this.busy = true;
     this.error = null;
+    this.success = null;
 
-    this.subscription = this.loadAll()
+    const showArchived = this.casesView === 'archived';
+    this.subscription = this.loadAll(showArchived)
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -319,7 +334,7 @@ export class CasesPage implements OnInit, OnDestroy {
       .pipe(
         switchMap(() => {
           this.resetForm();
-          return this.loadAll();
+          return this.loadAll(this.casesView === 'archived');
         }),
         finalize(() => {
           this.busy = false;
@@ -352,6 +367,95 @@ export class CasesPage implements OnInit, OnDestroy {
       });
   }
 
+  setCasesView(view: 'active' | 'archived') {
+    this.casesView = view;
+    this.refresh();
+  }
+
+  requestArchiveCase(c: CaseListItem) {
+    this.caseToArchive = c;
+    this.showArchiveConfirm = true;
+  }
+
+  confirmArchiveCase() {
+    const c = this.caseToArchive;
+    this.showArchiveConfirm = false;
+    this.caseToArchive = null;
+    if (!c || !this.canCreate) return;
+    this.archiveRestoreBusy = true;
+    this.error = null;
+    this.casesApi
+      .archive(c.id)
+      .then(() => {
+        this.success = `Case ${c.caseNumber} has been archived.`;
+        this.refresh();
+      })
+      .catch((e: { error?: { error?: string } }) => {
+        this.error = e?.error?.error ?? 'Failed to archive case.';
+      })
+      .finally(() => {
+        this.archiveRestoreBusy = false;
+      });
+  }
+
+  cancelArchiveCase() {
+    this.showArchiveConfirm = false;
+    this.caseToArchive = null;
+  }
+
+  requestRestoreCase(c: CaseListItem) {
+    this.caseToRestore = c;
+    this.showRestoreConfirm = true;
+  }
+
+  confirmRestoreCase() {
+    const c = this.caseToRestore;
+    this.showRestoreConfirm = false;
+    this.caseToRestore = null;
+    if (!c || !this.canCreate) return;
+    this.archiveRestoreBusy = true;
+    this.error = null;
+    this.casesApi
+      .restore(c.id)
+      .then(() => {
+        this.success = `Case ${c.caseNumber} has been restored.`;
+        if (this.editingCaseId === c.id) {
+          this.editingCaseId = null;
+          this.editingCaseArchivedAt = null;
+        }
+        this.refresh();
+      })
+      .catch((e: { error?: { error?: string } }) => {
+        this.error = e?.error?.error ?? 'Failed to restore case.';
+      })
+      .finally(() => {
+        this.archiveRestoreBusy = false;
+      });
+  }
+
+  cancelRestoreCase() {
+    this.showRestoreConfirm = false;
+    this.caseToRestore = null;
+  }
+
+  /** Restore the case currently being edited (when form shows archived banner). */
+  requestRestoreCaseBeingEdited() {
+    if (!this.editingCaseId) return;
+    const c = this.cases.find((x) => x.id === this.editingCaseId) ?? { id: this.editingCaseId, caseNumber: this.caseNumber, division: '' };
+    this.caseToRestore = c as CaseListItem;
+    this.showRestoreConfirm = true;
+  }
+
+  formatArchivedAt(archivedAt?: string | null): string {
+    if (!archivedAt) return '';
+    try {
+      const d = new Date(archivedAt);
+      return d.toLocaleDateString(undefined, { dateStyle: 'short' });
+    } catch {
+      return archivedAt;
+    }
+  }
+
   editCase(caseId: string) {
     if (!this.canCreate) {
       this.error = 'Forbidden';
@@ -371,6 +475,7 @@ export class CasesPage implements OnInit, OnDestroy {
       .subscribe({
         next: (c) => {
           this.editingCaseId = c.id;
+          this.editingCaseArchivedAt = c.archivedAt ?? null;
           this.caseNumber = c.caseNumber ?? '';
           this.division = c.division ?? '';
           this.circuitId = c.circuitId ?? null;

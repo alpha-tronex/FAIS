@@ -93,7 +93,31 @@
   <p *ngIf="!canCreate" class="mt16">You don’t have permission to create users.</p>
 
   <section class="mt16">
-    <h2>All users</h2>
+    <div class="rowActions" style="align-items: center; gap: 1rem;">
+      <h2 class="m0">All users</h2>
+      <nav *ngIf="canCreate" class="tabRow" role="tablist" aria-label="Users view">
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="usersView === 'active'"
+          [class.active]="usersView === 'active'"
+          (click)="setUsersView('active')"
+          [disabled]="busy"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="usersView === 'archived'"
+          [class.active]="usersView === 'archived'"
+          (click)="setUsersView('archived')"
+          [disabled]="busy"
+        >
+          Archived
+        </button>
+      </nav>
+    </div>
     <div class="rowActions mt8" *ngIf="users.length > 0">
       <label class="filterLabel">
         Filter by role
@@ -120,7 +144,8 @@
           <th class="th thSortable" (click)="setSort('role')" [attr.aria-sort]="sortBy === 'role' ? (sortDir === 'asc' ? 'ascending' : 'descending') : null">
             Role <span *ngIf="sortBy === 'role'" class="sortIcon">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
           </th>
-          <th class="th">Edit</th>
+          <th class="th" *ngIf="usersView === 'archived'">Archived</th>
+          <th class="th">Actions</th>
         </tr>
       </thead>
 
@@ -130,8 +155,14 @@
           <td class="td">{{ u.uname }}</td>
           <td class="td">{{ u.email }}</td>
           <td class="td">{{ roleTypeName(u.roleTypeId) }}</td>
+          <td class="td" *ngIf="usersView === 'archived'">{{ formatArchivedAt(u.archivedAt) }}</td>
           <td class="td">
-            <button *ngIf="canCreate" type="button" (click)="editUser(u)" [disabled]="busy" class="submit">Edit</button>
+            <span *ngIf="canCreate" class="rowActions" style="gap: 0.5rem;">
+              <button *ngIf="usersView === 'active'" type="button" (click)="editUser(u)" [disabled]="busy || archiveRestoreBusy" class="submit">Edit</button>
+              <button *ngIf="usersView === 'active'" type="button" (click)="requestArchiveUser(u)" [disabled]="busy || archiveRestoreBusy" class="dangerBtn">Archive</button>
+              <button *ngIf="usersView === 'archived'" type="button" (click)="requestRestoreUser(u)" [disabled]="busy || archiveRestoreBusy" class="submit">Restore</button>
+              <button *ngIf="usersView === 'archived'" type="button" (click)="editUser(u)" [disabled]="busy || archiveRestoreBusy" class="submit">Edit</button>
+            </span>
           </td>
         </tr>
       </tbody>
@@ -169,5 +200,26 @@
     [danger]="true"
     (confirm)="onUndoMinimalUser()"
     (cancel)="onDismissMinimalUserSuccess()"
+  />
+
+  <app-confirm-popup
+    [open]="showArchiveConfirm"
+    title="Archive this user?"
+    message="This user will be hidden from the active list and from case assignment dropdowns. You can restore them later from the Archived tab."
+    confirmText="Archive"
+    cancelText="Cancel"
+    [danger]="true"
+    (confirm)="confirmArchiveUser()"
+    (cancel)="cancelArchiveUser()"
+  />
+
+  <app-confirm-popup
+    [open]="showRestoreConfirm"
+    title="Restore this user?"
+    message="The user will appear in the active list and in case assignment dropdowns again."
+    confirmText="Restore"
+    cancelText="Cancel"
+    (confirm)="confirmRestoreUser()"
+    (cancel)="cancelRestoreUser()"
   />
 </div>

@@ -26,6 +26,13 @@ export function toUserDTO(doc: any): UserDTO {
   const roleTypeId = pickFirstNumber(doc?.roleTypeId) ?? 1;
   const mustResetPassword = Boolean(doc?.mustResetPassword ?? doc?.MustResetPassword ?? false);
 
+  const archivedAt = doc?.archivedAt instanceof Date
+    ? doc.archivedAt.toISOString()
+    : typeof doc?.archivedAt === 'string' && doc.archivedAt
+      ? doc.archivedAt
+      : undefined;
+  const archivedBy = doc?.archivedBy?._id?.toString?.() ?? (typeof doc?.archivedBy === 'string' ? doc.archivedBy : undefined);
+
   return {
     id,
     uname,
@@ -42,7 +49,9 @@ export function toUserDTO(doc: any): UserDTO {
 		phone,
 		ssnLast4,
     roleTypeId,
-    mustResetPassword
+    mustResetPassword,
+    ...(archivedAt != null && { archivedAt }),
+    ...(archivedBy != null && { archivedBy })
   };
 }
 

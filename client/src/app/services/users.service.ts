@@ -18,6 +18,9 @@ export type UserListItem = {
 	ssnLast4?: string;
   roleTypeId: number;
   mustResetPassword: boolean;
+  /** Set when user is archived. */
+  archivedAt?: string | null;
+  archivedBy?: string | null;
 };
 
 export type CreateUserRequest = {
@@ -69,8 +72,10 @@ export class UsersService {
 
   constructor(private readonly http: HttpClient) {}
 
-  async list(): Promise<UserListItem[]> {
-    return await firstValueFrom(this.http.get<UserListItem[]>(`${this.apiBase}/users`));
+  /** @param archived When true, returns only archived users (admin only). Default is active only. */
+  async list(archived?: boolean): Promise<UserListItem[]> {
+    const qs = archived === true ? '?archived=true' : '';
+    return await firstValueFrom(this.http.get<UserListItem[]>(`${this.apiBase}/users${qs}`));
   }
 
   async get(id: string): Promise<UserListItem> {
@@ -111,5 +116,15 @@ export class UsersService {
   /** Admin: send a password-reset email to this user so they can set a new password. */
   async sendPasswordReset(id: string): Promise<void> {
     await firstValueFrom(this.http.post<{ ok: boolean }>(`${this.apiBase}/users/${id}/send-password-reset`, {}));
+  }
+
+  /** Admin: archive user (soft delete). */
+  async archive(id: string): Promise<{ ok: boolean; archivedAt?: string }> {
+    return await firstValueFrom(this.http.post<{ ok: boolean; archivedAt?: string }>(`${this.apiBase}/users/${id}/archive`, {}));
+  }
+
+  /** Admin: restore archived user. */
+  async restore(id: string): Promise<{ ok: boolean }> {
+    return await firstValueFrom(this.http.post<{ ok: boolean }>(`${this.apiBase}/users/${id}/restore`, {}));
   }
 }

@@ -28,6 +28,9 @@ export const userSchema = new mongoose.Schema(
     passwordResetTokenExpiresAt: { type: Date, required: false },
 		createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 		updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    /** Soft delete: when set, user is archived and excluded from default lists and dropdowns. */
+    archivedAt: { type: Date, default: null },
+    archivedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   },
   {
     timestamps: true,
@@ -36,6 +39,8 @@ export const userSchema = new mongoose.Schema(
     strictQuery: true
   }
 );
+
+userSchema.index({ archivedAt: 1 });
 
 export type UserDoc = mongoose.InferSchemaType<typeof userSchema>;
 export const User = mongoose.model('User', userSchema);

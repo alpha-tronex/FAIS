@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import express from 'express';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import OpenAI from 'openai';
@@ -166,9 +167,19 @@ function formatValidationMessage(flattened: { formErrors: string[]; fieldErrors:
 export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'requireAdmin'>): express.Router {
   const router = express.Router();
 
-  router.get('/users', auth.requireAuth, async (_req, res) => {
-    const users = await User.find({})
-      .select({ uname: 1, email: 1, firstName: 1, lastName: 1, roleTypeId: 1, mustResetPassword: 1 })
+  router.get('/users', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
+    const queryArchived = String((req.query?.archived ?? '') as string).toLowerCase() === 'true';
+    if (queryArchived && authPayload.roleTypeId !== 5) {
+      return res.status(403).json({ error: 'Only administrators can list archived users.' });
+    }
+
+    const filter: Record<string, unknown> = queryArchived
+      ? { archivedAt: { $ne: null, $exists: true } }
+      : { $or: [{ archivedAt: null }, { archivedAt: { $exists: false } }] };
+
+    const users = await User.find(filter)
+      .select({ uname: 1, email: 1, firstName: 1, lastName: 1, roleTypeId: 1, mustResetPassword: 1, archivedAt: 1, archivedBy: 1 })
       .sort({ lastName: 1, firstName: 1, uname: 1 })
       .lean();
 
@@ -367,12 +378,44 @@ export function createUsersRouter(auth: Pick<AuthMiddlewares, 'requireAuth' | 'r
         phone: 1,
         ssnLast4: 1,
         roleTypeId: 1,
-        mustResetPassword: 1
+        mustResetPassword: 1,
+        archivedAt: 1,
+        archivedBy: 1
       })
       .lean<UserDoc>();
     if (!user) return res.status(404).json({ error: 'Not found' });
 
     res.json(toUserDTO(user));
+  });
+
+  /** Archive a user (soft delete). Admin only. */
+  router.post('/users/:id/archive', auth.requireAuth, auth.requireAdmin, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
+    const user = await User.findOne({ _id: req.params.id }).select({ archivedAt: 1 }).lean();
+    if (!user) return res.status(404).json({ error: 'Not found' });
+    if ((user as any).archivedAt) {
+      return res.status(400).json({ error: 'User is already archived.' });
+    }
+    const now = new Date();
+    await User.updateOne(
+      { _id: req.params.id },
+      { $set: { archivedAt: now, archivedBy: new mongoose.Types.ObjectId(authPayload.sub) } }
+    );
+    return res.json({ ok: true, archivedAt: now.toISOString() });
+  });
+
+  /** Restore an archived user. Admin only. */
+  router.post('/users/:id/restore', auth.requireAuth, auth.requireAdmin, async (req, res) => {
+    const user = await User.findOne({ _id: req.params.id }).select({ archivedAt: 1 }).lean();
+    if (!user) return res.status(404).json({ error: 'Not found' });
+    if (!(user as any).archivedAt) {
+      return res.status(400).json({ error: 'User is not archived.' });
+    }
+    await User.updateOne(
+      { _id: req.params.id },
+      { $set: { archivedAt: null, archivedBy: null } }
+    );
+    return res.json({ ok: true });
   });
 
   router.get('/users/:id/ssn', auth.requireAuth, auth.requireAdmin, async (req, res) => {

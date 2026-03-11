@@ -43,6 +43,7 @@ export class SessionIdleService implements OnDestroy {
       events.forEach((ev) => {
         document.addEventListener(ev, this.handleActivity);
       });
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
     this.router.events.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.recordActivity();
@@ -64,12 +65,29 @@ export class SessionIdleService implements OnDestroy {
     this.recordActivity();
   };
 
+  /**
+   * When the tab becomes visible (e.g. user wakes the computer), if the token is missing
+   * but we're on a protected route, redirect to login so the user sees the login page
+   * instead of hitting an API and seeing "Missing token" on the current page.
+   */
+  private handleVisibilityChange = (): void => {
+    if (typeof document === 'undefined' || document.visibilityState !== 'visible') return;
+    if (this.auth.isLoggedIn()) return;
+    const path = this.router.url.split('?')[0] || '';
+    const publicPaths = ['/', '/login', '/register', '/reset', '/forgot-password', '/reset-password'];
+    const isPublic = publicPaths.some((p) => path === p || path.startsWith(p + '/'));
+    if (!isPublic) {
+      void this.router.navigateByUrl('/login?session=expired');
+    }
+  };
+
   ngOnDestroy(): void {
     if (typeof document !== 'undefined') {
       const events = ['click', 'keydown', 'mousedown', 'touchstart', 'scroll'];
       events.forEach((ev) => {
         document.removeEventListener(ev, this.handleActivity);
       });
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
     this.destroy$.next();
     this.destroy$.complete();

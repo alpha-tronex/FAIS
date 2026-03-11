@@ -4,9 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && node scripts/ensure-rhda-lockfile.js",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "ensure-rhda-lockfile": "node scripts/ensure-rhda-lockfile.js"
   },
   "prettier": {
     "printWidth": 100,

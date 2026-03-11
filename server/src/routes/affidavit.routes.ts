@@ -60,9 +60,10 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
       }
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
 
-      const isAdmin = auth.roleTypeId === 5;
+      /** Admin (5), Petitioner Attorney (3), and Legal Assistant (6) may receive the official Florida form PDF; others get HTML summary PDF. */
+      const canGetOfficialPdf = [3, 5, 6].includes(auth.roleTypeId);
 
-      if (isAdmin) {
+      if (canGetOfficialPdf) {
         const formKey: PdfTemplateKey =
           requestedForm === 'auto'
             ? (await computeAffidavitSummary(targetUserObjectId)).form
