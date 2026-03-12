@@ -20,6 +20,7 @@ import { createDocumentsRouter } from './routes/documents.routes.js';
 import { refreshDiscoveredSchema } from './lib/ai-query-schema-discovery.js';
 import { createMessagesRouter } from './routes/messages.routes.js';
 import { scheduleAppointmentReminderJob } from './jobs/appointment-reminder.job.js';
+import { createDemoRequestRouter } from './routes/demo-request.routes.js';
 
 // eslint-disable-next-line no-console
 console.log('FAIS server boot (index.ts)');
@@ -92,6 +93,7 @@ const { requireAuth, requireAdmin, requireStaffOrAdmin, requireAdminOrAiStaff } 
 // Mount all API routes under /api for production (client calls /api/...)
 const apiRouter = express.Router();
 apiRouter.use(createHealthRouter());
+apiRouter.use(createDemoRequestRouter());
 apiRouter.use(createRoleTypesRouter({ requireAuth }));
 apiRouter.use(createAuthRouter({ jwtSecret, jwtExpiresIn, requireAuth }));
 apiRouter.use(createUsersRouter({ requireAuth, requireAdmin }));

@@ -4,189 +4,551 @@
 }
 
 .landing {
+  --bg: #f4efe6;
+  --surface: rgba(255, 250, 242, 0.88);
+  --surface-strong: #fffaf3;
+  --ink: #1f2430;
+  --muted: #5b6272;
+  --line: rgba(31, 36, 48, 0.1);
+  --accent: #9d5c2f;
+  --accent-dark: #6f3916;
+  --accent-soft: #e8d4c4;
+  --navy: #193347;
+  --navy-soft: #284e67;
+  --shadow: 0 18px 60px rgba(25, 51, 71, 0.12);
   font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
-  color: #2c3e50;
-  background: #f5f0e8;
+  color: var(--ink);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background:
+    radial-gradient(circle at top left, rgba(157, 92, 47, 0.12), transparent 26%),
+    radial-gradient(circle at top right, rgba(25, 51, 71, 0.14), transparent 28%),
+    linear-gradient(180deg, #fbf7f0 0%, var(--bg) 52%, #efe4d8 100%);
 }
 
 .landingHeader {
-  background: #1a2744;
-  color: #fff;
-  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 1rem;
+  padding: 1rem 2rem;
+  backdrop-filter: blur(16px);
+  background: rgba(251, 247, 240, 0.88);
+  border-bottom: 1px solid rgba(31, 36, 48, 0.06);
 }
 
-.logo {
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brandMark {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, var(--navy), var(--navy-soft));
+  color: #fff;
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
-.logo span {
-  color: #b8860b;
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.brandText strong {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.brandText span {
+  font-size: 0.92rem;
+  color: var(--muted);
 }
 
 .landingNav {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .landingNav a {
-  color: #fff;
   text-decoration: none;
-  margin-left: 1rem;
+  color: var(--ink);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
+  padding: 0.7rem 0.9rem;
+  border-radius: 999px;
 }
 
 .landingNav a:hover {
-  color: #b8860b;
+  background: rgba(25, 51, 71, 0.07);
 }
 
-.btnLogin {
-  margin-left: 1.5rem;
-  padding: 0.5rem 1rem;
-  background: #b8860b;
+.landingNav .navCta {
+  background: var(--navy);
   color: #fff;
-  border-radius: 4px;
 }
 
-.btnLogin:hover {
-  background: #9a7209;
-  color: #fff;
+.landingNav .navCta:hover {
+  background: var(--navy-soft);
 }
 
 .landingMain {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 2rem;
-  text-align: center;
+  width: min(1180px, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.hero,
+.section {
+  margin-bottom: 2rem;
 }
 
 .hero {
-  max-width: 720px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(290px, 0.8fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.heroCopy,
+.heroCard,
+.proofBar,
+.featureCard,
+.workflowStep,
+.pricingCard,
+.addonPanel,
+.buyerCard,
+.faqItem,
+.ctaCard,
+.compareTable {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.heroCopy {
+  padding: 3rem;
+  border-radius: 2rem;
+}
+
+.heroCard {
+  padding: 2rem;
+  border-radius: 1.75rem;
+  align-self: end;
+}
+
+.eyebrow,
+.cardLabel,
+.planBadge,
+.stepNumber {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.eyebrow,
+.cardLabel,
+.planBadge {
+  color: var(--accent-dark);
+}
+
+.hero h1,
+.sectionIntro h2,
+.ctaCard h2,
+.heroCard h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  line-height: 0.98;
+  color: #12283b;
 }
 
 .hero h1 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 600;
-  color: #1a2744;
-  margin-bottom: 0.75rem;
-  line-height: 1.2;
+  margin: 0.75rem 0 1rem;
+  font-size: clamp(3.2rem, 6vw, 5.8rem);
+  max-width: 11ch;
 }
 
-.tagline {
-  font-size: 1.1rem;
-  color: #2c3e50;
-  margin-bottom: 2rem;
-  letter-spacing: 0.02em;
+.heroText,
+.sectionIntro p,
+.featureCard p,
+.workflowStep p,
+.pricingCard p,
+.addonPanel p,
+.buyerCard p,
+.faqItem p,
+.proofItem p,
+.heroCard p {
+  color: var(--muted);
+  line-height: 1.6;
 }
 
-.tagline .dot {
-  color: #b8860b;
-  margin: 0 0.35em;
+.heroText {
+  max-width: 56ch;
+  font-size: 1.12rem;
 }
 
-.services {
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin: 1.8rem 0 1.4rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+}
+
+.btnSecondary {
+  background: rgba(25, 51, 71, 0.08);
+  color: var(--navy);
+}
+
+.btnGhost {
+  background: transparent;
+  color: var(--navy);
+  border: 1px solid rgba(25, 51, 71, 0.2);
+}
+
+.heroPoints {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 720px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.service-card {
-  background: #fff;
-  padding: 1.75rem 1.25rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(26, 39, 68, 0.08);
-  border: 1px solid rgba(26, 39, 68, 0.06);
-  transition: transform 0.2s, box-shadow 0.2s;
+.heroPoints li {
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(31, 36, 48, 0.06);
+  font-weight: 600;
 }
 
-.service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(26, 39, 68, 0.12);
+.heroCard h2 {
+  margin: 0.6rem 0 0.8rem;
+  font-size: 2.1rem;
 }
 
-.service-card h2 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.35rem;
-  color: #1a2744;
-  margin-bottom: 0.5rem;
+.metricGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin-top: 1.4rem;
 }
 
-.service-card p {
-  font-size: 0.9rem;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  line-height: 1.45;
+.metric {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(25, 51, 71, 0.07);
 }
 
-.service-card a {
+.metric strong {
+  display: block;
+  color: var(--navy);
+  font-size: 1.3rem;
+}
+
+.metric span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted);
+}
+
+.proofBar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.3rem;
+  border-radius: 1.5rem;
+}
+
+.proofItem {
+  padding: 0.7rem;
+}
+
+.proofItem h2,
+.featureCard h3,
+.workflowStep h3,
+.pricingCard h3,
+.buyerCard h3,
+.faqItem h3,
+.addonPanel h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1.1rem;
+  color: #16283a;
+}
+
+.section {
+  padding: 2.2rem;
+  border-radius: 2rem;
+  background: rgba(255, 253, 249, 0.46);
+  border: 1px solid rgba(31, 36, 48, 0.05);
+}
+
+.sectionIntro {
+  max-width: 56rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionIntro h2 {
+  margin: 0.4rem 0 0.6rem;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+}
+
+.featureGrid,
+.workflowGrid,
+.pricingGrid,
+.buyerGrid,
+.faqList,
+.addonGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.featureGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.featureCard,
+.workflowStep,
+.pricingCard,
+.buyerCard,
+.faqItem {
+  padding: 1.35rem;
+  border-radius: 1.25rem;
+}
+
+.workflowGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.workflowStep {
+  position: relative;
+  overflow: hidden;
+}
+
+.stepNumber {
   display: inline-block;
-  padding: 0.5rem 1rem;
-  background: #1a2744;
+  margin-bottom: 0.8rem;
+  color: var(--accent);
+}
+
+.compareTable {
+  border-radius: 1.4rem;
+  overflow: hidden;
+}
+
+.compareHeader,
+.compareRow {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+}
+
+.compareHeader {
+  background: #17364c;
   color: #fff;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: 4px;
-  transition: background 0.2s;
+  font-weight: 700;
 }
 
-.service-card a:hover {
-  background: #b8860b;
+.compareRow:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.compareLabel {
+  font-weight: 700;
+  color: #16283a;
+}
+
+.pricingGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.pricingCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.pricingCardFeatured {
+  background: linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(232, 212, 196, 0.92));
+  transform: translateY(-0.2rem);
+}
+
+.planPrice {
+  margin: 0;
+  color: var(--navy);
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.planCopy {
+  min-height: 4.5rem;
+}
+
+.pricingCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.pricingCard li::before {
+  content: '•';
+  color: var(--accent);
+  font-weight: 800;
+  margin-right: 0.55rem;
+}
+
+.addonPanel {
+  margin-top: 1rem;
+  padding: 1.35rem;
+  border-radius: 1.25rem;
+}
+
+.addonGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.buyerGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.faqList {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ctaSection {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.ctaCard {
+  padding: 2.4rem;
+  border-radius: 2rem;
+  background: linear-gradient(135deg, rgba(25, 51, 71, 0.96), rgba(56, 91, 112, 0.93));
+}
+
+.ctaCard h2,
+.ctaCard p {
   color: #fff;
 }
 
-.contact-bar {
-  margin-top: 3rem;
-  padding: 1rem 1.5rem;
-  background: #1a2744;
-  color: #fff;
-  border-radius: 8px;
-  font-size: 0.95rem;
+.ctaCard .eyebrow {
+  color: rgba(255, 255, 255, 0.75);
 }
 
-.contact-bar a {
-  color: #b8860b;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.contact-bar a:hover {
-  text-decoration: underline;
-}
-
-.landingFooter {
-  padding: 1rem 2rem;
-  text-align: center;
-  font-size: 0.85rem;
-  color: #2c3e50;
-  border-top: 1px solid rgba(26, 39, 68, 0.1);
-}
-
-@media (max-width: 600px) {
-  .landingNav a {
-    margin-left: 0;
-    margin-right: 0.5rem;
+@media (max-width: 1080px) {
+  .hero,
+  .featureGrid,
+  .workflowGrid,
+  .pricingGrid,
+  .buyerGrid,
+  .faqList,
+  .addonGrid,
+  .proofBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .btnLogin {
-    margin-left: 0;
+
+  .hero h1 {
+    max-width: 13ch;
+  }
+}
+
+@media (max-width: 760px) {
+  .landingHeader,
+  .landingMain {
+    width: calc(100% - 1.3rem);
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .landingHeader {
+    position: static;
+    padding: 1rem 0;
+  }
+
+  .hero,
+  .featureGrid,
+  .workflowGrid,
+  .pricingGrid,
+  .buyerGrid,
+  .faqList,
+  .addonGrid,
+  .proofBar,
+  .compareHeader,
+  .compareRow,
+  .heroPoints {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy,
+  .heroCard,
+  .section,
+  .ctaCard {
+    padding: 1.4rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.6rem, 14vw, 4rem);
+  }
+
+  .compareHeader {
+    display: none;
+  }
+
+  .compareRow {
+    gap: 0.45rem;
+  }
+
+  .compareRow span {
+    display: block;
+  }
+
+  .compareRow span:not(.compareLabel) {
+    padding-left: 0.9rem;
   }
 }

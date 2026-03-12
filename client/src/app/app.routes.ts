@@ -26,6 +26,10 @@ export const routes: Routes = [
 		loadChildren: () => import('./pages/login/login.module').then((m) => m.LoginModule)
 	},
 	{
+		path: 'demo',
+		loadChildren: () => import('./pages/demo/demo.module').then((m) => m.DemoModule)
+	},
+	{
 		path: 'register',
 		canActivate: [registerGuard],
 		loadChildren: () => import('./pages/register/register.module').then((m) => m.RegisterModule)

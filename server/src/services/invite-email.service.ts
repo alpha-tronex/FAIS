@@ -51,6 +51,15 @@ function getFromAddress(): string {
   return 'no-reply@localhost';
 }
 
+function getDemoRequestInbox(): string | null {
+  return (
+    process.env.DEMO_REQUEST_TO?.trim() ||
+    process.env.SALES_CONTACT_EMAIL?.trim() ||
+    process.env.SMTP_USER?.trim() ||
+    null
+  );
+}
+
 /**
  * Sends an invite email if SMTP is configured.
  *
@@ -204,4 +213,55 @@ export async function sendAppointmentReminder(p: AppointmentReminderEmailParams)
   }
 
   await transport.sendMail({ from, to: p.to, subject, text });
+}
+
+export type DemoRequestEmailParams = {
+  fullName: string;
+  firmName: string;
+  workEmail: string;
+  phone?: string;
+  firmSize: string;
+  monthlyAffidavits: string;
+  currentSoftware?: string;
+  biggestPain: string;
+  details?: string;
+};
+
+function formatDemoRequestText(p: DemoRequestEmailParams): string {
+  let body = 'A new FAIS demo request was submitted.\n\n';
+  body += `Contact: ${p.fullName}\n`;
+  body += `Firm: ${p.firmName}\n`;
+  body += `Email: ${p.workEmail}\n`;
+  if (p.phone) body += `Phone: ${p.phone}\n`;
+  body += `Firm size: ${p.firmSize}\n`;
+  body += `Monthly affidavits: ${p.monthlyAffidavits}\n`;
+  if (p.currentSoftware) body += `Current software: ${p.currentSoftware}\n`;
+  body += `Biggest pain: ${p.biggestPain}\n`;
+  if (p.details) body += `Additional details: ${p.details}\n`;
+  return body;
+}
+
+export async function sendDemoRequestEmail(p: DemoRequestEmailParams): Promise<void> {
+  const transport = getSmtpTransport();
+  const from = getFromAddress();
+  const to = getDemoRequestInbox();
+  const subject = `FAIS demo request: ${p.firmName}`;
+  const text = formatDemoRequestText(p);
+
+  if (!to) {
+    console.log('[demo-request-email] No inbox configured; set DEMO_REQUEST_TO or SALES_CONTACT_EMAIL.');
+    console.log('[demo-request-email] Subject:', subject);
+    console.log(text);
+    return;
+  }
+
+  if (!transport) {
+    console.log('[demo-request-email] SMTP not configured; skipping send.');
+    console.log('[demo-request-email] To:', to);
+    console.log('[demo-request-email] Subject:', subject);
+    console.log(text);
+    return;
+  }
+
+  await transport.sendMail({ from, to, replyTo: p.workEmail, subject, text });
 }

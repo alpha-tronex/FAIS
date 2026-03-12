@@ -1,45 +1,217 @@
 <div class="landing">
   <header class="landingHeader">
-    <div class="logo">Law Office of <span>Christophe Fiori</span>, PLLC</div>
-    <nav class="landingNav">
-      <a routerLink="/" fragment="family">Family Law</a>
-      <a routerLink="/" fragment="mediation">Mediation</a>
-      <a routerLink="/" fragment="evictions">Evictions</a>
-      <a routerLink="/" fragment="contact">Contact</a>
-      <a class="btnLogin" routerLink="/login">Login</a>
+    <a class="brand" routerLink="/">
+      <span class="brandMark">FAIS</span>
+      <span class="brandText">
+        <strong>Family-Law Operations</strong>
+        <span>Flat-fee software for Florida firms</span>
+      </span>
+    </a>
+
+    <nav class="landingNav" aria-label="Primary">
+      @for (item of navItems; track item.fragment) {
+        <a [routerLink]="['/']" [fragment]="item.fragment">{{ item.label }}</a>
+      }
+      <a class="navCta" routerLink="/login">Client Login</a>
     </nav>
   </header>
 
   <main class="landingMain">
-    <section class="hero">
-      <h1>Practical Legal Help • Clear Next Steps</h1>
-      <p class="tagline">Family Law <span class="dot">•</span> Mediation <span class="dot">•</span> Evictions (Florida)</p>
+    <section class="hero" id="top">
+      <div class="heroCopy">
+        <p class="eyebrow">Florida family-law specialist</p>
+        <h1>The flat-fee family-law operations platform built for Florida firms.</h1>
+        <p class="heroText">
+          FAIS helps small firms move matters from intake to affidavit completion with less
+          back-and-forth, clearer staff coordination, and predictable software cost.
+        </p>
 
-      <div class="services">
-        <div class="service-card" id="family">
-          <h2>Family Law</h2>
-          <p>Divorce, paternity, timesharing, support, and injunctions—clear advice and practical solutions.</p>
-          <a href="https://chrisfiori.com/" target="_blank" rel="noopener noreferrer">Request Consultation</a>
+        <div class="heroActions">
+          <a class="btn btnPrimary" routerLink="/demo">Book a Demo</a>
+          <a class="btn btnSecondary" [routerLink]="['/']" fragment="pricing">See Pricing</a>
         </div>
-        <div class="service-card" id="mediation">
-          <h2>Mediation</h2>
-          <p>Resolve disputes outside of court with remote or in-person mediation. Efficient scheduling and a structured process.</p>
-          <a href="https://chrisfiori.com/" target="_blank" rel="noopener noreferrer">Schedule Mediation</a>
-        </div>
-        <div class="service-card" id="evictions">
-          <h2>Evictions</h2>
-          <p>Fast, straightforward eviction filings for Florida landlords—nonpayment, lease violations, holdover, and unlawful detainer.</p>
-          <a href="https://chrisfiori.com/" target="_blank" rel="noopener noreferrer">Start an Eviction</a>
-        </div>
+
+        <ul class="heroPoints" aria-label="Primary value points">
+          @for (point of heroPoints; track point) {
+            <li>{{ point }}</li>
+          }
+        </ul>
       </div>
 
-      <div class="contact-bar" id="contact">
-        Family Law • Mediation • Evictions — Call <a href="tel:+18133331660">(813) 333-1660</a> — Tampa, FL
+      <aside class="heroCard" aria-label="Positioning summary">
+        <p class="cardLabel">Why firms switch</p>
+        <h2>Stop paying more every time you add a staff member.</h2>
+        <p>
+          Generic legal platforms charge per user. FAIS uses flat monthly firm pricing for small
+          Florida family-law teams.
+        </p>
+
+        <div class="metricGrid">
+          @for (metric of heroMetrics; track metric.label) {
+            <div class="metric">
+              <strong>{{ metric.value }}</strong>
+              <span>{{ metric.label }}</span>
+            </div>
+          }
+        </div>
+      </aside>
+    </section>
+
+    <section class="section proofBar" aria-label="Key proof points">
+      @for (proof of proofPoints; track proof.title) {
+        <article class="proofItem">
+          <h2>{{ proof.title }}</h2>
+          <p>{{ proof.copy }}</p>
+        </article>
+      }
+    </section>
+
+    <section class="section" id="product">
+      <div class="sectionIntro">
+        <p class="eyebrow">What FAIS handles</p>
+        <h2>Built around the workflows small family-law firms actually feel.</h2>
+        <p>
+          FAIS is designed around the recurring operational bottlenecks in Florida family-law
+          matters, especially when affidavits, documents, appointments, and client follow-up pile
+          up across the same case.
+        </p>
+      </div>
+
+      <div class="featureGrid">
+        @for (feature of productFeatures; track feature.title) {
+          <article class="featureCard">
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.copy }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="section workflowSection" id="workflow">
+      <div class="sectionIntro">
+        <p class="eyebrow">Demo narrative</p>
+        <h2>Show one matter moving cleanly from intake to court-ready output.</h2>
+      </div>
+
+      <div class="workflowGrid">
+        @for (step of workflowSteps; track step.title; let i = $index) {
+          <article class="workflowStep">
+            <span class="stepNumber">0{{ i + 1 }}</span>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.copy }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="section compareSection" id="compare">
+      <div class="sectionIntro">
+        <p class="eyebrow">Why this beats generic legal PM</p>
+        <h2>FAIS is sold on workflow depth and flat-fee economics.</h2>
+      </div>
+
+      <div class="compareTable" role="table" aria-label="FAIS comparison">
+        <div class="compareHeader" role="row">
+          <span role="columnheader">Category</span>
+          <span role="columnheader">FAIS</span>
+          <span role="columnheader">Generic per-user platforms</span>
+        </div>
+
+        @for (row of comparisonRows; track row.label) {
+          <div class="compareRow" role="row">
+            <span class="compareLabel" role="rowheader">{{ row.label }}</span>
+            <span role="cell">{{ row.fais }}</span>
+            <span role="cell">{{ row.competitor }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="section pricingSection" id="pricing">
+      <div class="sectionIntro">
+        <p class="eyebrow">Pricing</p>
+        <h2>Simple firm-based pricing, not a per-seat tax.</h2>
+        <p>
+          Standard plans are built for small firms with unlimited staff and client portal users
+          under normal small-firm usage. Larger firms or multi-office deployments move to custom
+          pricing.
+        </p>
+      </div>
+
+      <div class="pricingGrid">
+        @for (plan of pricingPlans; track plan.name) {
+          <article class="pricingCard" [class.pricingCardFeatured]="plan.featured">
+            <p class="planBadge">{{ plan.badge }}</p>
+            <h3>{{ plan.name }}</h3>
+            <p class="planPrice">{{ plan.price }}</p>
+            <p class="planCopy">{{ plan.copy }}</p>
+            <ul>
+              @for (item of plan.items; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </article>
+        }
+      </div>
+
+      <div class="addonPanel">
+        <h3>Optional add-ons</h3>
+        <div class="addonGrid">
+          @for (addon of addons; track addon.title) {
+            <article>
+              <strong>{{ addon.title }}</strong>
+              <p>{{ addon.copy }}</p>
+            </article>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section buyerSection" id="buyers">
+      <div class="sectionIntro">
+        <p class="eyebrow">Who this is for</p>
+        <h2>Best fit for Florida family-law firms with recurring affidavit workflow.</h2>
+      </div>
+
+      <div class="buyerGrid">
+        @for (buyer of buyerProfiles; track buyer.title) {
+          <article class="buyerCard">
+            <h3>{{ buyer.title }}</h3>
+            <p>{{ buyer.copy }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="section objectionSection" id="faq">
+      <div class="sectionIntro">
+        <p class="eyebrow">Sales enablement</p>
+        <h2>Handle the obvious objections before they slow the deal.</h2>
+      </div>
+
+      <div class="faqList">
+        @for (item of objections; track item.question) {
+          <article class="faqItem">
+            <h3>{{ item.question }}</h3>
+            <p>{{ item.answer }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="section ctaSection" id="contact">
+      <div class="ctaCard">
+        <p class="eyebrow">Next step</p>
+        <h2>Book a family-law workflow demo.</h2>
+        <p>
+          See how FAIS handles intake, affidavits, documents, scheduling, and staff coordination
+          in one case flow with flat monthly pricing for the whole firm.
+        </p>
+        <div class="heroActions">
+          <a class="btn btnPrimary" routerLink="/demo">Book a Demo</a>
+          <a class="btn btnGhost" routerLink="/login">Client Login</a>
+        </div>
       </div>
     </section>
   </main>
-
-  <footer class="landingFooter">
-    © Law Office of Christophe Fiori, PLLC — 607-A W Martin Luther King Jr Blvd, Tampa, Florida 33603
-  </footer>
 </div>
