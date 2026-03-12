@@ -1,0 +1,203 @@
+:host {
+  display: block;
+}
+
+.demoLanding {
+  --ink: #182532;
+  --muted: #55606d;
+  --accent: #8f4d26;
+  --navy: #1a3a4f;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.2rem 3rem;
+  color: var(--ink);
+}
+
+.demoCarouselWrap {
+  margin: 0 -1.2rem 2rem;
+  border-radius: 0 0 1rem 1rem;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(26, 58, 79, 0.15);
+}
+
+.demoCarousel :global(.carousel) {
+  background: linear-gradient(145deg, #f8f6f3 0%, #efe9e2 100%);
+}
+
+.demoCarousel :global(.carousel-inner),
+.demoCarousel :global(.carousel-item) {
+  min-height: 320px;
+}
+
+.demoCarousel :global(.carousel-control-prev),
+.demoCarousel :global(.carousel-control-next) {
+  opacity: 0.85;
+  width: 3rem;
+}
+
+.demoCarousel :global(.carousel-indicators) {
+  margin-bottom: 0.75rem;
+}
+
+.demoCarousel :global(.carousel-indicators button) {
+  background-color: var(--navy);
+  opacity: 0.4;
+}
+
+.demoCarousel :global(.carousel-indicators button.active) {
+  opacity: 1;
+}
+
+.carouselSlide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.carouselContent {
+  max-width: 28rem;
+}
+
+.carouselEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.carouselTitle {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.15;
+  color: #102537;
+  margin: 0 0 0.75rem;
+}
+
+.carouselCopy {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+}
+
+.carouselActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btnCarousel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.btnCarousel.btnPrimary {
+  background: linear-gradient(135deg, #8f4d26, #6e3414);
+  color: #fff;
+}
+
+.btnCarousel.btnSecondary {
+  background: transparent;
+  border: 2px solid var(--navy);
+  color: var(--navy);
+}
+
+.demoLandingHero {
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.demoLandingHero .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.demoLandingHero h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.1;
+  color: #102537;
+  margin: 0 0 1rem;
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.demoLandingHero .heroCopy {
+  color: var(--muted);
+  max-width: 36rem;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.heroActions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.35rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.heroActions .btnPrimary {
+  background: linear-gradient(135deg, #8f4d26, #6e3414);
+  color: #fff;
+}
+
+.heroActions .btnSecondary {
+  background: transparent;
+  border: 2px solid var(--navy);
+  color: var(--navy);
+}
+
+.backLink {
+  display: inline-block;
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .carouselSlide {
+    min-height: 280px;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .carouselActions {
+    flex-direction: column;
+  }
+
+  .btnCarousel {
+    width: 100%;
+  }
+}

@@ -1,0 +1,42 @@
+<main class="demoOverview">
+  <a class="backLink" routerLink="/demo">← Back to demo</a>
+
+  <section class="overviewIntro">
+    <p class="eyebrow">What the demo covers</p>
+    <h1>A focused walkthrough built for your firm.</h1>
+    <p class="introCopy">
+      We use one realistic family-law matter to show how FAIS handles intake, affidavits, documents,
+      and scheduling—with flat monthly pricing for the whole firm.
+    </p>
+  </section>
+
+  <div class="overviewGrid">
+    @for (item of demoChecklist; track item.title; let i = $index) {
+      <article class="overviewCard">
+        <div class="cardImageWrap" aria-hidden="true">
+          <!-- Placeholder for professional/context image; add assets/images/demo-overview-1.jpg etc. -->
+          <img
+            [src]="'assets/images/demo-overview-' + (i + 1) + '.jpg'"
+            alt=""
+            class="cardImage"
+            [class.hidden]="imgError[i]"
+            (error)="imgError[i] = true"
+          />
+          <div class="cardImagePlaceholder" [class.visible]="imgError[i]">
+            <span class="placeholderIcon">{{ i === 0 ? '📋' : i === 1 ? '💰' : '🚀' }}</span>
+            <span class="placeholderText">Professional / workflow image</span>
+          </div>
+        </div>
+        <div class="cardBody">
+          <h2>{{ item.title }}</h2>
+          <p>{{ item.copy }}</p>
+        </div>
+      </article>
+    }
+  </div>
+
+  <section class="overviewCta">
+    <p class="ctaCopy">Ready for a tailored walkthrough?</p>
+    <a class="btn btnPrimary" routerLink="/demo/request">Request a demo</a>
+  </section>
+</main>

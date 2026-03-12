@@ -45,9 +45,15 @@ Create a **Web Service** and connect the FAIS GitHub repo.
 - **Required**: `MONGODB_URI`, `JWT_SECRET`, `SSN_ENCRYPTION_KEY_B64` (generate: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`).
 - **PORT**: Set by Render automatically; server uses `process.env.PORT ?? 3001`.
 - **APP_BASE_URL**: Your Render URL (e.g. `https://<service>.onrender.com`) for invite/password-reset links.
-- **Optional**: `JWT_EXPIRES_IN`, and SMTP vars below if you use invite/password-reset emails.
+- **Optional**: `JWT_EXPIRES_IN`, `DEMO_REQUEST_TO`, and SMTP vars below if you use invite/password-reset/demo-request emails.
 
-**Sending invite and password-reset emails:** Without SMTP configured, the app still generates the correct links and logs the email body but does not send mail. To deliver emails from Render, use either:
+**Demo request inbox**
+
+- **`DEMO_REQUEST_TO`**: The inbox that should receive submissions from the public `/demo` form.
+- If unset, FAIS falls back to `SALES_CONTACT_EMAIL`, then `SMTP_USER`.
+- Recommended: set `DEMO_REQUEST_TO` explicitly so inbound marketing/demo leads do not depend on a fallback mailbox.
+
+**Sending invite, password-reset, and demo-request emails:** Without SMTP configured, the app still generates the correct links and logs the email body but does not send mail. To deliver emails from Render, use either:
 
 - **Option A – SMTP URL:** `SMTP_URL` (e.g. `smtps://user:password@smtp.example.com:465`) and optionally `SMTP_FROM`. For Gmail use an [App Password](https://support.google.com/accounts/answer/185833); URL-encode special characters in the password.
 

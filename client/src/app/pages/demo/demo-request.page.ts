@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 import { DemoContactService, type DemoRequestPayload } from '../../services/demo-contact.service';
 
-type ChecklistItem = { title: string; copy: string };
-
 @Component({
   standalone: false,
-  selector: 'app-demo-page',
-  templateUrl: './demo.page.html',
-  styleUrl: './demo.page.css'
+  selector: 'app-demo-request-page',
+  templateUrl: './demo-request.page.html',
+  styleUrl: './demo-request.page.css'
 })
-export class DemoPage {
+export class DemoRequestPage {
   fullName = '';
   firmName = '';
   workEmail = '';
@@ -23,6 +21,7 @@ export class DemoPage {
   busy = false;
   submitted = false;
   error: string | null = null;
+  introImgError = false;
 
   readonly firmSizeOptions = [
     'Solo attorney',
@@ -36,21 +35,6 @@ export class DemoPage {
     '6-15 per month',
     '16-30 per month',
     '30+ per month'
-  ];
-
-  readonly demoChecklist: ChecklistItem[] = [
-    {
-      title: 'Workflow walkthrough',
-      copy: 'See one family-law matter move from intake to affidavit completion, documents, and scheduling.'
-    },
-    {
-      title: 'Pricing fit',
-      copy: 'Review whether flat monthly pricing fits your staff count, case volume, and growth plans.'
-    },
-    {
-      title: 'Implementation path',
-      copy: 'Discuss pilot scope, onboarding support, and what would be needed to launch in your firm.'
-    }
   ];
 
   constructor(private readonly demoContact: DemoContactService) {}
