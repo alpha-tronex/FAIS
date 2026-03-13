@@ -18,3 +18,5 @@ import { DEMO_ROUTES } from './demo.routes';
   ]
 })
 export class DemoModule {}
+// Default export for loadChildren in case the chunk exposes it as default
+export default DemoModule;

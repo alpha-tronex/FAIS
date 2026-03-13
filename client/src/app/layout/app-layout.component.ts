@@ -10,10 +10,11 @@ import { Router } from '@angular/router';
 export class AppLayoutComponent {
   constructor(private readonly router: Router) {}
 
-  /** Show header and footer only when not on login/register/reset/forgot-password/reset-password or splash (root). */
+  /** Show header and footer only when not on login/register/reset/forgot-password/reset-password, splash (root), or demo. */
   get showChrome(): boolean {
     const url = this.router.url;
     const path = url.split('?')[0];
+    const isDemo = path === '/demo' || path.startsWith('/demo/');
     return (
       path !== '/login' &&
       path !== '/register' &&
@@ -21,7 +22,8 @@ export class AppLayoutComponent {
       path !== '/forgot-password' &&
       path !== '/reset-password' &&
       path !== '' &&
-      path !== '/'
+      path !== '/' &&
+      !isDemo
     );
   }
 }

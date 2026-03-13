@@ -1,4 +1,4 @@
-<main class="demoLanding">
+<main class="demoLanding" data-demo-page="landing">
   <section class="demoCarouselWrap">
     <ngb-carousel
       [showNavigationArrows]="true"
@@ -61,15 +61,10 @@
   </section>
 
   <section class="demoLandingHero">
-    <p class="eyebrow">Book a FAIS demo</p>
-    <h1>Show us your workflow. We’ll show you where FAIS fits.</h1>
-    <p class="heroCopy">
-      Built for small Florida family-law firms: flat pricing, better affidavit workflow, less operational drag.
-    </p>
-    <div class="heroActions">
-      <a class="btn btnPrimary" routerLink="/demo/request">Request a demo</a>
-      <a class="btn btnSecondary" routerLink="/demo/overview">What the demo covers</a>
+    <div class="heroGifs" aria-label="Attorneys and clients at work">
+      <img [src]="gif1Src" alt="Attorneys and clients collaborating" class="heroGif" (error)="onGifError(1)" />
+      <img [src]="gif2Src" alt="Legal team at work" class="heroGif" (error)="onGifError(2)" />
+      <img [src]="gif3Src" alt="Client meeting and case work" class="heroGif" (error)="onGifError(3)" />
     </div>
-    <a class="backLink" routerLink="/">Back to FAIS overview</a>
   </section>
 </main>

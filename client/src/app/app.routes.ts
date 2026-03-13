@@ -1,3 +1,4 @@
+import { Type } from '@angular/core';
 import { Routes } from '@angular/router';
 import { adminChildGuard, adminGuard } from './core/admin.guard';
 import { splashLandingGuard } from './core/splash-landing.guard';
@@ -27,7 +28,12 @@ export const routes: Routes = [
 	},
 	{
 		path: 'demo',
-		loadChildren: () => import('./pages/demo/demo.module').then((m) => m.DemoModule)
+		loadChildren: () =>
+			import('./pages/demo/demo-public.module').then((m: { DemoModule?: unknown; default?: unknown }) => {
+				const mod = m.DemoModule ?? m.default;
+				if (!mod) throw new Error('Demo module not found');
+				return mod as Type<unknown>;
+			})
 	},
 	{
 		path: 'register',
