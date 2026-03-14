@@ -1,70 +1,72 @@
 <main class="demoLanding" data-demo-page="landing">
-  <section class="demoCarouselWrap">
-    <ngb-carousel
-      [showNavigationArrows]="true"
-      [showNavigationIndicators]="true"
-      [interval]="5000"
-      [keyboard]="true"
-      [pauseOnHover]="true"
-      class="demoCarousel"
-    >
-      <ng-template ngbSlide>
-        <div class="carouselSlide carouselSlidePositioning">
-          <div class="carouselContent">
-            <p class="carouselEyebrow">Florida family-law specialist</p>
-            <h2 class="carouselTitle">Family-law operations built for Florida firms.</h2>
-            <p class="carouselCopy">Workflow depth for affidavit-heavy matters with flat monthly firm pricing.</p>
-          </div>
-        </div>
-      </ng-template>
-      <ng-template ngbSlide>
-        <div class="carouselSlide carouselSlideFlatFee">
-          <div class="carouselContent">
-            <p class="carouselEyebrow">Pricing</p>
-            <h2 class="carouselTitle">One monthly fee for the whole firm.</h2>
-            <p class="carouselCopy">Unlimited internal users and client portal users on standard plans. No per-seat tax.</p>
-          </div>
-        </div>
-      </ng-template>
-      <ng-template ngbSlide>
-        <div class="carouselSlide carouselSlideWorkflow">
-          <div class="carouselContent">
-            <p class="carouselEyebrow">Workflow</p>
-            <h2 class="carouselTitle">Intake → affidavits → documents → scheduling.</h2>
-            <p class="carouselCopy">One case flow from assignment to court-ready output.</p>
-          </div>
-        </div>
-      </ng-template>
-      <ng-template ngbSlide>
-        <div class="carouselSlide carouselSlidePricing">
-          <div class="carouselContent">
-            <p class="carouselEyebrow">Plans</p>
-            <h2 class="carouselTitle">Launch $399/mo · Growth $699/mo</h2>
-            <p class="carouselCopy">Pilot from $500 one-time. Choose the plan that fits your firm.</p>
-          </div>
-        </div>
-      </ng-template>
-      <ng-template ngbSlide>
-        <div class="carouselSlide carouselSlideCta">
-          <div class="carouselContent">
-            <p class="carouselEyebrow">Next step</p>
-            <h2 class="carouselTitle">See FAIS in action.</h2>
-            <p class="carouselCopy">30-day guided pilot. Book a tailored demo for your firm.</p>
-            <div class="carouselActions">
-              <a class="btnCarousel btnPrimary" routerLink="/demo/request">Request a demo</a>
-              <a class="btnCarousel btnSecondary" routerLink="/demo/overview">What to expect</a>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-    </ngb-carousel>
+  <section class="demoHero">
+    <div class="demoHeroCopy">
+      <p class="eyebrow">Request your FAIS demo</p>
+      <h1>See your affidavit workflow running cleanly in FAIS.</h1>
+      <p class="heroCopy">
+        Show us how your firm currently handles intake, affidavits, documents, and scheduling. We’ll
+        walk you through a FAIS flow tailored to your team and caseload.
+      </p>
+
+      <ul class="demoPoints">
+        <li>Built for small Florida family-law firms</li>
+        <li>Flat monthly pricing for your whole firm</li>
+        <li>Depth for affidavit, document, and scheduling workflows</li>
+      </ul>
+    </div>
+
+    <aside class="demoHeroCard" aria-label="Request a FAIS demo">
+      <h2>Book your workflow demo</h2>
+      <p>30–45 minute live walkthrough with time for questions.</p>
+      <a class="btnCarousel btnPrimary" routerLink="/demo/request">Request a demo</a>
+      <a class="btnCarousel btnSecondary" routerLink="/demo/overview">What the demo covers</a>
+    </aside>
   </section>
 
-  <section class="demoLandingHero">
+  <section class="demoBenefits">
+    <div class="sectionIntro">
+      <p class="eyebrow">What you’ll see in the demo</p>
+      <h2>How FAIS supports affidavit workflow, client coordination, and staff efficiency.</h2>
+    </div>
+
     <div class="heroGifs" aria-label="Attorneys and clients at work">
-      <img [src]="gif1Src" alt="Attorneys and clients collaborating" class="heroGif" (error)="onGifError(1)" />
-      <img [src]="gif2Src" alt="Legal team at work" class="heroGif" (error)="onGifError(2)" />
-      <img [src]="gif3Src" alt="Client meeting and case work" class="heroGif" (error)="onGifError(3)" />
+      <article class="heroGifItem">
+        <img [src]="gif1Src" alt="Affidavit workflow" class="heroGif" (error)="onGifError(1)" />
+        <h3>Affidavit workflow</h3>
+        <p>
+          Collect income, expenses, assets, and liabilities in one place and generate court-ready
+          affidavit output faster.
+        </p>
+      </article>
+
+      <article class="heroGifItem">
+        <img [src]="gif2Src" alt="Client coordination" class="heroGif" (error)="onGifError(2)" />
+        <h3>Client coordination</h3>
+        <p>
+          Give case participants a secure place to log in, update information, and complete work
+          without endless follow-up.
+        </p>
+      </article>
+
+      <article class="heroGifItem">
+        <img [src]="gif3Src" alt="Staff efficiency" class="heroGif" (error)="onGifError(3)" />
+        <h3>Staff efficiency</h3>
+        <p>
+          Keep messaging, appointments, reminders, and case-linked documents together so attorneys
+          and assistants stay aligned.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="demoClosingCta">
+    <div class="demoClosingCard">
+      <h2>Ready to see FAIS in your firm?</h2>
+      <p>
+        We’ll review your current process, show you a FAIS workflow across one example matter, and
+        outline a rollout plan tailored to your team.
+      </p>
+      <a class="btnCarousel btnPrimary" routerLink="/demo/request">Schedule your demo</a>
     </div>
   </section>
 </main>

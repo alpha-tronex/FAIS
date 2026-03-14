@@ -3,173 +3,45 @@
 }
 
 .demoLanding {
-  --ink: #182532;
-  --muted: #55606d;
-  --accent: #8f4d26;
-  --navy: #1a3a4f;
-  max-width: 1200px;
+  --ink: #1a2332;
+  --muted: #5c6b7a;
+  --accent: #c45c26;
+  --accent-dark: #a04a1a;
+  --navy: #0d2137;
+  --navy-soft: #1e4976;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow: 0 4px 24px rgba(13, 33, 55, 0.08);
+  width: min(1180px, calc(100% - 2.5rem));
   margin: 0 auto;
-  padding: 0 1.2rem 3rem;
+  padding: 2rem 1.25rem 4rem;
   color: var(--ink);
-}
-
-.demoCarouselWrap {
-  margin: 0 -1.2rem 2rem;
-  border-radius: 0 0 1rem 1rem;
-  overflow: hidden;
-  box-shadow: 0 12px 40px rgba(26, 58, 79, 0.15);
-}
-
-.demoCarousel :global(.carousel) {
-  background: linear-gradient(145deg, #f8f6f3 0%, #efe9e2 100%);
-}
-
-.demoCarousel :global(.carousel-inner),
-.demoCarousel :global(.carousel-item) {
-  min-height: 320px;
-}
-
-.demoCarousel :global(.carousel-control-prev),
-.demoCarousel :global(.carousel-control-next) {
-  opacity: 0.85;
-  width: 3rem;
-}
-
-.demoCarousel :global(.carousel-indicators) {
-  margin-bottom: 0.75rem;
-}
-
-.demoCarousel :global(.carousel-indicators button) {
-  background-color: var(--navy);
-  opacity: 0.4;
-}
-
-.demoCarousel :global(.carousel-indicators button.active) {
-  opacity: 1;
-}
-
-.carouselSlide {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 320px;
-  padding: 2.5rem 2rem;
-  text-align: center;
-}
-
-.carouselContent {
-  max-width: 28rem;
-}
-
-.carouselEyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin: 0 0 0.5rem;
-}
-
-.carouselTitle {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  line-height: 1.15;
-  color: #102537;
-  margin: 0 0 0.75rem;
-}
-
-.carouselCopy {
-  color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.5;
-  margin: 0 0 1.25rem;
-}
-
-.carouselActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f6f8 40%);
 }
 
 .btnCarousel {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.65rem 1.25rem;
-  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
   font-weight: 700;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btnCarousel.btnPrimary {
-  background: linear-gradient(135deg, #8f4d26, #6e3414);
+  background: var(--accent);
   color: #fff;
+  box-shadow: 0 4px 14px rgba(196, 92, 38, 0.3);
+}
+
+.btnCarousel.btnPrimary:hover {
+  background: var(--accent-dark);
 }
 
 .btnCarousel.btnSecondary {
-  background: transparent;
-  border: 2px solid var(--navy);
-  color: var(--navy);
-}
-
-.demoLandingHero {
-  text-align: center;
-  padding: 0 0.5rem;
-}
-
-.demoLandingHero .eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin: 0 0 0.5rem;
-}
-
-.demoLandingHero h1 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.1;
-  color: #102537;
-  margin: 0 0 1rem;
-  max-width: 20ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.demoLandingHero .heroCopy {
-  color: var(--muted);
-  max-width: 36rem;
-  margin: 0 auto 1.5rem;
-  line-height: 1.6;
-}
-
-.heroActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.heroActions .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.35rem;
-  border-radius: 999px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.heroActions .btnPrimary {
-  background: linear-gradient(135deg, #8f4d26, #6e3414);
-  color: #fff;
-}
-
-.heroActions .btnSecondary {
   background: transparent;
   border: 2px solid var(--navy);
   color: var(--navy);
@@ -187,6 +59,113 @@
   text-decoration: underline;
 }
 
+.demoHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.demoHeroCopy {
+  padding: 2.5rem 2rem;
+}
+
+.demoHeroCopy .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.demoHeroCopy h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.2rem, 4.2vw, 3.2rem);
+  line-height: 1.08;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 1rem;
+  max-width: 20ch;
+  letter-spacing: -0.02em;
+}
+
+.demoHeroCopy .heroCopy {
+  color: var(--muted);
+  max-width: 34rem;
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+.demoPoints {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.demoPoints li {
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  background: #f8f9fa;
+  border: 1px solid rgba(13, 33, 55, 0.08);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.demoHeroCard {
+  padding: 2rem 1.8rem;
+  border-radius: var(--radius-lg);
+  background: var(--navy);
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+
+.demoHeroCard h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+}
+
+.demoHeroCard p {
+  margin: 0 0 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.demoHeroCard .btnCarousel.btnPrimary {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.demoHeroCard .btnCarousel.btnSecondary {
+  width: 100%;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.72);
+  color: #fff;
+}
+
+.demoBenefits {
+  margin-top: 1rem;
+  padding: 2.2rem 0;
+}
+
+.demoBenefits .sectionIntro {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.demoBenefits .sectionIntro h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+  line-height: 1.08;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0.4rem 0 0.6rem;
+  letter-spacing: -0.01em;
+}
+
 .heroGifs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -195,27 +174,82 @@
   max-width: 900px;
 }
 
+.heroGifItem h3 {
+  margin-top: 0.8rem;
+  margin-bottom: 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.heroGifItem p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 0.96rem;
+}
+
 .heroGif {
   width: 100%;
   height: auto;
-  border-radius: 0.5rem;
+  border-radius: var(--radius);
   object-fit: cover;
   aspect-ratio: 4 / 3;
-  box-shadow: 0 8px 24px rgba(26, 58, 79, 0.12);
+  box-shadow: var(--shadow);
+}
+
+.demoClosingCta {
+  margin-top: 2.5rem;
+}
+
+.demoClosingCard {
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.8rem;
+  background: var(--navy);
+  color: #fff;
+  text-align: left;
+  box-shadow: 0 8px 32px rgba(13, 33, 55, 0.25);
+}
+
+.demoClosingCard h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.demoClosingCard p {
+  margin: 0 0 1.2rem;
+  max-width: 34rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.demoClosingCard .btnCarousel.btnPrimary {
+  background: #fff;
+  color: var(--navy);
 }
 
 @media (max-width: 760px) {
-  .heroGifs {
+  .demoLanding {
+    width: calc(100% - 1.3rem);
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+
+  .demoHero {
     grid-template-columns: 1fr;
   }
 
-  .carouselSlide {
-    min-height: 280px;
-    padding: 1.75rem 1.25rem;
+  .demoHeroCopy {
+    padding: 1.8rem 0.5rem 1.4rem;
   }
 
-  .carouselActions {
-    flex-direction: column;
+  .demoHeroCard {
+    padding: 1.6rem 1.2rem;
+  }
+
+  .heroGifs {
+    grid-template-columns: 1fr;
   }
 
   .btnCarousel {

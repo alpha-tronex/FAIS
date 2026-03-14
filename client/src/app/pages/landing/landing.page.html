@@ -8,26 +8,24 @@
       </span>
     </a>
 
-    <nav class="landingNav" aria-label="Primary">
-      @for (item of navItems; track item.fragment) {
-        <a [routerLink]="['/']" [fragment]="item.fragment">{{ item.label }}</a>
-      }
-      <a class="navCta" routerLink="/login">Client Login</a>
-    </nav>
+    <div class="landingHeaderRight">
+      <a class="headerPhone" href="tel:+1-000-000-0000">(000) 000-0000</a>
+      <a class="headerCta" routerLink="/demo">Book a Workflow Demo</a>
+    </div>
   </header>
 
   <main class="landingMain">
     <section class="hero" id="top">
       <div class="heroCopy">
-        <p class="eyebrow">Florida family-law specialist</p>
-        <h1>The flat-fee family-law operations platform built for Florida firms.</h1>
+        <p class="eyebrow">Built exclusively for Florida family-law firms</p>
+        <h1>FAIS is the operations edge for affidavit-heavy family-law practices.</h1>
         <p class="heroText">
-          FAIS helps small firms move matters from intake to affidavit completion with less
-          back-and-forth, clearer staff coordination, and predictable software cost.
+          From intake through affidavits, documents, and scheduling, FAIS gives small Florida firms
+          flat-fee software that reduces back-and-forth and keeps every case on track.
         </p>
 
         <div class="heroActions">
-          <a class="btn btnPrimary" routerLink="/demo">Book a Demo</a>
+          <a class="btn btnPrimary" routerLink="/demo">Request Your FAIS Demo</a>
           <a class="btn btnSecondary" [routerLink]="['/']" fragment="pricing">See Pricing</a>
         </div>
 
@@ -57,13 +55,24 @@
       </aside>
     </section>
 
-    <section class="section proofBar" aria-label="Key proof points">
-      @for (proof of proofPoints; track proof.title) {
-        <article class="proofItem">
-          <h2>{{ proof.title }}</h2>
-          <p>{{ proof.copy }}</p>
-        </article>
-      }
+    <section class="section proofSection" aria-label="Why choose FAIS">
+      <div class="sectionIntro">
+        <p class="eyebrow">Why choose FAIS</p>
+        <h2>100% focused on Florida family-law operations.</h2>
+        <p>
+          FAIS isn’t a general legal PM tool. Every workflow is built around how family-law
+          affidavits, documents, and client communication actually move through small firms.
+        </p>
+      </div>
+
+      <div class="proofBar">
+        @for (proof of proofPoints; track proof.title) {
+          <article class="proofItem">
+            <h3>{{ proof.title }}</h3>
+            <p>{{ proof.copy }}</p>
+          </article>
+        }
+      </div>
     </section>
 
     <section class="section" id="product">

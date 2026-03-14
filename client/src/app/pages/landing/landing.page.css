@@ -4,25 +4,24 @@
 }
 
 .landing {
-  --bg: #f4efe6;
-  --surface: rgba(255, 250, 242, 0.88);
-  --surface-strong: #fffaf3;
-  --ink: #1f2430;
-  --muted: #5b6272;
-  --line: rgba(31, 36, 48, 0.1);
-  --accent: #9d5c2f;
-  --accent-dark: #6f3916;
-  --accent-soft: #e8d4c4;
-  --navy: #193347;
-  --navy-soft: #284e67;
-  --shadow: 0 18px 60px rgba(25, 51, 71, 0.12);
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --ink: #1a2332;
+  --muted: #5c6b7a;
+  --line: rgba(26, 35, 50, 0.08);
+  --accent: #c45c26;
+  --accent-dark: #a04a1a;
+  --accent-soft: #f0e0d6;
+  --navy: #0d2137;
+  --navy-soft: #1e4976;
+  --shadow: 0 4px 24px rgba(13, 33, 55, 0.08);
+  --radius: 12px;
+  --radius-lg: 16px;
   font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
   color: var(--ink);
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(157, 92, 47, 0.12), transparent 26%),
-    radial-gradient(circle at top right, rgba(25, 51, 71, 0.14), transparent 28%),
-    linear-gradient(180deg, #fbf7f0 0%, var(--bg) 52%, #efe4d8 100%);
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 30%, #eef0f3 100%);
 }
 
 .landingHeader {
@@ -34,9 +33,9 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 2rem;
-  backdrop-filter: blur(16px);
-  background: rgba(251, 247, 240, 0.88);
-  border-bottom: 1px solid rgba(31, 36, 48, 0.06);
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 2px 12px rgba(13, 33, 55, 0.06);
 }
 
 .brand {
@@ -52,8 +51,8 @@
   place-items: center;
   width: 3rem;
   height: 3rem;
-  border-radius: 0.9rem;
-  background: linear-gradient(135deg, var(--navy), var(--navy-soft));
+  border-radius: var(--radius);
+  background: var(--navy);
   color: #fff;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.3rem;
@@ -78,33 +77,31 @@
   color: var(--muted);
 }
 
-.landingNav {
+.landingHeaderRight {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.75rem;
 }
 
-.landingNav a {
+.headerPhone {
+  font-weight: 700;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--navy);
   font-size: 0.95rem;
-  font-weight: 600;
-  padding: 0.7rem 0.9rem;
-  border-radius: 999px;
 }
 
-.landingNav a:hover {
-  background: rgba(25, 51, 71, 0.07);
-}
-
-.landingNav .navCta {
-  background: var(--navy);
+.headerCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  background: var(--accent);
   color: #fff;
-}
-
-.landingNav .navCta:hover {
-  background: var(--navy-soft);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 14px rgba(196, 92, 38, 0.35);
 }
 
 .landingMain {
@@ -120,9 +117,9 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(290px, 0.8fr);
-  gap: 1.5rem;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1.3fr) minmax(290px, 0.7fr);
+  gap: 2rem;
+  align-items: center;
 }
 
 .heroCopy,
@@ -139,17 +136,16 @@
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(12px);
 }
 
 .heroCopy {
-  padding: 3rem;
-  border-radius: 2rem;
+  padding: 2.5rem 2.75rem;
+  border-radius: var(--radius-lg);
 }
 
 .heroCard {
   padding: 2rem;
-  border-radius: 1.75rem;
+  border-radius: var(--radius-lg);
   align-self: end;
 }
 
@@ -174,14 +170,16 @@
 .ctaCard h2,
 .heroCard h2 {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  line-height: 0.98;
-  color: #12283b;
+  line-height: 1.08;
+  color: var(--navy);
+  font-weight: 700;
 }
 
 .hero h1 {
   margin: 0.75rem 0 1rem;
-  font-size: clamp(3.2rem, 6vw, 5.8rem);
-  max-width: 11ch;
+  font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+  max-width: 12ch;
+  letter-spacing: -0.02em;
 }
 
 .heroText,
@@ -214,35 +212,39 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 3rem;
-  padding: 0.85rem 1.2rem;
-  border-radius: 999px;
+  min-height: 2.75rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: 6px;
   text-decoration: none;
   font-weight: 700;
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    color 0.18s ease;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn:hover {
-  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(13, 33, 55, 0.15);
 }
 
 .btnPrimary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  background: var(--accent);
   color: #fff;
+  box-shadow: 0 4px 14px rgba(196, 92, 38, 0.3);
+}
+
+.btnPrimary:hover {
+  background: var(--accent-dark);
 }
 
 .btnSecondary {
-  background: rgba(25, 51, 71, 0.08);
+  background: #fff;
   color: var(--navy);
+  border: 2px solid var(--navy);
 }
 
 .btnGhost {
   background: transparent;
   color: var(--navy);
-  border: 1px solid rgba(25, 51, 71, 0.2);
+  border: 1px solid rgba(13, 33, 55, 0.25);
 }
 
 .heroPoints {
@@ -255,11 +257,12 @@
 }
 
 .heroPoints li {
-  padding: 0.95rem 1rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(31, 36, 48, 0.06);
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  background: #f8f9fa;
+  border: 1px solid var(--line);
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .heroCard h2 {
@@ -276,8 +279,9 @@
 
 .metric {
   padding: 1rem;
-  border-radius: 1rem;
-  background: rgba(25, 51, 71, 0.07);
+  border-radius: var(--radius);
+  background: #f0f3f6;
+  border: 1px solid var(--line);
 }
 
 .metric strong {
@@ -296,31 +300,32 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  padding: 1.3rem;
-  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
 }
 
 .proofItem {
   padding: 0.7rem;
 }
 
-.proofItem h2,
+.proofItem h3,
 .featureCard h3,
 .workflowStep h3,
 .pricingCard h3,
 .buyerCard h3,
 .faqItem h3,
 .addonPanel h3 {
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.5rem;
   font-size: 1.1rem;
-  color: #16283a;
+  font-weight: 700;
+  color: var(--navy);
 }
 
 .section {
-  padding: 2.2rem;
-  border-radius: 2rem;
-  background: rgba(255, 253, 249, 0.46);
-  border: 1px solid rgba(31, 36, 48, 0.05);
+  padding: 2rem 2.25rem;
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 1px solid var(--line);
 }
 
 .sectionIntro {
@@ -330,7 +335,8 @@
 
 .sectionIntro h2 {
   margin: 0.4rem 0 0.6rem;
-  font-size: clamp(2rem, 4vw, 3.3rem);
+  font-size: clamp(1.9rem, 3.8vw, 2.85rem);
+  letter-spacing: -0.01em;
 }
 
 .featureGrid,
@@ -353,7 +359,7 @@
 .buyerCard,
 .faqItem {
   padding: 1.35rem;
-  border-radius: 1.25rem;
+  border-radius: var(--radius);
 }
 
 .workflowGrid {
@@ -372,7 +378,7 @@
 }
 
 .compareTable {
-  border-radius: 1.4rem;
+  border-radius: var(--radius);
   overflow: hidden;
 }
 
@@ -385,7 +391,7 @@
 }
 
 .compareHeader {
-  background: #17364c;
+  background: var(--navy);
   color: #fff;
   font-weight: 700;
 }
@@ -396,7 +402,7 @@
 
 .compareLabel {
   font-weight: 700;
-  color: #16283a;
+  color: var(--navy);
 }
 
 .pricingGrid {
@@ -411,8 +417,9 @@
 }
 
 .pricingCardFeatured {
-  background: linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(232, 212, 196, 0.92));
-  transform: translateY(-0.2rem);
+  background: linear-gradient(180deg, #fffbf7 0%, #f8f4ef 100%);
+  border: 2px solid rgba(196, 92, 38, 0.2);
+  transform: translateY(-0.15rem);
 }
 
 .planPrice {
@@ -466,9 +473,11 @@
 }
 
 .ctaCard {
-  padding: 2.4rem;
-  border-radius: 2rem;
-  background: linear-gradient(135deg, rgba(25, 51, 71, 0.96), rgba(56, 91, 112, 0.93));
+  padding: 2.25rem 2.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--navy);
+  border: none;
+  box-shadow: 0 8px 32px rgba(13, 33, 55, 0.25);
 }
 
 .ctaCard h2,
@@ -477,7 +486,7 @@
 }
 
 .ctaCard .eyebrow {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 1080px) {

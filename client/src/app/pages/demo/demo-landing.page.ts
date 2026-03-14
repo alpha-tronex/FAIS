@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 const ASSET = (n: number) => `assets/images/demo-attorneys-clients-${n}.gif`;
 const PLACEHOLDER = (n: number) =>
-  `https://placehold.co/400x300/1a3a4f/efe9e2?text=Attorneys+%26+clients+${n}`;
+  `https://placehold.co/400x300/0d2137/f5f6f8?text=Attorneys+%26+clients+${n}`;
 
 @Component({
   standalone: false,
