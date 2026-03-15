@@ -7,12 +7,23 @@ import mongoose from 'mongoose';
 
 export type EnrichmentResult = {
   countyId?: number;
+  /** Multiple county IDs (e.g. from document context); use $in when length > 1. */
+  countyIds?: number[];
   stateId?: number;
   /** Resolved user ObjectId (set when exactly one user is mentioned). */
   userId?: string;
   /** Resolved user ObjectIds (set when one or more users are mentioned; use for $in when length > 1). */
   userIds?: string[];
+  /** Case numbers to filter by (e.g. from document context). */
+  caseNumbers?: string[];
   promptSnippet: string;
+};
+
+/** Optional context from an uploaded document (e.g. extracted by Manus). Merged into enrichment when provided. */
+export type DocumentContext = {
+  countyNames?: string[];
+  caseNumbers?: string[];
+  userIdentifiers?: string[];
 };
 
 /** Match county-like phrases: "in X county", "X county", "Broward", "Miami-Dade", etc. */
@@ -92,12 +103,16 @@ async function resolveUserByUname(uname: string): Promise<string | null> {
 /**
  * Enrich the question: detect county, state, and user mentions; resolve to IDs;
  * build a prompt snippet to inject so the LLM uses the correct IDs.
+ * If documentContext is provided (e.g. from an uploaded file extraction), resolve those entities too and merge.
  */
-export async function enrichQuestionWithIds(question: string): Promise<EnrichmentResult> {
+export async function enrichQuestionWithIds(
+  question: string,
+  documentContext?: DocumentContext
+): Promise<EnrichmentResult> {
   const result: EnrichmentResult = { promptSnippet: '' };
   const lines: string[] = [];
 
-  // Counties
+  // Counties (from question text)
   for (const re of COUNTY_PATTERNS) {
     const m = question.match(re);
     if (m) {
@@ -166,6 +181,44 @@ export async function enrichQuestionWithIds(question: string): Promise<Enrichmen
           break;
         }
       }
+    }
+  }
+
+  // Merge document context: resolve county names, user identifiers, and pass through case numbers
+  if (documentContext) {
+    if (documentContext.countyNames?.length) {
+      const ids: number[] = [];
+      for (const name of documentContext.countyNames) {
+        const id = await resolveCountyByName(name);
+        if (id != null && !ids.includes(id)) ids.push(id);
+      }
+      if (ids.length > 0) {
+        if (ids.length === 1) {
+          result.countyId = ids[0];
+        }
+        result.countyIds = ids;
+        lines.push(
+          `Document context: counties ${documentContext.countyNames.join(', ')} → countyId(s) ${ids.join(', ')}. Use in filters.`
+        );
+      }
+    }
+    if (documentContext.userIdentifiers?.length) {
+      const ids: string[] = [];
+      for (const ident of documentContext.userIdentifiers) {
+        const id = await resolveUserByUname(ident);
+        if (id && !ids.includes(id)) ids.push(id);
+      }
+      if (ids.length > 0 && !result.userIds?.length) {
+        result.userIds = ids;
+        result.userId = ids[0];
+        lines.push(
+          `Document context: user(s) ${documentContext.userIdentifiers.join(', ')} → userId(s). Use in filters.`
+        );
+      }
+    }
+    if (documentContext.caseNumbers?.length) {
+      result.caseNumbers = documentContext.caseNumbers;
+      lines.push(`Document context: restrict to case numbers: ${documentContext.caseNumbers.join(', ')}.`);
     }
   }
 

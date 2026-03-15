@@ -8,12 +8,15 @@ import {
   runMongoFind,
   runMongoAggregate,
 } from '../lib/mongo-query-runner.js';
-import { retrieveSimilarExamples } from '../lib/ai-query-rag.js';
-import { getSchemaForPrompt } from '../lib/ai-query-schema-discovery.js';
+import { retrieveSimilarExamples, invalidateRagCache } from '../lib/ai-query-rag.js';
+import { getSchemaForPrompt, refreshDiscoveredSchema, hasDiscoveredSchema } from '../lib/ai-query-schema-discovery.js';
 import { getRelationshipGraphText } from '../lib/ai-query-relationship-graph.js';
 import { enrichQuestionWithIds } from '../lib/ai-query-id-enrichment.js';
+import { loadDynamicExamples, insertDynamicExample } from '../lib/ai-query-dynamic-examples.js';
+import type { AiQueryExample, ExampleQuery } from '../lib/ai-query-examples.js';
+import { AiQueryExampleModel } from '../models/ai-query-example.model.js';
 import { sendError, sendErrorWithMessage } from './error.js';
-import type { AuthMiddlewares } from './middleware.js';
+import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 
 const RESULT_SIZE_THRESHOLD_FOR_SUMMARY = 8; // If more than this many rows, call summary LLM
 const MAX_RESULT_JSON_CHARS = 8000;
@@ -650,10 +653,88 @@ function formatAffidavitListSummary(
 
 const SUMMARY_SYSTEM = `You are a helpful assistant. The user asked a question about the database. You will receive the question, the query results (JSON), and optionally "Resolved users" (userId -> full name), "Resolved counties" (id -> county name), "Resolved circuits", "Resolved states", "Resolved divisions", "Resolved role types" (id -> name), "Appointments" (upcoming), and/or "Assets" (affidavit assets for those users). Use Resolved users to state person full names. When any "Resolved ..." lookup is provided (counties, circuits, states, divisions, role types), use it to state names by ID (e.g. "Broward: $6,300" or "Petitioner Attorney: 12 users")—do not say "id 1" or "county with id 1"; use the resolved name. When appointment data is provided, list each appointment with date/time, status, and duration. When asset data is provided, list each asset with description and market value. Respond in 2-4 clear, concise sentences or a short list. Do not use markdown or code blocks. A person's full name comes from the users collection (firstName, lastName). employment.name is the EMPLOYER name, not the person's name. When results include __collection (employment, monthlyincome, assets, liabilities), group your answer by that.`;
 
+/** Validate a candidate example query (find or aggregate); throws if invalid. */
+function validateExampleQuery(query: unknown): void {
+  const q = query as ExampleQuery;
+  if (!q || typeof q !== 'object' || typeof q.type !== 'string' || typeof q.collection !== 'string') {
+    throw new Error('Query must have type and collection');
+  }
+  const col = (q.collection ?? '').trim();
+  if (q.type === 'find') {
+    validateAndSanitizeQuery({
+      collection: col,
+      filter: (q as { filter?: Record<string, unknown> }).filter ?? {},
+      projection: (q as { projection?: Record<string, unknown> }).projection,
+      limit: (q as { limit?: number }).limit,
+    });
+  } else if (q.type === 'aggregate') {
+    const pipeline = (q as { pipeline?: unknown[] }).pipeline;
+    if (!Array.isArray(pipeline)) throw new Error('Aggregate query must have pipeline array');
+    validateAndSanitizeAggregate({ collection: col, pipeline });
+  } else {
+    throw new Error('Query type must be find or aggregate');
+  }
+}
+
 export function createAdminRouter(
   auth: Pick<AuthMiddlewares, 'requireAuth' | 'requireAdmin' | 'requireAdminOrAiStaff'>
 ): express.Router {
   const router = express.Router();
+
+  router.get('/admin/ai-query/context', auth.requireAuth, auth.requireAdminOrAiStaff, async (_req, res) => {
+    try {
+      if (!hasDiscoveredSchema()) {
+        await refreshDiscoveredSchema();
+      }
+      res.json({
+        schema: getSchemaForPrompt(),
+        relationshipGraph: getRelationshipGraphText(),
+      });
+    } catch (e) {
+      sendError(res, e, 500);
+    }
+  });
+
+  router.get('/admin/ai-query/examples', auth.requireAuth, auth.requireAdminOrAiStaff, async (_req, res) => {
+    try {
+      const docs = await AiQueryExampleModel.find({}).sort({ createdAt: -1 }).lean();
+      res.json({ examples: docs });
+    } catch (e) {
+      sendError(res, e, 500);
+    }
+  });
+
+  router.post('/admin/ai-query/examples', auth.requireAuth, auth.requireAdminOrAiStaff, async (req, res) => {
+    const body = req.body;
+    const items: AiQueryExample[] = Array.isArray(body)
+      ? body
+      : body && typeof body.question === 'string' && body.query && typeof body.result_summary === 'string'
+        ? [body as AiQueryExample]
+        : [];
+    if (items.length === 0) {
+      return sendErrorWithMessage(res, 'Missing or invalid body: provide { question, query, result_summary } or an array of same', 400);
+    }
+    const auth = (req as express.Request & { auth?: AuthPayload }).auth;
+    const createdBy = auth?.sub ? new mongoose.Types.ObjectId(auth.sub) : undefined;
+    const added: unknown[] = [];
+    const errors: { index: number; error: string }[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const ex = items[i]!;
+      try {
+        validateExampleQuery(ex.query);
+        await insertDynamicExample(ex, createdBy);
+        added.push({ question: ex.question });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        errors.push({ index: i, error: msg });
+      }
+    }
+    if (errors.length > 0 && added.length === 0) {
+      return res.status(400).json({ error: 'All examples failed validation', details: errors });
+    }
+    invalidateRagCache();
+    res.status(201).json({ added: added.length, errors: errors.length > 0 ? errors : undefined });
+  });
 
   router.post('/admin/query', auth.requireAuth, auth.requireAdminOrAiStaff, async (req, res) => {
     const question =
@@ -663,6 +744,23 @@ export function createAdminRouter(
     }
 
     const skipClarification = req.body?.skipClarification === true;
+    const documentContext = req.body?.documentContext &&
+      typeof req.body.documentContext === 'object' &&
+      (Array.isArray(req.body.documentContext.countyNames) ||
+        Array.isArray(req.body.documentContext.caseNumbers) ||
+        Array.isArray(req.body.documentContext.userIdentifiers))
+      ? {
+          countyNames: Array.isArray(req.body.documentContext.countyNames)
+            ? req.body.documentContext.countyNames.filter((x: unknown) => typeof x === 'string')
+            : undefined,
+          caseNumbers: Array.isArray(req.body.documentContext.caseNumbers)
+            ? req.body.documentContext.caseNumbers.filter((x: unknown) => typeof x === 'string')
+            : undefined,
+          userIdentifiers: Array.isArray(req.body.documentContext.userIdentifiers)
+            ? req.body.documentContext.userIdentifiers.filter((x: unknown) => typeof x === 'string')
+            : undefined,
+        }
+      : undefined;
 
     const client = getOpenAIClient();
     if (!client) {
@@ -682,10 +780,10 @@ export function createAdminRouter(
         }
       }
 
-      // Step 2b: ID enrichment — resolve county/state/user names in the question to IDs
+      // Step 2b: ID enrichment — resolve county/state/user names in the question (and optional documentContext) to IDs
       let enrichment: Awaited<ReturnType<typeof enrichQuestionWithIds>>;
       try {
-        enrichment = await enrichQuestionWithIds(question);
+        enrichment = await enrichQuestionWithIds(question, documentContext);
       } catch {
         enrichment = { promptSnippet: '' };
       }
@@ -750,8 +848,17 @@ export function createAdminRouter(
       // Optionally inject resolved IDs into filter when the LLM did not set them
       const filter = (args.filter && typeof args.filter === 'object' ? args.filter : {}) as Record<string, unknown>;
       const col = (args.collection ?? '').trim();
-      if (enrichment.countyId != null && col === 'case' && filter.countyId == null) {
-        filter.countyId = enrichment.countyId;
+      if (col === 'case' && filter.countyId == null) {
+        if (enrichment.countyIds?.length) {
+          filter.countyId = enrichment.countyIds.length === 1 ? enrichment.countyIds[0] : { $in: enrichment.countyIds };
+          args.filter = filter;
+        } else if (enrichment.countyId != null) {
+          filter.countyId = enrichment.countyId;
+          args.filter = filter;
+        }
+      }
+      if (col === 'case' && enrichment.caseNumbers?.length && filter.caseNumber == null) {
+        filter.caseNumber = enrichment.caseNumbers.length === 1 ? enrichment.caseNumbers[0] : { $in: enrichment.caseNumbers };
         args.filter = filter;
       }
       // For affidavit collections, always use resolved userId(s) (LLM may output placeholder or username string)

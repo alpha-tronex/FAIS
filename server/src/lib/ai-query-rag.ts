@@ -1,11 +1,13 @@
 /**
  * RAG for AI Query: LangChain OpenAIEmbeddings + in-memory similarity search over (question, query, result_summary) examples.
  * At request time we embed the user question and retrieve top-k similar examples to augment the prompt.
+ * Merges static examples with dynamic examples from MongoDB (see ai-query-dynamic-examples.ts).
  */
 
 import { OpenAIEmbeddings } from '@langchain/openai';
 import type { AiQueryExample, ExampleQuery } from './ai-query-examples.js';
 import { AI_QUERY_EXAMPLES } from './ai-query-examples.js';
+import { loadDynamicExamples } from './ai-query-dynamic-examples.js';
 
 const EMBEDDING_MODEL = 'text-embedding-3-small';
 const TOP_K = 5;
@@ -13,6 +15,11 @@ const TOP_K = 5;
 let embeddings: OpenAIEmbeddings | null = null;
 type ExampleWithEmbedding = AiQueryExample & { embedding: number[] };
 let examplesWithEmbeddings: ExampleWithEmbedding[] | null = null;
+
+/** Call after adding dynamic examples so the next request re-embeds static + dynamic. */
+export function invalidateRagCache(): void {
+  examplesWithEmbeddings = null;
+}
 
 function getEmbeddings(): OpenAIEmbeddings {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -44,14 +51,21 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 /**
- * Load example embeddings (once). Uses LangChain OpenAIEmbeddings.
+ * Load all examples (static + dynamic from MongoDB), then embed. Cache is invalidated when dynamic examples are added.
  */
 async function getExamplesWithEmbeddings(): Promise<ExampleWithEmbedding[]> {
   if (examplesWithEmbeddings) return examplesWithEmbeddings;
   const emb = getEmbeddings();
-  const questions = AI_QUERY_EXAMPLES.map((ex) => ex.question);
+  let allExamples: AiQueryExample[];
+  try {
+    const dynamic = await loadDynamicExamples();
+    allExamples = [...AI_QUERY_EXAMPLES, ...dynamic];
+  } catch {
+    allExamples = AI_QUERY_EXAMPLES;
+  }
+  const questions = allExamples.map((ex) => ex.question);
   const vectors = await emb.embedDocuments(questions);
-  examplesWithEmbeddings = AI_QUERY_EXAMPLES.map((ex, i) => ({
+  examplesWithEmbeddings = allExamples.map((ex, i) => ({
     ...ex,
     embedding: vectors[i] ?? [],
   }));
