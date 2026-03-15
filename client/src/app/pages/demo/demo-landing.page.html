@@ -1,4 +1,52 @@
-<main class="demoLanding" data-demo-page="landing">
+@if (layoutVersion$ | async; as version) {
+  @switch (version) {
+    @case (2) {
+      <main class="demoLanding demoLandingV2" data-demo-page="landing">
+        <div class="trDemoUtility">
+          <a [routerLink]="['/']" [queryParams]="{ v: version }">← Back to FAIS overview</a>
+          <a routerLink="/login">Client Login</a>
+        </div>
+        <header class="trDemoHeader">
+          <a class="brand" [routerLink]="['/']" [queryParams]="{ v: version }">
+            <span class="brandMark">FAIS</span>
+            <span class="brandText"><strong>Financial Affidavit Intake System</strong></span>
+          </a>
+          <a class="trDemoCta" [routerLink]="['/demo/request']" [queryParams]="{ v: version }">Request a demo</a>
+        </header>
+        <section class="trDemoHero">
+          <p class="trDemoEyebrow">Book a family-law workflow demo</p>
+          <h1>See your affidavit workflow running cleanly in FAIS.</h1>
+          <p class="trDemoSub">Show us how your firm handles intake, affidavits, documents, and scheduling. We'll walk you through a FAIS flow tailored to your team and caseload.</p>
+          <a class="btnCarousel btnPrimary" [routerLink]="['/demo/request']" [queryParams]="{ v: version }">Book a family-law workflow demo</a>
+        </section>
+        <section class="trDemoPillars">
+          <h2>Why FAIS</h2>
+          <div class="trDemoPillarGrid">
+            <article class="trDemoPillar">
+              <h3>Workflows that match your practice</h3>
+              <p>Built around the workflows small family-law firms actually feel.</p>
+            </article>
+            <article class="trDemoPillar">
+              <h3>Simple firm-based pricing</h3>
+              <p>Not a per-seat tax. One monthly fee for the firm.</p>
+            </article>
+            <article class="trDemoPillar">
+              <h3>Live walkthrough</h3>
+              <p>30–45 minute demo tailored to your process and questions.</p>
+            </article>
+          </div>
+        </section>
+        <section class="trDemoClosing">
+          <h2>Ready to see FAIS in your firm?</h2>
+          <p>We'll review your current process, show you a FAIS workflow across one example matter, and outline a rollout plan tailored to your team.</p>
+          <a class="btnCarousel btnPrimary" [routerLink]="['/demo/request']" [queryParams]="{ v: version }">Schedule your demo</a>
+        </section>
+      </main>
+    }
+    @default {
+      <main class="demoLanding" data-demo-page="landing">
+  <a class="backLink" routerLink="/">← Back to FAIS overview</a>
+
   <section class="demoHero">
     <div class="demoHeroCopy">
       <p class="eyebrow">Request your FAIS demo</p>
@@ -70,3 +118,6 @@
     </div>
   </section>
 </main>
+    }
+  }
+}

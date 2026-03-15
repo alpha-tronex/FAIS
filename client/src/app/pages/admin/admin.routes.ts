@@ -3,6 +3,7 @@ import { AdminPage } from './admin.page';
 import { UsersPage } from '../users/users.page';
 import { CasesPage } from '../cases/cases.page';
 import { AdminAffidavitPage } from '../admin-affidavit/admin-affidavit.page';
+import { AdminChildSupportWorksheetPage } from '../admin-child-support-worksheet/admin-child-support-worksheet.page';
 import { AdminQueryPage } from '../admin-query/admin-query.page';
 import { ProfilePage } from '../profile/profile.page';
 import { adminChildGuard } from '../../core/admin.guard';
@@ -18,6 +19,7 @@ export const ADMIN_ROUTES: Routes = [
       { path: 'users/:id/profile', component: ProfilePage },
       { path: 'cases', component: CasesPage },
       { path: 'affidavit', component: AdminAffidavitPage },
+      { path: 'child-support-worksheet', component: AdminChildSupportWorksheetPage },
       { path: 'query', component: AdminQueryPage }
     ]
   }

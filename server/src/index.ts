@@ -14,6 +14,7 @@ import { createUsersRouter } from './routes/users.routes.js';
 import { createCasesRouter } from './routes/cases.routes.js';
 import { createLookupsRouter } from './routes/lookups.routes.js';
 import { createAffidavitRouter } from './routes/affidavit.routes.js';
+import { createChildSupportWorksheetRouter } from './routes/child-support-worksheet.routes.js';
 import { createAppointmentsRouter } from './routes/appointments.routes.js';
 import { createAdminRouter } from './routes/admin.routes.js';
 import { createDocumentsRouter } from './routes/documents.routes.js';
@@ -101,6 +102,7 @@ apiRouter.use(createDocumentsRouter({ requireAuth, requireAdminOrAiStaff, requir
 apiRouter.use(createCasesRouter({ requireAuth, requireStaffOrAdmin }));
 apiRouter.use(createLookupsRouter({ requireAuth }));
 apiRouter.use(createAffidavitRouter({ requireAuth }));
+apiRouter.use(createChildSupportWorksheetRouter({ requireAuth }));
 apiRouter.use(createAppointmentsRouter({ requireAuth }));
 apiRouter.use(createAdminRouter({ requireAuth, requireAdmin, requireAdminOrAiStaff }));
 apiRouter.use(createMessagesRouter({ requireAuth }));

@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { map, Observable } from 'rxjs';
+import { DEFAULT_LAYOUT_VERSION } from '../../core/layout-version.config';
 
 type NavItem = { label: string; fragment: string };
 type Card = { title: string; copy: string };
@@ -21,6 +24,19 @@ type FaqItem = { question: string; answer: string };
   styleUrl: './landing.page.css'
 })
 export class LandingPage {
+  /** Layout version from query param v=1, v=2, v=3...; falls back to DEFAULT_LAYOUT_VERSION. */
+  readonly layoutVersion$: Observable<number>;
+
+  constructor(private readonly route: ActivatedRoute) {
+    this.layoutVersion$ = this.route.queryParamMap.pipe(
+      map((q) => {
+        const v = q.get('v');
+        const n = v ? +v : DEFAULT_LAYOUT_VERSION;
+        return Number.isFinite(n) && n >= 1 ? n : DEFAULT_LAYOUT_VERSION;
+      })
+    );
+  }
+
   readonly navItems: NavItem[] = [
     { label: 'Product', fragment: 'product' },
     { label: 'Workflow', fragment: 'workflow' },

@@ -49,6 +49,7 @@
 
 .backLink {
   display: inline-block;
+  margin-bottom: 1.5rem;
   color: var(--navy);
   font-weight: 700;
   text-decoration: none;
@@ -254,5 +255,198 @@
 
   .btnCarousel {
     width: 100%;
+  }
+}
+
+/* ========== Layout v2 (Thomson Reuters–style demo) ========== */
+.demoLandingV2 {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.demoLandingV2 .trDemoUtility {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  background: #f0f2f5;
+  font-size: 0.875rem;
+}
+
+.demoLandingV2 .trDemoUtility a {
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.demoLandingV2 .trDemoUtility a:hover {
+  text-decoration: underline;
+}
+
+.demoLandingV2 .trDemoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid rgba(26, 35, 50, 0.08);
+}
+
+.demoLandingV2 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.demoLandingV2 .brandMark {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius);
+  background: var(--navy);
+  color: #fff;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.demoLandingV2 .brandText strong {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.demoLandingV2 .trDemoCta {
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.demoLandingV2 .trDemoCta:hover {
+  background: var(--accent-dark);
+}
+
+.demoLandingV2 .trDemoHero {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.demoLandingV2 .trDemoEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.demoLandingV2 .trDemoHero h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.demoLandingV2 .trDemoSub {
+  color: var(--muted);
+  margin: 0 0 1.25rem;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.demoLandingV2 .trDemoPillars {
+  padding: 2rem 1.5rem;
+  border-top: 1px solid rgba(26, 35, 50, 0.08);
+  width: min(900px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.demoLandingV2 .trDemoPillars h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 1rem;
+}
+
+.demoLandingV2 .trDemoPillarGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.demoLandingV2 .trDemoPillar {
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid rgba(26, 35, 50, 0.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.demoLandingV2 .trDemoPillar h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.4rem;
+}
+
+.demoLandingV2 .trDemoPillar p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.demoLandingV2 .trDemoClosing {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: var(--navy);
+  color: #fff;
+  margin-top: 0;
+}
+
+.demoLandingV2 .trDemoClosing h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.demoLandingV2 .trDemoClosing p {
+  margin: 0 0 1rem;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.95rem;
+}
+
+.demoLandingV2 .trDemoClosing .btnCarousel.btnPrimary {
+  background: #fff;
+  color: var(--navy);
+}
+
+@media (max-width: 760px) {
+  .demoLandingV2 .trDemoHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .demoLandingV2 .trDemoPillarGrid {
+    grid-template-columns: 1fr;
   }
 }

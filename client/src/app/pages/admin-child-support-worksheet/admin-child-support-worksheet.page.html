@@ -1,0 +1,74 @@
+<div>
+  <h1>Admin child support worksheet</h1>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section *ngIf="selectedUserId && selectedCaseId" class="panel mt16">
+    <h2 class="panelTitle">Worksheet</h2>
+    <p class="mt12">
+      User: <strong>{{ selectedUserLabel() }}</strong>
+      <br />
+      Case: <strong>{{ selectedCaseLabel() }}</strong>
+    </p>
+    <div class="rowActions mt12">
+      <a [routerLink]="['/child-support-worksheet']" [queryParams]="worksheetQueryParams()" class="link mr12">View worksheet</a>
+      <a [routerLink]="['/child-support-worksheet/edit']" [queryParams]="worksheetQueryParams()" class="link mr12">Edit worksheet data</a>
+      <button type="button" (click)="generatePdf()" [disabled]="pdfBusy">Generate PDF</button>
+      <button type="button" (click)="clearCaseSelection()" [disabled]="pdfBusy">Change selection</button>
+      <span *ngIf="pdfBusy">Generating…</span>
+    </div>
+  </section>
+
+  <section *ngIf="!selectedCaseId" class="panel mt16">
+    <h2 class="panelTitle">Select user</h2>
+    <label>
+      User
+      <select
+        name="selectedUserId"
+        [ngModel]="selectedUserId"
+        (ngModelChange)="setSelectedUserId($event)"
+        class="input"
+        [disabled]="busy"
+      >
+        <option *ngFor="let u of users" [ngValue]="u.id">{{ u.uname }} ({{ u.email }})</option>
+      </select>
+    </label>
+    <p *ngIf="selectedUserId && !casesBusy" class="mt12">
+      Selected case: <strong>{{ selectedCaseLabel() || 'None' }}</strong>
+    </p>
+  </section>
+
+  <section *ngIf="selectedUserId && !selectedCaseId" class="mt16">
+    <h2 class="panelTitle">Cases</h2>
+    <p *ngIf="casesBusy" class="mt12">Loading cases…</p>
+    <table *ngIf="!casesBusy && cases.length > 0" class="table mt12">
+      <thead>
+        <tr>
+          <th class="th">Case #</th>
+          <th class="th">Division</th>
+          <th class="th">Petitioner</th>
+          <th class="th">Respondent</th>
+          <th class="th">Select</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of cases">
+          <td class="td">{{ c.caseNumber }}</td>
+          <td class="td">{{ c.division }}</td>
+          <td class="td">
+            {{ c.petitioner ? (c.petitioner.lastName || '') + ', ' + (c.petitioner.firstName || '') : '' }}
+          </td>
+          <td class="td">
+            {{ c.respondent ? (c.respondent.lastName || '') + ', ' + (c.respondent.firstName || '') : '' }}
+          </td>
+          <td class="td">
+            <button type="button" (click)="selectCase(c.id)" [disabled]="casesBusy" class="submit">
+              {{ selectedCaseId === c.id ? 'Selected' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="!casesBusy && cases.length === 0" class="mt12">No cases found for this user.</p>
+  </section>
+</div>

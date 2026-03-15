@@ -6,6 +6,7 @@ import { homeGuard } from './core/home.guard';
 import { myCasesGuard } from './core/my-cases.guard';
 import { registerGuard } from './core/register.guard';
 import { affidavitEditGuard } from './core/affidavit-edit.guard';
+import { childSupportWorksheetEditGuard } from './core/child-support-worksheet-edit.guard';
 import { upcomingEventsGuard } from './core/upcoming-events.guard';
 import { messagesGuard } from './core/messages.guard';
 import { queryGuard } from './core/query.guard';
@@ -69,6 +70,17 @@ export const routes: Routes = [
 		canActivate: [affidavitEditGuard],
 		loadChildren: () =>
 			import('./pages/affidavit-edit/affidavit-edit.module').then((m) => m.AffidavitEditModule)
+	},
+	{
+		path: 'child-support-worksheet',
+		loadChildren: () =>
+			import('./pages/child-support-worksheet/child-support-worksheet.module').then((m) => m.ChildSupportWorksheetModule)
+	},
+	{
+		path: 'child-support-worksheet/edit',
+		canActivate: [childSupportWorksheetEditGuard],
+		loadChildren: () =>
+			import('./pages/child-support-worksheet-edit/child-support-worksheet-edit.module').then((m) => m.ChildSupportWorksheetEditModule)
 	},
 	{
 		path: 'profile',

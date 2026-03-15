@@ -561,3 +561,313 @@
     padding-left: 0.9rem;
   }
 }
+
+/* ========== Layout v2 (Thomson Reuters–style) ========== */
+.landingV2 .trUtilityBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 0.5rem 2rem;
+  background: #f0f2f5;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.landingV2 .trUtilityBar a {
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landingV2 .trUtilityBar a:hover {
+  text-decoration: underline;
+}
+
+.landingV2 .trHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
+.landingV2 .trNav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.landingV2 .trNav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.landingV2 .trNav a:hover {
+  color: var(--navy-soft);
+}
+
+.landingV2 .trNavCta {
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff !important;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.landingV2 .trNavCta:hover {
+  background: var(--accent-dark);
+}
+
+.landingV2 .trMain {
+  width: min(1100px, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.landingV2 .trHero {
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.landingV2 .trEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+}
+
+.landingV2 .trHero h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 1rem;
+  line-height: 1.2;
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.landingV2 .trHeroSub {
+  color: var(--muted);
+  max-width: 42rem;
+  margin: 0 auto 1.5rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.landingV2 .trHeroCta {
+  display: inline-flex;
+}
+
+.landingV2 .trExplore,
+.landingV2 .trNoteworthy,
+.landingV2 .trFeatured,
+.landingV2 .trSupport {
+  padding: 2rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.landingV2 .trExplore h2,
+.landingV2 .trNoteworthy h2,
+.landingV2 .trFeatured h2,
+.landingV2 .trSupport h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.5rem;
+}
+
+.landingV2 .trExploreSub {
+  color: var(--muted);
+  margin: 0 0 1.5rem;
+  max-width: 50ch;
+}
+
+.landingV2 .trPillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.landingV2 .trPillar {
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.landingV2 .trPillar h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.5rem;
+}
+
+.landingV2 .trPillar p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.landingV2 .trCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.landingV2 .trCard {
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.landingV2 .trCard h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.6rem;
+  line-height: 1.3;
+}
+
+.landingV2 .trCard p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.landingV2 .trCard a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--navy-soft);
+  text-decoration: none;
+}
+
+.landingV2 .trCard a:hover {
+  text-decoration: underline;
+}
+
+.landingV2 .trCardCta {
+  color: var(--accent) !important;
+}
+
+.landingV2 .trFeaturedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.landingV2 .trFeaturedItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--line);
+}
+
+.landingV2 .trFeaturedItem strong {
+  color: var(--navy);
+  font-size: 0.95rem;
+}
+
+.landingV2 .trFeaturedItem span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.landingV2 .trSupportGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.landingV2 .trSupportCol h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.35rem;
+}
+
+.landingV2 .trSupportCol p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.landingV2 .trSupportCol a {
+  font-weight: 600;
+  color: var(--navy-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.landingV2 .trSupportCol a:hover {
+  text-decoration: underline;
+}
+
+.landingV2 .trFooter {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.landingV2 .trFooterInner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+}
+
+.landingV2 .trFooter a {
+  color: var(--navy-soft);
+  text-decoration: none;
+}
+
+.landingV2 .trFooter a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .landingV2 .trUtilityBar {
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .landingV2 .trHeader {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .landingV2 .trNav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .landingV2 .trPillars,
+  .landingV2 .trCards,
+  .landingV2 .trFeaturedGrid,
+  .landingV2 .trSupportGrid {
+    grid-template-columns: 1fr;
+  }
+}

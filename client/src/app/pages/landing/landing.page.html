@@ -1,9 +1,132 @@
-<div class="landing">
+@if (layoutVersion$ | async; as version) {
+  @switch (version) {
+    @case (2) {
+      <!-- Layout v2: Thomson Reuters–style structure -->
+      <div class="landing landingV2">
+        <div class="trUtilityBar">
+          <span class="trUtilityText">Questions? We're here to help.</span>
+          <a [routerLink]="['/demo']" [queryParams]="{ v: version }">Contact us</a>
+          <a routerLink="/login">Client Login</a>
+        </div>
+        <header class="trHeader">
+          <a class="brand" routerLink="/" [queryParams]="{ v: version }">
+            <span class="brandMark">FAIS</span>
+            <span class="brandText">
+              <strong>Financial Affidavit Intake System</strong>
+              <span>Flat-fee software for Florida family-law firms</span>
+            </span>
+          </a>
+          <nav class="trNav">
+            <a [routerLink]="['/']" fragment="product" [queryParams]="{ v: version }">Product</a>
+            <a [routerLink]="['/']" fragment="pricing" [queryParams]="{ v: version }">Pricing</a>
+            <a [routerLink]="['/']" fragment="resources" [queryParams]="{ v: version }">Resources</a>
+            <a class="trNavCta" [routerLink]="['/demo']" [queryParams]="{ v: version }">Book a demo</a>
+          </nav>
+        </header>
+        <main class="trMain">
+          <section class="trHero">
+            <p class="trEyebrow">Built exclusively for Florida family-law firms</p>
+            <h1>FAIS: The operations edge for affidavit-heavy family-law practices.</h1>
+            <p class="trHeroSub">
+              From intake through affidavits, documents, and scheduling—flat-fee software that reduces back-and-forth and keeps every case on track.
+            </p>
+            <a class="btn btnPrimary trHeroCta" [routerLink]="['/demo']" [queryParams]="{ v: version }">Book a family-law workflow demo</a>
+          </section>
+          <section class="trExplore" id="product">
+            <h2>What FAIS delivers</h2>
+            <p class="trExploreSub">
+              Reduce inefficiencies, add value to your practice, and keep affidavit workflow under control with software built for small Florida family-law firms.
+            </p>
+            <div class="trPillars">
+              <article class="trPillar">
+                <h3>Workflows that match your practice</h3>
+                <p>Built around the workflows small family-law firms actually feel—intake, affidavits, documents, scheduling, and client coordination in one place.</p>
+              </article>
+              <article class="trPillar">
+                <h3>Pricing that scales with the firm</h3>
+                <p>Simple firm-based pricing, not a per-seat tax. One monthly fee for the firm; add staff without per-user creep.</p>
+              </article>
+              <article class="trPillar">
+                <h3>See it in action</h3>
+                <p>Book a family-law workflow demo. A 30–45 minute walkthrough tailored to your team and caseload.</p>
+              </article>
+            </div>
+          </section>
+          <section class="trNoteworthy" id="pricing">
+            <h2>Why firms choose FAIS</h2>
+            <div class="trCards">
+              <article class="trCard">
+                <h3>Built around the workflows small family-law firms actually feel.</h3>
+                <p>FAIS isn't generic practice management. Every workflow—intake, financial affidavits, documents, messaging, scheduling—is designed around how family-law matters actually move through small firms.</p>
+                <a [routerLink]="['/']" fragment="product" [queryParams]="{ v: version }">See how it works</a>
+              </article>
+              <article class="trCard">
+                <h3>Simple firm-based pricing, not a per-seat tax.</h3>
+                <p>Standard plans are one monthly fee for the firm. Unlimited staff and client portal users under normal small-firm usage. No surprise bumps when you add an attorney or assistant.</p>
+                <a [routerLink]="['/']" fragment="pricing" [queryParams]="{ v: version }">See pricing</a>
+              </article>
+              <article class="trCard">
+                <h3>Book a family-law workflow demo.</h3>
+                <p>See one matter move from intake to court-ready affidavit in a live 30–45 minute demo. We'll tailor the walkthrough to your process and answer your questions.</p>
+                <a class="trCardCta" [routerLink]="['/demo']" [queryParams]="{ v: version }">Request your demo</a>
+              </article>
+            </div>
+          </section>
+          <section class="trFeatured" id="resources">
+            <h2>Learn more</h2>
+            <div class="trFeaturedGrid">
+              <a class="trFeaturedItem" [routerLink]="['/']" fragment="product" [queryParams]="{ v: version }">
+                <strong>Why FAIS</strong>
+                <span>100% focused on Florida family-law operations.</span>
+              </a>
+              <a class="trFeaturedItem" [routerLink]="['/']" fragment="pricing" [queryParams]="{ v: version }">
+                <strong>Pricing guide</strong>
+                <span>Simple firm-based pricing, not a per-seat tax.</span>
+              </a>
+              <a class="trFeaturedItem" [routerLink]="['/demo']" [queryParams]="{ v: version }">
+                <strong>What the demo covers</strong>
+                <span>From intake to affidavit in one flow.</span>
+              </a>
+            </div>
+          </section>
+          <section class="trSupport" id="faq">
+            <h2>Next steps</h2>
+            <div class="trSupportGrid">
+              <div class="trSupportCol">
+                <h3>Need help?</h3>
+                <p>Product help, demo overview, and FAQ.</p>
+                <a [routerLink]="['/']" fragment="faq" [queryParams]="{ v: version }">Go to FAQ</a>
+              </div>
+              <div class="trSupportCol">
+                <h3>Get in touch</h3>
+                <p>Questions? Contact us to schedule a demo or discuss your firm.</p>
+                <a [routerLink]="['/demo']" [queryParams]="{ v: version }">Contact us</a>
+              </div>
+              <div class="trSupportCol">
+                <h3>Log in</h3>
+                <p>Already a client? Log in to access your account.</p>
+                <a routerLink="/login">Client login</a>
+              </div>
+            </div>
+          </section>
+          <footer class="trFooter">
+            <div class="trFooterInner">
+              <div><strong>About</strong> · About FAIS · For family-law firms</div>
+              <div><strong>Learn more</strong> · <a [routerLink]="['/']" fragment="product" [queryParams]="{ v: version }">Product</a> · <a [routerLink]="['/']" fragment="pricing" [queryParams]="{ v: version }">Pricing</a> · <a [routerLink]="['/demo']" [queryParams]="{ v: version }">Demo</a></div>
+              <div><strong>Contact</strong> · <a [routerLink]="['/demo']" [queryParams]="{ v: version }">Book a demo</a></div>
+            </div>
+          </footer>
+        </main>
+      </div>
+    }
+    @default {
+      <!-- Layout v1: Original structure -->
+      <div class="landing">
   <header class="landingHeader">
     <a class="brand" routerLink="/">
       <span class="brandMark">FAIS</span>
       <span class="brandText">
-        <strong>Family-Law Operations</strong>
+        <strong>Financial Affidavit Intake System (FAIS)</strong>
         <span>Flat-fee software for Florida firms</span>
       </span>
     </a>
@@ -224,3 +347,6 @@
     </section>
   </main>
 </div>
+    }
+  }
+}

@@ -1,0 +1,182 @@
+<main class="page">
+  <h1>Edit child support worksheet data</h1>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="saveSuccess" class="success">Worksheet saved.</p>
+
+  <section class="mt16">
+    <div class="rowActions">
+      <a [routerLink]="['/child-support-worksheet']" [queryParams]="navQueryParams()" class="link">Back to worksheet</a>
+      <span *ngIf="busy">Loading…</span>
+    </div>
+
+    <form *ngIf="!busy" (ngSubmit)="save()" class="panel mt12">
+      <h2 class="panelTitle">Worksheet data</h2>
+      <p class="muted mt8">These values are used when generating the filled PDF. Leave blank to use affidavit income where applicable.</p>
+
+      <div class="formGroup mt12">
+        <label for="numberOfChildren">Number of children</label>
+        <input
+          id="numberOfChildren"
+          type="number"
+          min="0"
+          max="99"
+          [(ngModel)]="data.numberOfChildren"
+          name="numberOfChildren"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="parentAMonthlyGrossIncome">Parent A monthly gross income</label>
+        <input
+          id="parentAMonthlyGrossIncome"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.parentAMonthlyGrossIncome"
+          name="parentAMonthlyGrossIncome"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="parentBMonthlyGrossIncome">Parent B monthly gross income</label>
+        <input
+          id="parentBMonthlyGrossIncome"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.parentBMonthlyGrossIncome"
+          name="parentBMonthlyGrossIncome"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="overnightsParentA">Overnights with Parent A (per year)</label>
+        <input
+          id="overnightsParentA"
+          type="number"
+          min="0"
+          max="365"
+          [(ngModel)]="data.overnightsParentA"
+          name="overnightsParentA"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="overnightsParentB">Overnights with Parent B (per year)</label>
+        <input
+          id="overnightsParentB"
+          type="number"
+          min="0"
+          max="365"
+          [(ngModel)]="data.overnightsParentB"
+          name="overnightsParentB"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="timesharingPercentageParentA">Timesharing % Parent A</label>
+        <input
+          id="timesharingPercentageParentA"
+          type="number"
+          min="0"
+          max="100"
+          step="0.1"
+          [(ngModel)]="data.timesharingPercentageParentA"
+          name="timesharingPercentageParentA"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="timesharingPercentageParentB">Timesharing % Parent B</label>
+        <input
+          id="timesharingPercentageParentB"
+          type="number"
+          min="0"
+          max="100"
+          step="0.1"
+          [(ngModel)]="data.timesharingPercentageParentB"
+          name="timesharingPercentageParentB"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="healthInsuranceMonthly">Health insurance (monthly)</label>
+        <input
+          id="healthInsuranceMonthly"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.healthInsuranceMonthly"
+          name="healthInsuranceMonthly"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="daycareMonthly">Daycare (monthly)</label>
+        <input
+          id="daycareMonthly"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.daycareMonthly"
+          name="daycareMonthly"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="otherChildCareMonthly">Other child care (monthly)</label>
+        <input
+          id="otherChildCareMonthly"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.otherChildCareMonthly"
+          name="otherChildCareMonthly"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="mandatoryUnionDues">Mandatory union dues (monthly)</label>
+        <input
+          id="mandatoryUnionDues"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.mandatoryUnionDues"
+          name="mandatoryUnionDues"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="supportPaidForOtherChildren">Support paid for other children (monthly)</label>
+        <input
+          id="supportPaidForOtherChildren"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.supportPaidForOtherChildren"
+          name="supportPaidForOtherChildren"
+          class="input"
+        />
+      </div>
+
+      <div class="rowActions mt16">
+        <button type="submit" [disabled]="saveBusy">Save</button>
+        <button type="button" (click)="goBack()" [disabled]="saveBusy">Cancel</button>
+        <span *ngIf="saveBusy">Saving…</span>
+      </div>
+    </form>
+  </section>
+</main>

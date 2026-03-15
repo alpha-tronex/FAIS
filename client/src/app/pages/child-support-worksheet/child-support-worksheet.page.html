@@ -1,0 +1,50 @@
+<main class="page">
+  <h1>Child support guidelines worksheet</h1>
+  <p *ngIf="isRespondentViewer" class="muted">View and print the worksheet for the case you are a respondent on.</p>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <section class="mt16">
+    <div class="rowActions">
+      <a *ngIf="showBackToMyCases" routerLink="/my-cases" class="link">Back to My cases</a>
+      <a *ngIf="!showBackToMyCases" routerLink="/admin/child-support-worksheet" class="link">Back to Admin</a>
+      <span *ngIf="busy">Loading…</span>
+    </div>
+
+    <div *ngIf="summary" class="panel mt12">
+      <h2 class="panelTitle">Summary</h2>
+      <p *ngIf="summary.targetUserDisplayName" class="mt8">
+        <strong>Subject:</strong> {{ summary.targetUserDisplayName }}
+      </p>
+      <p>
+        Gross monthly income (from affidavit):
+        <strong>{{ summary.grossMonthlyIncomeFromMonthlyIncome | number:'1.2-2' }}</strong>
+      </p>
+      <p>
+        Gross annual income:
+        <strong>{{ summary.grossAnnualIncome | number:'1.2-2' }}</strong>
+      </p>
+      <p *ngIf="summary.worksheet && summary.worksheet.numberOfChildren != null" class="mt8">
+        Number of children (worksheet):
+        <strong>{{ summary.worksheet.numberOfChildren }}</strong>
+      </p>
+
+      <div class="rowActions mt12">
+        <a
+          *ngIf="!isRespondentViewer"
+          [routerLink]="['/child-support-worksheet/edit']"
+          [queryParams]="navQueryParams()"
+          class="link mr12"
+        >
+          Edit worksheet data
+        </a>
+        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy">
+          Generate PDF
+        </button>
+        <span *ngIf="pdfBusy">Generating…</span>
+      </div>
+    </div>
+
+    <p *ngIf="!busy && !summary && !error" class="mt12">No summary available.</p>
+  </section>
+</main>

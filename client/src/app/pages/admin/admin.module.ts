@@ -6,6 +6,7 @@ import { AdminPage } from './admin.page';
 import { UsersPage } from '../users/users.page';
 import { CasesPage } from '../cases/cases.page';
 import { AdminAffidavitPage } from '../admin-affidavit/admin-affidavit.page';
+import { AdminChildSupportWorksheetPage } from '../admin-child-support-worksheet/admin-child-support-worksheet.page';
 import { AdminQueryModule } from '../admin-query/admin-query.module';
 import { ProfileModule } from '../profile/profile.module';
 import { AffidavitEditModule } from '../affidavit-edit/affidavit-edit.module';
@@ -13,7 +14,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { ADMIN_ROUTES } from './admin.routes';
 
 @NgModule({
-  declarations: [AdminPage, UsersPage, CasesPage, AdminAffidavitPage],
+  declarations: [AdminPage, UsersPage, CasesPage, AdminAffidavitPage, AdminChildSupportWorksheetPage],
   imports: [
     CommonModule,
     FormsModule,

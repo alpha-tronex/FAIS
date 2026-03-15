@@ -81,7 +81,7 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
       }
 
       const summary = await computeAffidavitSummary(targetUserObjectId);
-      const form: 'short' | 'long' = requestedForm === 'auto' ? summary.form : (requestedForm as PdfTemplateKey);
+      const form: 'short' | 'long' = requestedForm === 'auto' ? summary.form : (requestedForm as 'short' | 'long');
       const filter = userScopedFilter(targetUserObjectId);
       const [
         employment,

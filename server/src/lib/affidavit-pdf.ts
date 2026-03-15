@@ -4,15 +4,20 @@ import fs from 'node:fs/promises';
 import mongoose from 'mongoose';
 import type { PDFDocument } from 'pdf-lib';
 
-export type PdfTemplateKey = 'short' | 'long';
+export type PdfTemplateKey = 'short' | 'long' | 'child-support-worksheet';
 
 // Resolve relative to this file so template is found whether server runs from repo root or server dir
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PDF_TEMPLATES_DIR = path.join(__dirname, '..', '..', 'private', 'forms');
 
+const TEMPLATE_FILENAMES: Record<PdfTemplateKey, string> = {
+  short: 'fl-financial-affidavit-short.pdf',
+  long: 'fl-financial-affidavit-long.pdf',
+  'child-support-worksheet': 'fl-child-support-guidelines-worksheet.pdf'
+};
+
 export function templatePath(key: PdfTemplateKey): string {
-  const filename = key === 'short' ? 'fl-financial-affidavit-short.pdf' : 'fl-financial-affidavit-long.pdf';
-  return path.join(PDF_TEMPLATES_DIR, filename);
+  return path.join(PDF_TEMPLATES_DIR, TEMPLATE_FILENAMES[key]);
 }
 
 export async function loadTemplatePdf(key: PdfTemplateKey): Promise<PDFDocument> {
