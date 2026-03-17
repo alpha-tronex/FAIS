@@ -95,6 +95,15 @@ Base URL: your FAIS server (e.g. `http://localhost:3001` or production URL).
 - **Tasks:** Create with `POST /v1/tasks`; include instructions and optionally file IDs. Use webhooks or polling to get the result.
 - **Files:** Upload with `POST /v1/files`; attach the returned file ID to a task if the task should use the file as context.
 
+## Option B: In-app job (no n8n)
+
+FAIS can run the same RAG example generation flow on a schedule **without n8n**. A server job calls the Manus API directly, then writes valid examples to the same `ai_query_examples` collection and invalidates the RAG cache.
+
+- **Job file:** `server/src/jobs/rag-example-manus.job.ts`
+- **Schedule:** Configurable via `RAG_MANUS_CRON` (default: `0 3 * * 0`, i.e. 3:00 AM server time every Sunday).
+- **Env:** `MANUS_API_KEY` (required for the job to run). Optional: `MANUS_API_BASE_URL` (default `https://api.manus.ai`), `RAG_MANUS_CRON`.
+- If `MANUS_API_KEY` is not set, the job logs and skips. No n8n or FAIS JWT is needed for this path.
+
 ## Security
 
 - Keep JWT and Manus API keys in n8n credentials; do not commit them.

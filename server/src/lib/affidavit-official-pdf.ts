@@ -823,76 +823,7 @@ export async function fillOfficialAffidavitPdf(params: FillOfficialAffidavitPara
   }
 
   // Update appearances so set values are visible before we strip or flatten.
-  // Set font size on all text fields to match the document's text (10pt typical for court forms).
-  const formFontSize = 10;
-  const captionNeedles = ['Petitioner', 'Respondent', 'Case No', 'Division', 'Circuit No', 'county', 'IN THE CIRCUIT COURT OF THE', 'IN AND FOR'];
-  for (const { field } of allFormFields) {
-    if (typeof (field as { setFontSize?: (n: number) => void }).setFontSize === 'function') {
-      try {
-        (field as { setFontSize: (n: number) => void }).setFontSize(formFontSize);
-      } catch {
-        // Some fields may lack default appearance; skip
-      }
-    }
-  }
-  // Ensure caption fields (Petitioner, Respondent, etc.) use the same font size; some templates
-  // give Respondent a smaller DA, or setFontSize throws when DA has no Tf — set DA explicitly.
-  const defaultDa = `/Helvetica ${formFontSize} Tf 0 g`;
-  for (const needle of captionNeedles) {
-    const name = findFieldName(needle);
-    if (!name) continue;
-    try {
-      const textField = form.getTextField(name);
-      if (typeof (textField as { setFontSize?: (n: number) => void }).setFontSize === 'function') {
-        (textField as { setFontSize: (n: number) => void }).setFontSize(formFontSize);
-      }
-    } catch {
-      try {
-        const textField = form.getTextField(name) as { acroField?: { setDefaultAppearance?: (da: string) => void } };
-        if (textField?.acroField?.setDefaultAppearance) {
-          textField.acroField.setDefaultAppearance(defaultDa);
-        }
-      } catch {
-        // Ignore
-      }
-    }
-  }
-  // County field: use a larger font size. pdf-lib uses the *widget* DA for font size when
-  // present, so we must set DA on the field's widget(s), not just the field.
-  const countyFontSize = 12;
-  const countyFieldName = findFieldName('county');
-  if (countyFieldName) {
-    const countyDa = `/Helvetica ${countyFontSize} Tf 0 g`;
-    try {
-      const countyField = form.getTextField(countyFieldName) as {
-        setFontSize?: (n: number) => void;
-        acroField?: { getWidgets?: () => { setDefaultAppearance?: (da: string) => void }[] };
-      };
-      if (typeof countyField.setFontSize === 'function') {
-        countyField.setFontSize(countyFontSize);
-      }
-      const widgets = countyField?.acroField?.getWidgets?.();
-      if (Array.isArray(widgets)) {
-        for (const w of widgets) {
-          if (w?.setDefaultAppearance) w.setDefaultAppearance(countyDa);
-        }
-      }
-    } catch {
-      try {
-        const countyField = form.getTextField(countyFieldName) as {
-          acroField?: { getWidgets?: () => { setDefaultAppearance?: (da: string) => void }[] };
-        };
-        const widgets = countyField?.acroField?.getWidgets?.();
-        if (Array.isArray(widgets)) {
-          for (const w of widgets) {
-            if (w?.setDefaultAppearance) w.setDefaultAppearance(countyDa);
-          }
-        }
-      } catch {
-        // Ignore
-      }
-    }
-  }
+  // Font size comes from the template PDF's field default appearance (DA).
   try {
     const formFont = await pdf.embedFont(StandardFonts.Helvetica);
     form.updateFieldAppearances(formFont);

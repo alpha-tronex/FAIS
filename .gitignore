@@ -8,6 +8,7 @@ server/dist/
 # Local env
 server/.env
 server/server-request.log
+server/logs/
 
 #Report: html Playwright pdf files and official florida short and long form pdf files
 FAIS Downloads/

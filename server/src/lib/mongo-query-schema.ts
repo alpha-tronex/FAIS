@@ -2,9 +2,51 @@
  * Schema and allowed collections for the admin ad-hoc Mongo query tool.
  */
 
+/** All queryable collections. Excludes: messages, documents, document_chunks, document_deletion_audit, ai_query_examples. */
+export const ALLOWED_COLLECTIONS = [
+  'case',
+  'users',
+  'appointments',
+  'monthlyincome',
+  'monthlydeductions',
+  'monthlyhouseholdexpense',
+  'monthlyautomobileexpense',
+  'monthlychildrenexpense',
+  'monthlychildrenotherrelationshipexpense',
+  'monthlycreditorexpense',
+  'monthlyinsuranceexpense',
+  'monthlyotherexpense',
+  'assets',
+  'employment',
+  'liabilities',
+  'contingentasset',
+  'contingentliability',
+  'childsupportworksheet',
+  'lookup_role_types',
+  'lookup_counties',
+  'lookup_states',
+  'lookup_divisions',
+  'lookup_circuits',
+  'lookup_pay_frequency_types',
+  'lookup_monthly_income_types',
+  'lookup_monthly_deduction_types',
+  'lookup_monthly_household_expense_types',
+  'lookup_monthly_automobile_expense_types',
+  'lookup_monthly_children_expense_types',
+  'lookup_monthly_children_other_expense_types',
+  'lookup_monthly_creditors_expense_types',
+  'lookup_monthly_insurance_expense_types',
+  'lookup_monthly_other_expense_types',
+  'lookup_assets_types',
+  'lookup_liabilities_types',
+  'lookup_non_marital_types',
+] as const;
+
+export type AllowedCollection = (typeof ALLOWED_COLLECTIONS)[number];
+
 /** Short schema for RAG prompt: collections and one-line descriptions. */
 export const MONGO_QUERY_SCHEMA_SHORT = `
-Allowed collections: case, users, appointments, lookup_role_types, lookup_counties, lookup_states, lookup_divisions, lookup_circuits, monthlyincome, assets, employment, liabilities.
+Allowed collections: ${[...ALLOWED_COLLECTIONS].join(', ')}.
 - case: caseNumber, countyId, petitionerId, respondentId, petitionerAttId, respondentAttId, legalAssistantId, etc.
 - users: uname, firstName, lastName, roleTypeId (1=Petitioner, 2=Respondent, 3=Petitioner Attorney, 4=Respondent Attorney, 5=Admin, 6=Legal Assistant), state, etc.
 - appointments: caseId, petitionerId, scheduledAt, durationMinutes, status (pending, accepted, rejected, cancelled).
@@ -16,24 +58,6 @@ In a $group stage, every field except _id must be an accumulator (e.g. $sum, $av
 For "counties with most/highest amount of liabilities": $group by countyId with totalLiabilities: { $sum: 1 }, totalAmount: { $sum: '$amountOwed' }, items: { $push: { description: '$description', amount: '$amountOwed' } }; then $project with items: { $slice: ['$items', 10] } so the result includes type (description) and amount per liability.
 For "counties with highest income": include income type names by $lookup from lookup_monthly_income_types (match id to typeId) first, then $lookup case for county; $group with avgIncome, totalIncome, items: { $push: { typeName: '$incomeTypeDoc.name', amount: '$amount' } }; $project with items: { $slice: ['$items', 10] } so the result includes income type description and amount.
 `.trim();
-
-export const ALLOWED_COLLECTIONS = [
-  'case',
-  'users',
-  'appointments',
-  'lookup_role_types',
-  'lookup_counties',
-  'lookup_states',
-  'lookup_divisions',
-  'lookup_circuits',
-  'lookup_monthly_income_types',
-  'monthlyincome',
-  'assets',
-  'employment',
-  'liabilities',
-] as const;
-
-export type AllowedCollection = (typeof ALLOWED_COLLECTIONS)[number];
 
 export const MONGO_QUERY_SCHEMA_DESCRIPTION = `
 You convert natural language questions into a single MongoDB find query. Only use the query_mongodb tool.

@@ -13,7 +13,8 @@ import { getSchemaForPrompt, refreshDiscoveredSchema, hasDiscoveredSchema } from
 import { getRelationshipGraphText } from '../lib/ai-query-relationship-graph.js';
 import { enrichQuestionWithIds } from '../lib/ai-query-id-enrichment.js';
 import { loadDynamicExamples, insertDynamicExample } from '../lib/ai-query-dynamic-examples.js';
-import type { AiQueryExample, ExampleQuery } from '../lib/ai-query-examples.js';
+import { AI_QUERY_EXAMPLES, type AiQueryExample, type ExampleQuery } from '../lib/ai-query-examples.js';
+import { validateExampleQuery } from '../lib/ai-query-example-validation.js';
 import { AiQueryExampleModel } from '../models/ai-query-example.model.js';
 import { sendError, sendErrorWithMessage } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
@@ -653,29 +654,6 @@ function formatAffidavitListSummary(
 
 const SUMMARY_SYSTEM = `You are a helpful assistant. The user asked a question about the database. You will receive the question, the query results (JSON), and optionally "Resolved users" (userId -> full name), "Resolved counties" (id -> county name), "Resolved circuits", "Resolved states", "Resolved divisions", "Resolved role types" (id -> name), "Appointments" (upcoming), and/or "Assets" (affidavit assets for those users). Use Resolved users to state person full names. When any "Resolved ..." lookup is provided (counties, circuits, states, divisions, role types), use it to state names by ID (e.g. "Broward: $6,300" or "Petitioner Attorney: 12 users")—do not say "id 1" or "county with id 1"; use the resolved name. When appointment data is provided, list each appointment with date/time, status, and duration. When asset data is provided, list each asset with description and market value. Respond in 2-4 clear, concise sentences or a short list. Do not use markdown or code blocks. A person's full name comes from the users collection (firstName, lastName). employment.name is the EMPLOYER name, not the person's name. When results include __collection (employment, monthlyincome, assets, liabilities), group your answer by that.`;
 
-/** Validate a candidate example query (find or aggregate); throws if invalid. */
-function validateExampleQuery(query: unknown): void {
-  const q = query as ExampleQuery;
-  if (!q || typeof q !== 'object' || typeof q.type !== 'string' || typeof q.collection !== 'string') {
-    throw new Error('Query must have type and collection');
-  }
-  const col = (q.collection ?? '').trim();
-  if (q.type === 'find') {
-    validateAndSanitizeQuery({
-      collection: col,
-      filter: (q as { filter?: Record<string, unknown> }).filter ?? {},
-      projection: (q as { projection?: Record<string, unknown> }).projection,
-      limit: (q as { limit?: number }).limit,
-    });
-  } else if (q.type === 'aggregate') {
-    const pipeline = (q as { pipeline?: unknown[] }).pipeline;
-    if (!Array.isArray(pipeline)) throw new Error('Aggregate query must have pipeline array');
-    validateAndSanitizeAggregate({ collection: col, pipeline });
-  } else {
-    throw new Error('Query type must be find or aggregate');
-  }
-}
-
 export function createAdminRouter(
   auth: Pick<AuthMiddlewares, 'requireAuth' | 'requireAdmin' | 'requireAdminOrAiStaff'>
 ): express.Router {
@@ -699,6 +677,23 @@ export function createAdminRouter(
     try {
       const docs = await AiQueryExampleModel.find({}).sort({ createdAt: -1 }).lean();
       res.json({ examples: docs });
+    } catch (e) {
+      sendError(res, e, 500);
+    }
+  });
+
+  router.get('/admin/ai-query/suggestions', auth.requireAuth, auth.requireAdminOrAiStaff, async (req, res) => {
+    try {
+      const count = Math.min(20, Math.max(1, parseInt(String(req.query?.count ?? 5), 10) || 5));
+      const staticQuestions = AI_QUERY_EXAMPLES.map((e) => e.question);
+      const dynamicDocs = await AiQueryExampleModel.find({}).select({ question: 1 }).lean();
+      const dynamicQuestions = dynamicDocs.map((d: { question?: string }) => d.question).filter((q): q is string => typeof q === 'string');
+      const all = [...staticQuestions, ...dynamicQuestions];
+      for (let i = all.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [all[i], all[j]] = [all[j]!, all[i]!];
+      }
+      res.json({ questions: all.slice(0, count) });
     } catch (e) {
       sendError(res, e, 500);
     }

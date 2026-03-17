@@ -21,6 +21,7 @@ import { createDocumentsRouter } from './routes/documents.routes.js';
 import { refreshDiscoveredSchema } from './lib/ai-query-schema-discovery.js';
 import { createMessagesRouter } from './routes/messages.routes.js';
 import { scheduleAppointmentReminderJob } from './jobs/appointment-reminder.job.js';
+import { scheduleRagExampleManusJob } from './jobs/rag-example-manus.job.js';
 import { createDemoRequestRouter } from './routes/demo-request.routes.js';
 
 // eslint-disable-next-line no-console
@@ -122,6 +123,7 @@ async function main() {
   await mongoose.connect(mongoUri);
 
   scheduleAppointmentReminderJob();
+  scheduleRagExampleManusJob();
 
   // Best-effort startup checks to surface role data issues early.
   try {

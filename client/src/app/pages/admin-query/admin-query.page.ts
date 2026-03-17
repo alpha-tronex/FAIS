@@ -31,52 +31,19 @@ export class AdminQueryPage {
   /** True briefly after copying answer to clipboard. */
   copied = false;
 
-  /** Full list of suggested questions; a random subset is shown. */
-  readonly allSuggestedQuestions = [
-    'List all the case numbers involving stress-petitioner-1',
-    'List all petitioners',
-    'List all liabilities for stress-petitioner-35',
-    'Employment information for stress-petitioner-1',
-    'Which county has the most liabilities',
-    'List the 3 counties with the highest amount of liabilities',
-    'List monthly income for stress-petitioner-10',
-    'What is the average income in Broward county',
-    'Assets for stress-petitioner-5',
-    'Which county has the most assets',
+  /** Fallback when the suggestions API fails. */
+  private static readonly fallbackSuggestions = [
+    'List all monthly income types.',
+    'Find the total monthly household expenses for a specific user (e.g., John Doe).',
+    'List all petitioners and their associated case numbers.',
+    'Find the average market value of all assets.',
     'List the 3 counties with the highest amount of assets',
-    'Show the last 20 cases',
-    'Who has the highest income in Broward county',
-    'Who has the least income in Broward county',
-    'Which county has the most employment',
-    'List the 3 counties with the most employment',
-    'Which county has the least employment',
-    'List the 3 counties with the least employment',
-    'Which county has the highest assets',
-    'List the 3 counties with the highest assets',
-    'Which county has the least assets',
-    'List the 3 counties with the least assets',
-    'What is the least income in Miami-Dade county',
-    'What is the highest income in Broward county',
-    'What is the average income in Palm Beach county',
-    'What is the least employment in Orange county',
-    'What is the highest employment in Broward county',
-    'What is the average employment in Miami-Dade county',
-    'What is the least assets in Hillsborough county',
-    'List 3 petitioners with the highest assets in Broward county',
-    'List 3 petitioners with the least assets in Broward county',
-    'What is the average assets in Broward county',
-    'What is the least liabilities in Palm Beach county',
-    'What is the highest liabilities in Broward county',
-    'What is the average liabilities in Miami-Dade county',
-    'List 3 petitioners with the least income in Broward county',
-    'Who has the least employment in Orange county',
-    'List 3 petitioners with the assets in Broward county',
-    'Who has the least liabilities in Broward county',
   ];
 
-  /** Currently displayed suggestions (random 5 from allSuggestedQuestions). */
+  /** Currently displayed suggestions (from API: static + ai_query_examples, random 5). */
   suggestedQuestions: string[] = [];
   readonly suggestionCount = 5;
+  suggestionsLoading = false;
 
   constructor(
     private readonly adminQuery: AdminQueryService,
@@ -96,19 +63,20 @@ export class AdminQueryPage {
     this.refreshSuggestions();
   }
 
-  /** Replace the displayed suggestions with a new random set of 5. */
+  /** Fetch a new random set of 5 suggestions from the server (static + ai_query_examples). */
   refreshSuggestions(): void {
-    this.suggestedQuestions = this.pickRandomSuggestions(this.suggestionCount);
-  }
-
-  private pickRandomSuggestions(n: number): string[] {
-    const list = [...this.allSuggestedQuestions];
-    if (list.length <= n) return list;
-    for (let i = list.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [list[i], list[j]] = [list[j]!, list[i]!];
-    }
-    return list.slice(0, n);
+    this.suggestionsLoading = true;
+    this.adminQuery
+      .getSuggestions(this.suggestionCount)
+      .then((res) => {
+        this.suggestedQuestions = res.questions ?? [];
+      })
+      .catch(() => {
+        this.suggestedQuestions = [...AdminQueryPage.fallbackSuggestions];
+      })
+      .finally(() => {
+        this.suggestionsLoading = false;
+      });
   }
 
   runQuery(options?: { skipClarification?: boolean }): void {

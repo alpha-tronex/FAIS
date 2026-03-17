@@ -29,4 +29,13 @@ export class AdminQueryService {
       })
     );
   }
+
+  /** Fetch a random set of suggested questions (static + dynamic from ai_query_examples). */
+  getSuggestions(count = 5): Promise<{ questions: string[] }> {
+    return firstValueFrom(
+      this.http.get<{ questions: string[] }>(`${this.apiBase}/admin/ai-query/suggestions`, {
+        params: { count: String(count) },
+      })
+    );
+  }
 }

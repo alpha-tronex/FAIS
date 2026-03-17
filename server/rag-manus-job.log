@@ -1,0 +1,10 @@
+
+> fais-server@0.1.0 run:rag-manus-once
+> tsx src/scripts/run-rag-manus-job-once.ts
+
+[dotenv@17.3.1] injecting env (17) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+Error: No JSON array found in assistant output. First 300 chars: Here are the 20 triples for the family-law admin dashboard, including questions, MongoDB queries, and result summaries.
+    at parseTriplesFromAssistantText (/Users/alphathiam/Documents/GitHub/FAIS/server/src/jobs/rag-example-manus.job.ts:71:11)
+    at runRagExampleManusJobOnce (/Users/alphathiam/Documents/GitHub/FAIS/server/src/jobs/rag-example-manus.job.ts:134:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async main (/Users/alphathiam/Documents/GitHub/FAIS/server/src/scripts/run-rag-manus-job-once.ts:26:3)

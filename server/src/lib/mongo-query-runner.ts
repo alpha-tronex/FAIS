@@ -1,3 +1,4 @@
+
 import mongoose from 'mongoose';
 import { ALLOWED_COLLECTIONS, type AllowedCollection } from './mongo-query-schema.js';
 
@@ -81,6 +82,14 @@ function normalizeUnwindPaths(pipeline: unknown[]): void {
   }
 }
 
+/**
+ * Ensures that all $unwind stages in the given aggregation pipeline have a path value starting with '$' as required by MongoDB.
+ * Modifies the given pipeline array in place.
+ * 
+ * - If $unwind is a string and does not start with '$', it will be prefixed.
+ * - If $unwind is an object with a 'path' property that does not start with '$', it will be prefixed.
+ * - All other cases are left unchanged.
+ */
 function validatePipelineStages(pipeline: unknown[]): void {
   for (let i = 0; i < pipeline.length; i++) {
     const stage = pipeline[i];
@@ -142,6 +151,13 @@ export type MongoFindSanitized = {
   limit: number;
 };
 
+/**
+ * Validates and sanitizes a MongoDB query input for a find operation.
+ * - Checks if the provided collection is allowed.
+ * - Ensures the filter and projection are valid objects, with no forbidden operators.
+ * - Clamps the limit to allowed bounds.
+ * Returns a standardized object ready for execution.
+ */
 export function validateAndSanitizeQuery(input: MongoQueryInput): MongoFindSanitized {
   const col = input.collection?.trim();
   if (!col || !ALLOWED_COLLECTIONS.includes(col as AllowedCollection)) {

@@ -7,8 +7,8 @@
   <section class="mt16 suggested">
     <div class="suggestedHeader">
       <h2 class="suggestedTitle">Suggested questions</h2>
-      <button type="button" class="refreshSuggestionsBtn" (click)="refreshSuggestions()" title="Show 5 different suggestions">
-        Show different suggestions
+      <button type="button" class="refreshSuggestionsBtn" (click)="refreshSuggestions()" [disabled]="suggestionsLoading" title="Show 5 different suggestions">
+        {{ suggestionsLoading ? 'Loading…' : 'Show different suggestions' }}
       </button>
     </div>
     <ul class="suggestedList">
