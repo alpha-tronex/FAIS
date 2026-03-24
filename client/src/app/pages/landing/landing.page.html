@@ -20,6 +20,7 @@
             <a [routerLink]="['/']" fragment="product" [queryParams]="{ v: version }">Product</a>
             <a [routerLink]="['/']" fragment="pricing" [queryParams]="{ v: version }">Pricing</a>
             <a [routerLink]="['/']" fragment="resources" [queryParams]="{ v: version }">Resources</a>
+            <a routerLink="/splash">Intake automation</a>
             <a class="trNavCta" [routerLink]="['/demo']" [queryParams]="{ v: version }">Book a demo</a>
           </nav>
         </header>
@@ -132,6 +133,7 @@
     </a>
 
     <div class="landingHeaderRight">
+      <a class="headerSplashLink" routerLink="/splash">Intake automation</a>
       <a class="headerPhone" href="tel:+1-000-000-0000">(000) 000-0000</a>
       <a class="headerCta" routerLink="/demo">Book a Workflow Demo</a>
     </div>

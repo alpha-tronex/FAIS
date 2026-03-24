@@ -1,0 +1,145 @@
+<main class="splash" data-page="splash">
+  <header class="splashHeader">
+    <a class="brand" routerLink="/">
+      <span class="brandMark">FAIS</span>
+      <span class="brandText">
+        <strong>Financial Affidavit Intake System</strong>
+        <span>Florida family-law firms</span>
+      </span>
+    </a>
+    <nav class="splashNav" aria-label="Marketing links">
+      <a routerLink="/splash" fragment="how">How it works</a>
+      <a routerLink="/splash" fragment="faq">FAQ</a>
+      <a routerLink="/demo">Book a demo</a>
+      <a class="splashNavCta" routerLink="/login">Client login</a>
+    </nav>
+  </header>
+
+  <section class="splashHero" id="top">
+    <p class="splashEyebrow">Intake-to-affidavit automation</p>
+    <h1>Financial affidavits from real documents—not from retyping.</h1>
+    <p class="splashHeroSub">
+      Upload W-2s, statements, and bills. FAIS extracts the numbers, maps them to your workflow, and your team reviews before
+      anything is filed. Generate a print-ready affidavit in minutes, not hours.
+    </p>
+    <div class="splashHeroActions">
+      <a class="btn btnPrimary" routerLink="/demo">Book a 15-minute demo</a>
+      <a class="btn btnSecondary" routerLink="/splash" fragment="how">See how it works</a>
+    </div>
+    <p class="splashTrust">
+      Built for family law teams · Human review before filing · Florida financial affidavit workflows
+    </p>
+  </section>
+
+  <section class="splashSection splashProblem" id="problem">
+    <div class="sectionIntro">
+      <p class="splashEyebrow">The problem</p>
+      <h2>Clerks should not spend every case retyping the same documents.</h2>
+    </div>
+    <ul class="splashList">
+      @for (item of problemBullets; track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+  </section>
+
+  <section class="splashSection splashHow" id="how">
+    <div class="sectionIntro">
+      <p class="splashEyebrow">How FAIS works</p>
+      <h2>From upload to print in three steps.</h2>
+    </div>
+    <ol class="splashSteps">
+      @for (step of steps; track step.title; let i = $index) {
+        <li class="splashStep">
+          <span class="stepNum">{{ i + 1 }}</span>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.copy }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <section class="splashSection" id="features">
+    <div class="sectionIntro">
+      <p class="splashEyebrow">Why this approach</p>
+      <h2>Built for real matter files—not ideal digital copies.</h2>
+    </div>
+    <div class="splashFeatureGrid">
+      @for (f of features; track f.title) {
+        <article class="splashFeature">
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.copy }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="splashSection splashProof">
+    <div class="sectionIntro">
+      <p class="splashEyebrow">Differentiation</p>
+      <h2>Why firms choose FAIS over generic form tools.</h2>
+    </div>
+    <div class="proofTable" role="table" aria-label="FAIS differentiation">
+      <div class="proofRow proofHead" role="row">
+        <span role="columnheader">Claim</span>
+        <span role="columnheader">What it means</span>
+      </div>
+      @for (row of proofRows; track row.claim) {
+        <div class="proofRow" role="row">
+          <span class="proofClaim" role="cell">{{ row.claim }}</span>
+          <span role="cell">{{ row.notes }}</span>
+        </div>
+      }
+    </div>
+    <p class="proofPlaceholder">
+      Pilot metric (replace when measured): median affidavit prep time from [X hours] to [Y minutes] per case.
+    </p>
+  </section>
+
+  <section class="splashSection" id="who">
+    <div class="sectionIntro">
+      <p class="splashEyebrow">Who it is for</p>
+      <h2>Teams that file a lot of financial affidavits.</h2>
+    </div>
+    <ul class="splashList">
+      @for (item of audienceBullets; track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+  </section>
+
+  <section class="splashSection splashFaq" id="faq">
+    <div class="sectionIntro">
+      <p class="splashEyebrow">FAQ</p>
+      <h2>Questions firms ask first.</h2>
+    </div>
+    <div class="faqGrid">
+      @for (item of faq; track item.question) {
+        <article class="faqItem">
+          <h3>{{ item.question }}</h3>
+          <p>{{ item.answer }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="splashCta">
+    <h2>See FAIS on your documents and your affidavit flow.</h2>
+    <p>We walk through a case-shaped demo: upload, extract, review, print.</p>
+    <div class="splashHeroActions">
+      <a class="btn btnPrimary" routerLink="/demo">Schedule demo</a>
+      <a class="btn btnGhost" routerLink="/">Back to FAIS overview</a>
+    </div>
+  </section>
+
+  <footer class="splashFooter">
+    <p>FAIS — Financial affidavit intelligence for family law teams.</p>
+    <p class="splashFooterMeta">
+      <a routerLink="/">Home</a>
+      ·
+      <a routerLink="/demo">Demo</a>
+      ·
+      <a routerLink="/login">Login</a>
+    </p>
+  </footer>
+</main>

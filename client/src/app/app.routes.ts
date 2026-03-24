@@ -37,6 +37,10 @@ export const routes: Routes = [
 			})
 	},
 	{
+		path: 'splash',
+		loadChildren: () => import('./pages/splash/splash.module').then((m) => m.SplashModule)
+	},
+	{
 		path: 'register',
 		canActivate: [registerGuard],
 		loadChildren: () => import('./pages/register/register.module').then((m) => m.RegisterModule)
