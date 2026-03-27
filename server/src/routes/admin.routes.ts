@@ -21,6 +21,207 @@ import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 
 const RESULT_SIZE_THRESHOLD_FOR_SUMMARY = 8; // If more than this many rows, call summary LLM
 const MAX_RESULT_JSON_CHARS = 8000;
+const RESULT_ROW_LIMIT_FOR_ANSWER_LIST = 25;
+
+type QueryIntent = 'list' | 'aggregate' | 'both' | 'clarify';
+type QueryTypeUsed = 'find' | 'aggregate';
+
+type AdminQueryAnswer = {
+  plainEnglishSummary: string;
+  list: {
+    applies: boolean;
+    columns: string[];
+    rows: unknown[];
+    truncated: boolean;
+    rowLimit: number;
+  };
+  aggregate: {
+    applies: boolean;
+    metrics: { name: string; value: number | string; unit: 'count' | 'usd' | 'percent' | 'other' }[];
+    breakdowns: { dimension: string; buckets: { key: string; value: number | string }[] }[];
+  };
+  caveats: string[];
+  queryUsed: string;
+  resultMeta: {
+    queryType: QueryTypeUsed;
+    intent: QueryIntent;
+    rowCountReturned: number;
+    executionMs: number;
+    executionNote: string;
+    validationFailed: boolean;
+  };
+};
+
+type TelemetrySnapshot = {
+  totals: {
+    requests: number;
+    clarifications: number;
+    validationFailures: number;
+    success: number;
+  };
+  intent: Record<QueryIntent, number>;
+  queryType: Record<QueryTypeUsed, number>;
+  recent: Array<{
+    at: string;
+    intent: QueryIntent;
+    queryType: QueryTypeUsed | null;
+    clarification: boolean;
+    validationFailed: boolean;
+    durationMs: number;
+  }>;
+};
+
+const TELEMETRY_HISTORY_LIMIT = 200;
+const AI_QUERY_TELEMETRY: TelemetrySnapshot = {
+  totals: {
+    requests: 0,
+    clarifications: 0,
+    validationFailures: 0,
+    success: 0,
+  },
+  intent: {
+    list: 0,
+    aggregate: 0,
+    both: 0,
+    clarify: 0,
+  },
+  queryType: {
+    find: 0,
+    aggregate: 0,
+  },
+  recent: [],
+};
+
+function classifyIntent(question: string): QueryIntent {
+  const q = question.toLowerCase();
+  const hasAggregateSignals =
+    /\b(count|total|sum|avg|average|highest|lowest|most|least|top|trend|group by|per )\b/.test(q) ||
+    /\bwhich \d+\b/.test(q);
+  const hasListSignals = /\b(list|show|display|details|records|cases|appointments|users)\b/.test(q);
+  if (hasAggregateSignals && hasListSignals) return 'both';
+  if (hasAggregateSignals) return 'aggregate';
+  return 'list';
+}
+
+function bumpTelemetry(entry: {
+  intent: QueryIntent;
+  queryType: QueryTypeUsed | null;
+  clarification: boolean;
+  validationFailed: boolean;
+  durationMs: number;
+}): void {
+  AI_QUERY_TELEMETRY.totals.requests += 1;
+  AI_QUERY_TELEMETRY.intent[entry.intent] += 1;
+  if (entry.queryType) AI_QUERY_TELEMETRY.queryType[entry.queryType] += 1;
+  if (entry.clarification) AI_QUERY_TELEMETRY.totals.clarifications += 1;
+  if (entry.validationFailed) AI_QUERY_TELEMETRY.totals.validationFailures += 1;
+  if (!entry.clarification && !entry.validationFailed) AI_QUERY_TELEMETRY.totals.success += 1;
+  AI_QUERY_TELEMETRY.recent.unshift({
+    at: new Date().toISOString(),
+    intent: entry.intent,
+    queryType: entry.queryType,
+    clarification: entry.clarification,
+    validationFailed: entry.validationFailed,
+    durationMs: entry.durationMs,
+  });
+  if (AI_QUERY_TELEMETRY.recent.length > TELEMETRY_HISTORY_LIMIT) {
+    AI_QUERY_TELEMETRY.recent.length = TELEMETRY_HISTORY_LIMIT;
+  }
+}
+
+function serializeQueryUsed(queryType: QueryTypeUsed, collection: string, args: { filter?: unknown; projection?: unknown; limit?: number; pipeline?: unknown[] }): string {
+  if (queryType === 'aggregate') {
+    return JSON.stringify(
+      { type: 'aggregate', collection, pipeline: Array.isArray(args.pipeline) ? args.pipeline : [] },
+      null,
+      2
+    );
+  }
+  return JSON.stringify(
+    {
+      type: 'find',
+      collection,
+      filter: args.filter ?? {},
+      projection: args.projection,
+      limit: typeof args.limit === 'number' ? args.limit : undefined,
+    },
+    null,
+    2
+  );
+}
+
+function buildAnswerV2(input: {
+  summary: string;
+  results: unknown[];
+  count: number;
+  queryType: QueryTypeUsed;
+  intent: QueryIntent;
+  queryUsed: string;
+  executionMs: number;
+  caveats?: string[];
+  validationFailed?: boolean;
+}): AdminQueryAnswer {
+  const first = input.results[0];
+  const rowLike = first && typeof first === 'object' ? (first as Record<string, unknown>) : null;
+  const columns = rowLike ? Object.keys(rowLike).slice(0, 12) : [];
+  const rows = input.results.slice(0, RESULT_ROW_LIMIT_FOR_ANSWER_LIST);
+  const listApplies = input.intent === 'list' || input.intent === 'both' || input.queryType === 'find';
+  const aggregateApplies = input.intent === 'aggregate' || input.intent === 'both' || input.queryType === 'aggregate';
+  const metrics: { name: string; value: number | string; unit: 'count' | 'usd' | 'percent' | 'other' }[] = [
+    { name: 'Returned rows', value: input.count, unit: 'count' },
+  ];
+  if (aggregateApplies && rowLike) {
+    for (const [k, v] of Object.entries(rowLike)) {
+      if (k === '_id') continue;
+      if (typeof v === 'number') {
+        const lower = k.toLowerCase();
+        const unit = lower.includes('amount') || lower.includes('income') || lower.includes('value') ? 'usd' : 'other';
+        metrics.push({ name: k, value: v, unit });
+      }
+    }
+  }
+  const breakdowns =
+    aggregateApplies && rowLike && '_id' in rowLike
+      ? [
+          {
+            dimension: '_id',
+            buckets: input.results.slice(0, 10).map((r) => {
+              const rec = r as Record<string, unknown>;
+              const valueCandidate = Object.entries(rec).find(([k, v]) => k !== '_id' && typeof v === 'number');
+              return {
+                key: String(rec._id ?? 'null'),
+                value: typeof valueCandidate?.[1] === 'number' ? valueCandidate[1] : '',
+              };
+            }),
+          },
+        ]
+      : [];
+  return {
+    plainEnglishSummary: input.summary,
+    list: {
+      applies: listApplies,
+      columns,
+      rows,
+      truncated: input.results.length > RESULT_ROW_LIMIT_FOR_ANSWER_LIST,
+      rowLimit: RESULT_ROW_LIMIT_FOR_ANSWER_LIST,
+    },
+    aggregate: {
+      applies: aggregateApplies,
+      metrics,
+      breakdowns,
+    },
+    caveats: input.caveats ?? [],
+    queryUsed: input.queryUsed,
+    resultMeta: {
+      queryType: input.queryType,
+      intent: input.intent,
+      rowCountReturned: input.count,
+      executionMs: input.executionMs,
+      executionNote: input.count === 0 ? 'No matching documents.' : 'Query executed successfully.',
+      validationFailed: input.validationFailed === true,
+    },
+  };
+}
 
 /** Ensure a county filter is applied in the first $lookup to 'case' when we have a resolved countyId (e.g. "income in Broward"). */
 function injectCountyIdIntoCaseLookup(pipeline: unknown[], countyId: number): void {
@@ -699,6 +900,10 @@ export function createAdminRouter(
     }
   });
 
+  router.get('/admin/ai-query/telemetry', auth.requireAuth, auth.requireAdminOrAiStaff, async (_req, res) => {
+    res.json(AI_QUERY_TELEMETRY);
+  });
+
   router.post('/admin/ai-query/examples', auth.requireAuth, auth.requireAdminOrAiStaff, async (req, res) => {
     const body = req.body;
     const items: AiQueryExample[] = Array.isArray(body)
@@ -766,12 +971,33 @@ export function createAdminRouter(
       );
     }
 
+    const startedAt = Date.now();
+    const intent = classifyIntent(question);
+    let queryTypeUsed: QueryTypeUsed | null = null;
+    let validationFailed = false;
     try {
       // Step 2: Check ambiguity (skip when user is answering a clarification—prevents infinite loop)
       if (!skipClarification) {
         const clarification = await checkAmbiguity(client, question);
         if (clarification) {
-          return res.json({ clarification, summary: null, count: 0, results: [] });
+          bumpTelemetry({
+            intent: 'clarify',
+            queryType: null,
+            clarification: true,
+            validationFailed: false,
+            durationMs: Date.now() - startedAt,
+          });
+          const answer = buildAnswerV2({
+            summary: clarification,
+            results: [],
+            count: 0,
+            queryType: 'find',
+            intent: 'clarify',
+            queryUsed: '',
+            executionMs: Date.now() - startedAt,
+            caveats: ['Clarification required before query execution.'],
+          });
+          return res.json({ clarification, summary: null, count: 0, results: [], answer });
         }
       }
 
@@ -804,7 +1030,17 @@ export function createAdminRouter(
       // Step 4: Generate Mongo query — use schema + relationship graph + RAG + enrichment
       const schemaText = getSchemaForPrompt();
       const relationshipText = getRelationshipGraphText();
-      const systemContent = `${schemaText}\n\n${relationshipText}${ragContext}${enrichment.promptSnippet}\n\nOutput only by calling the query_mongodb tool. Use type "find" for simple filters; use type "aggregate" for averages, counts, or grouping. When the message above gives you a resolved countyId, stateId, or userId, use that exact value in your filter or pipeline. Do not explain.`;
+      const systemContent = `${schemaText}\n\n${relationshipText}${ragContext}${enrichment.promptSnippet}
+
+Query intent classification for this request: ${intent.toUpperCase()}.
+Rules:
+- Output only by calling query_mongodb.
+- Use type "aggregate" for totals, counts, averages, top-N, grouped-by, trends.
+- Use type "find" for list/details queries.
+- If intent is BOTH, prefer aggregate output that supports concise list + metrics in one response.
+- If a field mapping is uncertain, return best safe query using known fields only; do not invent fields.
+- When the message above gives you a resolved countyId, stateId, or userId, use that exact value.
+- Do not explain.`;
 
       const completion = await client.chat.completions.create({
         model: 'gpt-4o-mini',
@@ -937,6 +1173,7 @@ export function createAdminRouter(
       let queryCollection: string;
 
       if (queryType === 'aggregate' && Array.isArray(args.pipeline)) {
+        queryTypeUsed = 'aggregate';
         if (enrichment.countyId != null) {
           injectCountyIdIntoCaseLookup(args.pipeline, enrichment.countyId);
         }
@@ -953,6 +1190,7 @@ export function createAdminRouter(
         results = await runMongoAggregate(sanitized);
         queryCollection = sanitized.collection;
       } else {
+        queryTypeUsed = 'find';
         // Step 5: Validate find
         const sanitized = validateAndSanitizeQuery({
           collection: args.collection ?? '',
@@ -1120,14 +1358,42 @@ export function createAdminRouter(
       }
 
       res.json({
+        answer: buildAnswerV2({
+          summary,
+          results,
+          count,
+          queryType: queryTypeUsed ?? 'find',
+          intent,
+          queryUsed: serializeQueryUsed(queryTypeUsed ?? 'find', queryCollection, args),
+          executionMs: Date.now() - startedAt,
+          caveats: summary.includes('truncated') ? ['Large result set was truncated for summary generation.'] : [],
+          validationFailed: false,
+        }),
         summary,
         ...(summaryList != null && { summaryList }),
         ...(summarySections != null && summarySections.length > 0 && { summarySections }),
         count,
         results,
       });
+      bumpTelemetry({
+        intent,
+        queryType: queryTypeUsed,
+        clarification: false,
+        validationFailed: false,
+        durationMs: Date.now() - startedAt,
+      });
     } catch (e) {
       const err = e as { status?: number; message?: string };
+      if (err?.message?.includes('Invalid collection') || err?.message?.includes('Forbidden') || err?.message?.includes('forbidden')) {
+        validationFailed = true;
+      }
+      bumpTelemetry({
+        intent,
+        queryType: queryTypeUsed,
+        clarification: false,
+        validationFailed,
+        durationMs: Date.now() - startedAt,
+      });
       if (err?.status === 429 || err?.status === 402) {
         return sendErrorWithMessage(
           res,

@@ -579,4 +579,78 @@ export const AI_QUERY_EXAMPLES: AiQueryExample[] = [
     },
     result_summary: 'Broward County has the most employment records (156), followed by Miami-Dade (98).',
   },
+  {
+    question: 'Show total liabilities amount and top 5 liability-heavy counties',
+    query: {
+      type: 'aggregate',
+      collection: 'liabilities',
+      pipeline: [
+        {
+          $lookup: {
+            from: 'case',
+            let: { userId: '$userId' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $or: [{ $eq: ['$petitionerId', '$$userId'] }, { $eq: ['$respondentId', '$$userId'] }],
+                  },
+                },
+              },
+              { $limit: 1 },
+            ],
+            as: 'userCase',
+          },
+        },
+        { $unwind: { path: '$userCase', preserveNullAndEmptyArrays: false } },
+        {
+          $group: {
+            _id: '$userCase.countyId',
+            totalLiabilities: { $sum: 1 },
+            totalAmount: { $sum: '$amountOwed' },
+          },
+        },
+        { $sort: { totalAmount: -1 } },
+        { $limit: 5 },
+      ],
+    },
+    result_summary: 'Top 5 counties by total liabilities are listed with total amount and count.',
+  },
+  {
+    question: 'Count cases by county and show the top 10 counties',
+    query: {
+      type: 'aggregate',
+      collection: 'case',
+      pipeline: [
+        { $group: { _id: '$countyId', totalCases: { $sum: 1 } } },
+        { $match: { _id: { $ne: null } } },
+        { $sort: { totalCases: -1 } },
+        { $limit: 10 },
+      ],
+    },
+    result_summary: 'Top 10 counties by case count are returned in descending order.',
+  },
+  {
+    question: 'List the top 10 users by total monthly income',
+    query: {
+      type: 'aggregate',
+      collection: 'monthlyincome',
+      pipeline: [
+        { $group: { _id: '$userId', totalIncome: { $sum: '$amount' } } },
+        { $sort: { totalIncome: -1 } },
+        { $limit: 10 },
+        {
+          $lookup: {
+            from: 'users',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'userDoc',
+          },
+        },
+        { $unwind: { path: '$userDoc', preserveNullAndEmptyArrays: false } },
+        { $project: { _id: 0, firstName: '$userDoc.firstName', lastName: '$userDoc.lastName', totalIncome: 1 } },
+      ],
+    },
+    result_summary: 'Top 10 users by total monthly income are returned with full names and totals.',
+  },
 ];

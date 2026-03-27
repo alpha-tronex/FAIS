@@ -338,3 +338,46 @@ Three components improve LLM accuracy without changing the safety model (structu
 - **Conditional summarization:** Summarize only if result set is large; otherwise return raw results to save cost and latency.
 - **Query tool:** Extend to **find** and **aggregate**; allow only stages `$match`, `$group`, `$sort`, `$limit`, `$project`, `$count`. Validate and execute server-side.
 - **Next step:** Implement ambiguity check (step 2), then add example triples, indexing and retrieval, find/aggregate tool, and conditional summarization. Keep bypasses and validation; add more examples over time.
+
+---
+
+## 9. Response Contract v2 (implemented)
+
+`POST /admin/query` now supports an additive `answer` object while preserving old fields:
+
+- `answer.plainEnglishSummary`
+- `answer.list` (applies, columns, rows, truncated, rowLimit)
+- `answer.aggregate` (applies, metrics, breakdowns)
+- `answer.caveats`
+- `answer.queryUsed`
+- `answer.resultMeta` (queryType, intent, rowCountReturned, executionMs, executionNote, validationFailed)
+
+Legacy fields (`summary`, `summaryList`, `summarySections`, `count`, `results`) are still returned for compatibility.
+
+See `docs/AI_QUERY_RESPONSE_CONTRACT_V2.md`.
+
+---
+
+## 10. Four-phase rollout status
+
+### Phase 1 — Backend contract
+
+- Added `answer` object to `/admin/query`.
+- Preserved legacy response fields to minimize regression risk.
+
+### Phase 2 — UI migration
+
+- Admin Query page now renders from `answer` first.
+- Falls back to legacy `summary`/`summaryList`/`summarySections` if `answer` is absent.
+
+### Phase 3 — Prompt/rules hardening + aggregate examples
+
+- Query generation prompt is now intent-aware (`list`, `aggregate`, `both`, `clarify`).
+- Rules prioritize aggregate for totals/averages/top-N/grouping.
+- Example store includes aggregate-heavy intents for county and affidavit analytics.
+
+### Phase 4 — Telemetry dashboards
+
+- Added `GET /admin/ai-query/telemetry`.
+- Captures intent mix, query type mix, clarification rate, validation-failure rate, and recent durations.
+- Admin Query UI now displays telemetry counters for fast operational visibility.

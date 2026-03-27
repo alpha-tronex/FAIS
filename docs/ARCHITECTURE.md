@@ -198,3 +198,15 @@ No major architectural red flags. Ensure `OPENAI_API_KEY` and `SSN_ENCRYPTION_KE
 ## 9. Conclusion
 
 FAIS is structured as a **classic three-tier web app** (Angular → Express → MongoDB) with clear separation of routes, models, DTOs, and business logic. The use of router factories, Zod, and role-based middleware makes the backend maintainable and testable. The main improvements to aim for are a **global error handler**, **typed `req.auth`**, and optional **rate limiting** and **richer validation responses**. The rest is incremental (health checks, versioning, tests) as the product and team grow.
+
+---
+
+## AI Query v2 additions
+
+- `/admin/query` now returns an additive `answer` contract (plain-English summary, list block, aggregate block, caveats, queryUsed, metadata) while preserving legacy fields for backward compatibility.
+- `/admin/ai-query/telemetry` now exposes AI query operational counters:
+  - request count
+  - clarification rate
+  - query type mix (find vs aggregate)
+  - validation-failure rate
+- Admin Query UI consumes `answer` first and falls back to legacy fields, enabling low-risk rollout.

@@ -20,6 +20,23 @@
     </ul>
   </section>
 
+  <section class="mt16 telemetry" *ngIf="telemetry">
+    <h2 class="suggestedTitle">AI query telemetry</h2>
+    <p class="description">
+      Requests: {{ telemetry.totals.requests }} |
+      Success: {{ telemetry.totals.success }} |
+      Clarifications: {{ telemetry.totals.clarifications }} |
+      Validation failures: {{ telemetry.totals.validationFailures }}
+    </p>
+    <p class="description">
+      Intent — list: {{ telemetry.intent.list }}, aggregate: {{ telemetry.intent.aggregate }}, both: {{ telemetry.intent.both }}, clarify: {{ telemetry.intent.clarify }}
+    </p>
+    <p class="description">
+      Query type — find: {{ telemetry.queryType.find }}, aggregate: {{ telemetry.queryType.aggregate }}
+    </p>
+  </section>
+  <p *ngIf="telemetryError" class="hint">{{ telemetryError }}</p>
+
   <p *ngIf="error" class="error">{{ error }}</p>
 
   <section class="mt16">
@@ -70,6 +87,21 @@
       <li *ngFor="let item of summaryList">{{ item }}</li>
     </ul>
     <p *ngIf="summarySections.length === 0 && summaryList.length === 0" class="summaryText">{{ summary }}</p>
+    <div *ngIf="!clarification && answer?.aggregate?.applies && answer!.aggregate.metrics.length > 0" class="mt12">
+      <h3 class="summarySectionTitle">Key metrics</h3>
+      <ul class="summaryList">
+        <li *ngFor="let m of answer!.aggregate.metrics">{{ m.name }}: {{ m.value }} <span *ngIf="m.unit !== 'other'">({{ m.unit }})</span></li>
+      </ul>
+    </div>
+    <div *ngIf="!clarification && answer?.caveats?.length" class="mt12">
+      <h3 class="summarySectionTitle">Caveats</h3>
+      <ul class="summaryList">
+        <li *ngFor="let c of answer!.caveats">{{ c }}</li>
+      </ul>
+    </div>
+    <p *ngIf="!clarification && answer?.resultMeta" class="hint">
+      Intent: {{ answer!.resultMeta.intent }} | Query type: {{ answer!.resultMeta.queryType }} | Time: {{ answer!.resultMeta.executionMs }}ms
+    </p>
     <div *ngIf="clarification" class="clarificationFollowUp mt12">
       <label for="clarification-response">Your answer</label>
       <div class="clarificationInputRow">
@@ -93,6 +125,10 @@
       {{ showRawResults ? 'Hide' : 'Show' }} raw results ({{ count }})
     </button>
     <pre *ngIf="showRawResults" class="resultsJson">{{ results | json }}</pre>
+    <details *ngIf="answer?.queryUsed" class="mt12">
+      <summary>Query used</summary>
+      <pre class="resultsJson">{{ answer!.queryUsed }}</pre>
+    </details>
   </section>
 
   <p *ngIf="!busy && !ranOnce && !error" class="mt16 hint">Enter a question and click Run query.</p>

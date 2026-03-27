@@ -28,6 +28,43 @@ export class AdminQueryPage {
   clarificationResponse = '';
   /** Toggle to show/hide raw JSON results. */
   showRawResults = false;
+  answer: {
+    plainEnglishSummary: string;
+    list: {
+      applies: boolean;
+      columns: string[];
+      rows: unknown[];
+      truncated: boolean;
+      rowLimit: number;
+    };
+    aggregate: {
+      applies: boolean;
+      metrics: { name: string; value: number | string; unit: 'count' | 'usd' | 'percent' | 'other' }[];
+      breakdowns: { dimension: string; buckets: { key: string; value: number | string }[] }[];
+    };
+    caveats: string[];
+    queryUsed: string;
+    resultMeta: {
+      queryType: 'find' | 'aggregate';
+      intent: 'list' | 'aggregate' | 'both' | 'clarify';
+      rowCountReturned: number;
+      executionMs: number;
+      executionNote: string;
+      validationFailed: boolean;
+    };
+  } | null = null;
+
+  telemetry: {
+    totals: {
+      requests: number;
+      clarifications: number;
+      validationFailures: number;
+      success: number;
+    };
+    intent: Record<'list' | 'aggregate' | 'both' | 'clarify', number>;
+    queryType: Record<'find' | 'aggregate', number>;
+  } | null = null;
+  telemetryError: string | null = null;
   /** True briefly after copying answer to clipboard. */
   copied = false;
 
@@ -61,6 +98,7 @@ export class AdminQueryPage {
       return;
     }
     this.refreshSuggestions();
+    this.refreshTelemetry();
   }
 
   /** Fetch a new random set of 5 suggestions from the server (static + ai_query_examples). */
@@ -93,23 +131,38 @@ export class AdminQueryPage {
     this.count = 0;
     this.clarification = false;
     this.clarificationResponse = '';
+    this.answer = null;
     this.adminQuery
       .query(this.question, options)
       .then((res) => {
         this.ranOnce = true;
+        if (res.answer) {
+          this.answer = res.answer;
+        }
         if (res.clarification) {
-          this.summary = res.clarification;
+          this.summary = res.answer?.plainEnglishSummary ?? res.clarification;
           this.results = res.results ?? [];
           this.count = res.count ?? 0;
           this.clarification = true;
         } else {
-          this.summary = res.summary ?? null;
-          this.summaryList = res.summaryList ?? [];
+          this.summary = res.answer?.plainEnglishSummary ?? res.summary ?? null;
+          this.summaryList =
+            res.answer?.list?.applies && Array.isArray(res.answer.list.rows) && res.answer.list.rows.length > 0
+              ? res.answer.list.rows.map((row) => {
+                  if (!row || typeof row !== 'object') return String(row);
+                  const rec = row as Record<string, unknown>;
+                  const pairs = Object.entries(rec)
+                    .slice(0, 4)
+                    .map(([k, v]) => `${k}: ${String(v)}`);
+                  return pairs.join(', ');
+                })
+              : (res.summaryList ?? []);
           this.summarySections = res.summarySections ?? [];
           this.results = res.results ?? [];
           this.count = res.count ?? 0;
           this.clarification = false;
         }
+        this.refreshTelemetry();
       })
       .catch((e: { error?: { error?: string }; status?: number }) => {
         if (e?.status === 401) {
@@ -134,6 +187,22 @@ export class AdminQueryPage {
       })
       .finally(() => {
         this.busy = false;
+      });
+  }
+
+  refreshTelemetry(): void {
+    this.telemetryError = null;
+    this.adminQuery
+      .getTelemetry()
+      .then((res) => {
+        this.telemetry = {
+          totals: res.totals,
+          intent: res.intent,
+          queryType: res.queryType,
+        };
+      })
+      .catch(() => {
+        this.telemetryError = 'Telemetry unavailable.';
       });
   }
 

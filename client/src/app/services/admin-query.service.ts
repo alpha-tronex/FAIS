@@ -6,6 +6,31 @@ import { environment } from '../../environments/environment';
 export type AdminQueryResponse = {
   /** When present, the question was ambiguous; show this and do not show results. */
   clarification?: string;
+  answer?: {
+    plainEnglishSummary: string;
+    list: {
+      applies: boolean;
+      columns: string[];
+      rows: unknown[];
+      truncated: boolean;
+      rowLimit: number;
+    };
+    aggregate: {
+      applies: boolean;
+      metrics: { name: string; value: number | string; unit: 'count' | 'usd' | 'percent' | 'other' }[];
+      breakdowns: { dimension: string; buckets: { key: string; value: number | string }[] }[];
+    };
+    caveats: string[];
+    queryUsed: string;
+    resultMeta: {
+      queryType: 'find' | 'aggregate';
+      intent: 'list' | 'aggregate' | 'both' | 'clarify';
+      rowCountReturned: number;
+      executionMs: number;
+      executionNote: string;
+      validationFailed: boolean;
+    };
+  };
   summary: string | null;
   /** When present, render summary as a ul/li list (e.g. counties with income). */
   summaryList?: string[];
@@ -36,6 +61,46 @@ export class AdminQueryService {
       this.http.get<{ questions: string[] }>(`${this.apiBase}/admin/ai-query/suggestions`, {
         params: { count: String(count) },
       })
+    );
+  }
+
+  getTelemetry(): Promise<{
+    totals: {
+      requests: number;
+      clarifications: number;
+      validationFailures: number;
+      success: number;
+    };
+    intent: Record<'list' | 'aggregate' | 'both' | 'clarify', number>;
+    queryType: Record<'find' | 'aggregate', number>;
+    recent: Array<{
+      at: string;
+      intent: 'list' | 'aggregate' | 'both' | 'clarify';
+      queryType: 'find' | 'aggregate' | null;
+      clarification: boolean;
+      validationFailed: boolean;
+      durationMs: number;
+    }>;
+  }> {
+    return firstValueFrom(
+      this.http.get<{
+        totals: {
+          requests: number;
+          clarifications: number;
+          validationFailures: number;
+          success: number;
+        };
+        intent: Record<'list' | 'aggregate' | 'both' | 'clarify', number>;
+        queryType: Record<'find' | 'aggregate', number>;
+        recent: Array<{
+          at: string;
+          intent: 'list' | 'aggregate' | 'both' | 'clarify';
+          queryType: 'find' | 'aggregate' | null;
+          clarification: boolean;
+          validationFailed: boolean;
+          durationMs: number;
+        }>;
+      }>(`${this.apiBase}/admin/ai-query/telemetry`)
     );
   }
 }
