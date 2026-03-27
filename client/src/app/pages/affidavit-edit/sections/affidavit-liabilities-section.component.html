@@ -63,7 +63,7 @@
         <td class="td">{{ typeLabel(nonMaritalTypes, l.nonMaritalTypeId) || '—' }}</td>
         <td class="td">{{ l.userOwes ? 'Yes' : 'No' }}</td>
         <td class="td">
-          <button type="button" (click)="startEdit(l)" [disabled]="busy || editingId !== null" class="mini">Edit</button>
+          <button type="button" (click)="startEdit(l)" [disabled]="busy || (editingId !== null && editingId === l.id)" class="mini">Edit</button>
           <button type="button" (click)="remove.emit(l.id)" [disabled]="busy" class="mini">Remove</button>
         </td>
       </tr>

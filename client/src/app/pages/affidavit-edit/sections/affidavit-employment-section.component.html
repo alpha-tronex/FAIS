@@ -64,7 +64,7 @@
         <td class="td">{{ row.payRate | number:'1.2-2' }}</td>
         <td class="td">{{ typeLabel(row.payFrequencyTypeId) }}</td>
         <td class="td">
-          <button type="button" (click)="onEditRow($event, row)" (mousedown)="onEditRow($event, row)" [disabled]="editingId !== null" class="mini">Edit</button>
+          <button type="button" (click)="onEditRow($event, row)" [disabled]="busy || (editingId !== null && editingId === row.id)" class="mini">Edit</button>
           <button type="button" (click)="remove.emit(row.id)" [disabled]="busy" class="mini">Remove</button>
         </td>
       </tr>

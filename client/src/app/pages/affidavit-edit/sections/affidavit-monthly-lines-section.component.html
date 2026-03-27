@@ -41,7 +41,7 @@
         <td class="td">{{ typeLabel(r.typeId) }}</td>
         <td class="td">{{ r.amount | number:'1.2-2' }}</td>
         <td class="td">
-          <button type="button" (click)="startEdit(r)" [disabled]="busy || editingId !== null" class="mini">Edit</button>
+          <button type="button" (click)="startEdit(r)" [disabled]="busy || (editingId !== null && editingId === r.id)" class="mini">Edit</button>
           <button type="button" (click)="remove.emit(r.id)" [disabled]="busy" class="mini">Remove</button>
         </td>
       </tr>
