@@ -28,6 +28,50 @@
         Number of children (worksheet):
         <strong>{{ summary.worksheet.numberOfChildren }}</strong>
       </p>
+      <p *ngIf="summary.netMonthlyIncome" class="mt8">
+        Net monthly income (Petitioner / Respondent):
+        <strong>
+          {{ summary.netMonthlyIncome.parentA | number:'1.2-2' }} /
+          {{ summary.netMonthlyIncome.parentB | number:'1.2-2' }}
+        </strong>
+      </p>
+
+      <div *ngIf="summary.calculated" class="calcCard mt12">
+        <h3 class="panelTitle">Calculated guideline values</h3>
+        <p>
+          Line 1 (total net monthly income):
+          <strong>{{ summary.calculated.line1Total | number:'1.2-2' }}</strong>
+        </p>
+        <p>
+          Line 2 (basic monthly obligation):
+          <strong>{{ summary.calculated.line2BasicMonthlyObligation | number:'1.2-2' }}</strong>
+        </p>
+        <p>
+          Line 3 (responsibility %):
+          <strong>
+            {{ formatPercent(summary.calculated.line3PercentA) }} /
+            {{ formatPercent(summary.calculated.line3PercentB) }}
+          </strong>
+        </p>
+        <p>
+          Line 9 (minimum obligation, Petitioner / Respondent):
+          <strong>
+            {{ summary.calculated.line9MinimumObligationA | number:'1.2-2' }} /
+            {{ summary.calculated.line9MinimumObligationB | number:'1.2-2' }}
+          </strong>
+        </p>
+        <p>
+          Substantial time-sharing gross-up:
+          <strong>{{ summary.calculated.substantialTimeSharingApplied ? 'Applied' : 'Not applied' }}</strong>
+        </p>
+        <p class="presumptiveLine">
+          Line 21 (presumptive support):
+          <strong>{{ summary.calculated.line21PresumptiveAmount | number:'1.2-2' }}</strong>
+          <span *ngIf="summary.calculated.line21PresumptivePaidBy !== 'none'">
+            (paid by {{ summary.calculated.line21PresumptivePaidBy }})
+          </span>
+        </p>
+      </div>
 
       <div class="rowActions mt12">
         <a

@@ -4,6 +4,8 @@ import { loadTemplatePdf } from '../lib/affidavit-pdf.js';
 import { computeAffidavitSummary } from '../lib/affidavit-summary.js';
 import { getWorksheet, putWorksheet } from '../lib/child-support-worksheet-store.js';
 import { fillChildSupportWorksheetPdf } from '../lib/child-support-worksheet-pdf.js';
+import { resolveParentNetMonthlyIncomes } from '../lib/child-support-worksheet-values.js';
+import { computeChildSupport } from '../lib/child-support-calculator.js';
 import { resolveAffidavitTarget } from './affidavit-middleware.js';
 import { sendError } from './error.js';
 import type { AuthMiddlewares } from './middleware.js';
@@ -40,10 +42,11 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
       const { targetUserObjectId } = await resolveAffidavitTarget(req);
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
 
-      const [targetUser, worksheetDoc, affidavitSummary] = await Promise.all([
+      const [targetUser, worksheetDoc, affidavitSummary, netIncomeContext] = await Promise.all([
         User.findById(targetUserObjectId).select({ firstName: 1, lastName: 1, uname: 1 }).lean(),
         getWorksheet(targetUserObjectId, caseId ?? null),
-        computeAffidavitSummary(targetUserObjectId)
+        computeAffidavitSummary(targetUserObjectId),
+        resolveParentNetMonthlyIncomes(targetUserObjectId, caseId)
       ]);
 
       const targetUserDisplayName = targetUser
@@ -52,12 +55,29 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
           : (targetUser as { uname?: string }).uname ?? '')
         : '';
 
+      const worksheet = worksheetDoc?.data ?? {};
+      const calc = await computeChildSupport({
+        numberOfChildren: Number(worksheet.numberOfChildren ?? 1),
+        parentANetMonthlyIncome: Number(worksheet.parentAMonthlyGrossIncome ?? netIncomeContext.parentANetMonthlyIncome),
+        parentBNetMonthlyIncome: Number(worksheet.parentBMonthlyGrossIncome ?? netIncomeContext.parentBNetMonthlyIncome),
+        overnightsParentA: Number(worksheet.overnightsParentA ?? 0),
+        overnightsParentB: Number(worksheet.overnightsParentB ?? 0),
+        healthInsuranceMonthly: Number(worksheet.healthInsuranceMonthly ?? 0),
+        daycareMonthly: Number(worksheet.daycareMonthly ?? 0),
+        otherChildCareMonthly: Number(worksheet.otherChildCareMonthly ?? 0)
+      });
+
       res.json({
         targetUserDisplayName,
         grossAnnualIncome: affidavitSummary.grossAnnualIncome,
         grossMonthlyIncomeFromMonthlyIncome: affidavitSummary.grossMonthlyIncomeFromMonthlyIncome,
         form: affidavitSummary.form,
-        worksheet: worksheetDoc?.data ?? {}
+        worksheet,
+        netMonthlyIncome: {
+          parentA: netIncomeContext.parentANetMonthlyIncome,
+          parentB: netIncomeContext.parentBNetMonthlyIncome
+        },
+        calculated: calc
       });
     } catch (e) {
       sendError(res, e);

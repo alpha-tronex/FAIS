@@ -27,6 +27,28 @@ export type ChildSupportWorksheetSummary = {
   grossMonthlyIncomeFromMonthlyIncome: number;
   form: 'short' | 'long';
   worksheet: WorksheetData;
+  netMonthlyIncome?: {
+    parentA: number;
+    parentB: number;
+  };
+  calculated?: {
+    line1ParentA: number;
+    line1ParentB: number;
+    line1Total: number;
+    line2BasicMonthlyObligation: number;
+    line3PercentA: number;
+    line3PercentB: number;
+    line4ShareA: number;
+    line4ShareB: number;
+    line5TotalAdditional: number;
+    line6AdditionalA: number;
+    line6AdditionalB: number;
+    line9MinimumObligationA: number;
+    line9MinimumObligationB: number;
+    substantialTimeSharingApplied: boolean;
+    line21PresumptivePaidBy: 'petitioner' | 'respondent' | 'none';
+    line21PresumptiveAmount: number;
+  };
 };
 
 @Injectable({ providedIn: 'root' })

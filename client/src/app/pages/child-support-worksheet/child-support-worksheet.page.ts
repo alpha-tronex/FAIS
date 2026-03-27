@@ -80,6 +80,12 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
+  formatPercent(value: number | null | undefined): string {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '0.00%';
+    return `${(n * 100).toFixed(2)}%`;
+  }
+
   refresh(): void {
     this.subscription?.unsubscribe();
 

@@ -2,9 +2,10 @@ import mongoose from 'mongoose';
 import { CaseModel, User } from '../models.js';
 import { loadTemplatePdf, setTextIfExists, checkIfExists, formatMoneyDecimal } from './affidavit-pdf.js';
 import { userDisplayName, caseIncludesUser } from './affidavit-helpers.js';
-import { userScopedFilter, listAffidavitRows } from './affidavit-store.js';
-import { computeAffidavitSummary } from './affidavit-summary.js';
 import { getWorksheet } from './child-support-worksheet-store.js';
+import { resolveParentNetMonthlyIncomes } from './child-support-worksheet-values.js';
+import { computeChildSupport } from './child-support-calculator.js';
+import { setTextByWidgetIndex } from './pdf-multi-widget.js';
 import type { AuthPayload } from '../routes/middleware.js';
 import type { WorksheetData } from './child-support-worksheet-store.js';
 
@@ -13,14 +14,6 @@ export type FillChildSupportWorksheetParams = {
   caseId?: string;
   auth: AuthPayload;
 };
-
-function sumAmounts(rows: any[] | null | undefined): number {
-  if (!rows || rows.length === 0) return 0;
-  return rows.reduce((acc, r) => {
-    const amt = Number(r?.amount ?? 0);
-    return acc + (Number.isFinite(amt) ? amt : 0);
-  }, 0);
-}
 
 export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorksheetParams): Promise<Buffer> {
   const { targetUserObjectId, caseId: requestedCaseId } = params;
@@ -50,25 +43,13 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
         throw Object.assign(new Error('Forbidden'), { status: 403 });
       }
     }
-  } else {
-    const participantFilter = {
-      $or: [
-        { petitionerId: new mongoose.Types.ObjectId(targetUserObjectId) },
-        { respondentId: new mongoose.Types.ObjectId(targetUserObjectId) }
-      ]
-    };
-    caseDoc = await CaseModel.findOne(participantFilter)
-      .sort({ createdAt: -1, _id: -1 })
-      .populate('petitionerId', 'uname firstName lastName')
-      .populate('respondentId', 'uname firstName lastName')
-      .lean<any>();
   }
 
-  const [worksheetDoc, affidavitSummary, monthlyIncome] = await Promise.all([
+  const [worksheetDoc, netIncomeContext] = await Promise.all([
     getWorksheet(targetUserObjectId, requestedCaseId ?? null),
-    computeAffidavitSummary(targetUserObjectId),
-    listAffidavitRows('monthlyincome', userScopedFilter(targetUserObjectId))
+    resolveParentNetMonthlyIncomes(targetUserObjectId, requestedCaseId)
   ]);
+  if (!caseDoc && netIncomeContext.caseDoc) caseDoc = netIncomeContext.caseDoc;
 
   const pdf = await loadTemplatePdf('child-support-worksheet');
   const form = pdf.getForm();
@@ -117,11 +98,18 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
   }
 
   const data: WorksheetData = worksheetDoc?.data ?? {};
-  const monthlyGrossFromAffidavit = sumAmounts(monthlyIncome);
-  const petitionerId = caseDoc?.petitionerId?._id?.toString?.() ?? (caseDoc?.petitionerId as any)?.toString?.();
-  const isTargetPetitioner = petitionerId === targetUserObjectId;
-  const parentAMonthlyIncome = data.parentAMonthlyGrossIncome ?? (isTargetPetitioner ? monthlyGrossFromAffidavit : 0);
-  const parentBMonthlyIncome = data.parentBMonthlyGrossIncome ?? (isTargetPetitioner ? 0 : monthlyGrossFromAffidavit);
+  const parentANetMonthlyIncome = data.parentAMonthlyGrossIncome ?? netIncomeContext.parentANetMonthlyIncome;
+  const parentBNetMonthlyIncome = data.parentBMonthlyGrossIncome ?? netIncomeContext.parentBNetMonthlyIncome;
+  const calc = await computeChildSupport({
+    numberOfChildren: Number(data.numberOfChildren ?? 1),
+    parentANetMonthlyIncome,
+    parentBNetMonthlyIncome,
+    overnightsParentA: Number(data.overnightsParentA ?? 0),
+    overnightsParentB: Number(data.overnightsParentB ?? 0),
+    healthInsuranceMonthly: Number(data.healthInsuranceMonthly ?? 0),
+    daycareMonthly: Number(data.daycareMonthly ?? 0),
+    otherChildCareMonthly: Number(data.otherChildCareMonthly ?? 0)
+  });
 
   if (caseDoc) {
     const petitionerName = userDisplayName(caseDoc.petitionerId);
@@ -136,21 +124,8 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
     setTextByNeedle('number of children', String(data.numberOfChildren));
     setAllByNeedle('children', String(data.numberOfChildren));
   }
-  if (data.parentAMonthlyGrossIncome != null && Number.isFinite(data.parentAMonthlyGrossIncome)) {
-    setTextByNeedle('parent a', formatMoneyDecimal(data.parentAMonthlyGrossIncome));
-    setTextByNeedle('parent a income', formatMoneyDecimal(data.parentAMonthlyGrossIncome));
-    setAllByNeedle('gross monthly', formatMoneyDecimal(data.parentAMonthlyGrossIncome));
-  } else if (parentAMonthlyIncome > 0) {
-    setTextByNeedle('parent a', formatMoneyDecimal(parentAMonthlyIncome));
-    setTextByNeedle('parent a income', formatMoneyDecimal(parentAMonthlyIncome));
-  }
-  if (data.parentBMonthlyGrossIncome != null && Number.isFinite(data.parentBMonthlyGrossIncome)) {
-    setTextByNeedle('parent b', formatMoneyDecimal(data.parentBMonthlyGrossIncome));
-    setTextByNeedle('parent b income', formatMoneyDecimal(data.parentBMonthlyGrossIncome));
-  } else if (parentBMonthlyIncome > 0) {
-    setTextByNeedle('parent b', formatMoneyDecimal(parentBMonthlyIncome));
-    setTextByNeedle('parent b income', formatMoneyDecimal(parentBMonthlyIncome));
-  }
+  if (parentANetMonthlyIncome > 0) setTextByNeedle('parent a income', formatMoneyDecimal(parentANetMonthlyIncome));
+  if (parentBNetMonthlyIncome > 0) setTextByNeedle('parent b income', formatMoneyDecimal(parentBNetMonthlyIncome));
   if (data.overnightsParentA != null && Number.isFinite(data.overnightsParentA)) {
     setTextByNeedle('overnight', String(data.overnightsParentA));
     setTextByNeedle('parent a overnight', String(data.overnightsParentA));
@@ -179,6 +154,34 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
   if (data.supportPaidForOtherChildren != null && Number.isFinite(data.supportPaidForOtherChildren)) {
     setTextByNeedle('support other', formatMoneyDecimal(data.supportPaidForOtherChildren));
   }
+
+  const { StandardFonts } = await import('pdf-lib');
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  setTextByWidgetIndex(form as any, 'Present Net Monthly Income', [
+    formatMoneyDecimal(calc.line1ParentA),
+    formatMoneyDecimal(calc.line1ParentB)
+  ], font);
+  setTextByWidgetIndex(form as any, 'Basic Monthly Obligation', [
+    formatMoneyDecimal(calc.line2BasicMonthlyObligation),
+    formatMoneyDecimal(calc.line2BasicMonthlyObligation)
+  ], font);
+
+  setTextIfExists(form as any, 'Total Present Net Monthly Income', formatMoneyDecimal(calc.line1Total));
+  setTextIfExists(form as any, 'Total Basic Monthly Obligation', formatMoneyDecimal(calc.line2BasicMonthlyObligation));
+  setTextIfExists(form as any, 'Total Percent of Financial Responsibility', '100');
+  setTextIfExists(form as any, 'Total Share of Basic Monthly Obligation', formatMoneyDecimal(calc.line4ShareA + calc.line4ShareB));
+  setTextIfExists(form as any, 'Petitioner Monthly Obligation', formatMoneyDecimal(calc.line9MinimumObligationA));
+  setTextIfExists(form as any, 'Respondent Monthly Obligation', formatMoneyDecimal(calc.line9MinimumObligationB));
+  setTextIfExists(form as any, 'Total Monthly Obligation', formatMoneyDecimal(calc.line9MinimumObligationA + calc.line9MinimumObligationB));
+  setTextIfExists(form as any, 'Petitioner Percentage of Overnight Stays', formatMoneyDecimal(calc.line12PctOvernightsA));
+  setTextIfExists(form as any, 'Respondent Percentage of Overnight Stays', formatMoneyDecimal(calc.line12PctOvernightsB));
+  setTextIfExists(form as any, 'Total Percentage of Overnight Stays', formatMoneyDecimal(calc.line12PctOvernightsA + calc.line12PctOvernightsB));
+  setTextIfExists(form as any, 'Petitioner Support Multiplied by other Parent percentage of overnights', formatMoneyDecimal(calc.line13SupportAByOtherPct));
+  setTextIfExists(form as any, 'Respondenet Support Multiplied by other Parent percentage of overnights', formatMoneyDecimal(calc.line13SupportBByOtherPct));
+  setTextIfExists(form as any, 'Total Support Multiplied by other Parent percentage of overnights', formatMoneyDecimal(calc.line13SupportAByOtherPct + calc.line13SupportBByOtherPct));
+  setTextIfExists(form as any, '19 Total Child Support Owed from Petitioner to Respondent Add line 13A plus 18A', formatMoneyDecimal(calc.line19OwedPetitionerToRespondent));
+  setTextIfExists(form as any, '20 Total Child Support Owed from Respondent to Petitioner Add line 13B plus line 18B', formatMoneyDecimal(calc.line20OwedRespondentToPetitioner));
+  setTextIfExists(form as any, '21. Presumptive Child Support to be Paid', formatMoneyDecimal(calc.line21PresumptiveAmount));
 
   setTextByNeedle('date', new Date().toLocaleDateString('en-US'));
 
