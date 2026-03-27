@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { CasesService, CaseListItem } from '../../services/cases.service';
 import {
   DocumentsService,
+  DocumentIntakeExtraction,
   DocumentListItem,
   DocumentQueryResponse
 } from '../../services/documents.service';
@@ -33,6 +34,12 @@ export class DocumentsPage implements OnInit, OnDestroy {
   dragOver = false;
   showDeleteConfirm = false;
   documentToDelete: DocumentListItem | null = null;
+  /** null = not yet determined; false = server returned 503 (feature off). */
+  intakeFeatureAvailable: boolean | null = null;
+  intakeByDocumentId = new Map<string, DocumentIntakeExtraction>();
+  intakeListError: string | null = null;
+  intakeAnalyzeBusy: Record<string, boolean> = {};
+  intakeRejectBusy: Record<string, boolean> = {};
   private pollTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -64,16 +71,38 @@ export class DocumentsPage implements OnInit, OnDestroy {
     );
   }
 
+  private hasIntakeProcessing(): boolean {
+    for (const e of this.intakeByDocumentId.values()) {
+      if (e.status === 'processing') return true;
+    }
+    return false;
+  }
+
+  private hasReasonToPoll(): boolean {
+    return this.hasProcessingOrUploaded() || this.hasIntakeProcessing();
+  }
+
+  private mergeLatestIntake(rows: DocumentIntakeExtraction[]): Map<string, DocumentIntakeExtraction> {
+    const m = new Map<string, DocumentIntakeExtraction>();
+    for (const e of rows) {
+      const cur = m.get(e.documentId);
+      if (!cur || e.extractionVersion > cur.extractionVersion) {
+        m.set(e.documentId, e);
+      }
+    }
+    return m;
+  }
+
   private startPolling(): void {
     this.stopPolling();
-    if (!this.hasProcessingOrUploaded()) return;
+    if (!this.hasReasonToPoll()) return;
     this.pollTimer = setInterval(() => {
-      if (!this.selectedCaseId || this.listBusy) {
+      if (!this.selectedCaseId) {
         this.stopPolling();
         return;
       }
-      void this.loadDocuments().then(() => {
-        if (!this.hasProcessingOrUploaded()) this.stopPolling();
+      void this.loadDocuments(true).then(() => {
+        if (!this.hasReasonToPoll()) this.stopPolling();
       });
     }, POLL_INTERVAL_MS);
   }
@@ -109,11 +138,17 @@ export class DocumentsPage implements OnInit, OnDestroy {
     return 'This cannot be undone.';
   }
 
+  /** Administrator (any case), petitioner, petitioner attorney, or assigned legal assistant. */
   get canUpload(): boolean {
     const c = this.selectedCase;
     if (!c) return false;
+    if (this.auth.isAdmin()) return true;
     const userId = this.auth.getUserIdFromToken();
-    return c.petitioner?.id === userId;
+    if (!userId) return false;
+    if (c.petitioner?.id === userId) return true;
+    if (c.petitionerAttorney?.id === userId) return true;
+    if (c.legalAssistant?.id === userId) return true;
+    return false;
   }
 
   async loadCases(): Promise<void> {
@@ -139,16 +174,25 @@ export class DocumentsPage implements OnInit, OnDestroy {
   onCaseChange(): void {
     this.documents = [];
     this.listError = null;
+    this.intakeByDocumentId = new Map();
+    this.intakeFeatureAvailable = null;
+    this.intakeListError = null;
     if (this.selectedCaseId) this.loadDocuments();
   }
 
-  async loadDocuments(): Promise<void> {
+  /**
+   * @param silent When true (e.g. polling), skip full-page list busy state.
+   */
+  async loadDocuments(silent = false): Promise<void> {
     if (!this.selectedCaseId) return;
-    this.listBusy = true;
+    if (!silent) {
+      this.listBusy = true;
+    }
     this.listError = null;
     try {
       this.documents = await this.documentsApi.listByCase(this.selectedCaseId);
-      if (this.hasProcessingOrUploaded()) this.startPolling();
+      await this.refreshIntakeForCase();
+      if (this.hasReasonToPoll()) this.startPolling();
       else this.stopPolling();
     } catch (e: unknown) {
       const err = e as { status?: number; error?: { error?: string } };
@@ -159,8 +203,154 @@ export class DocumentsPage implements OnInit, OnDestroy {
       }
       this.listError = err?.error?.error ?? 'Failed to load documents';
     } finally {
-      this.listBusy = false;
+      if (!silent) {
+        this.listBusy = false;
+      }
     }
+  }
+
+  private async refreshIntakeForCase(): Promise<void> {
+    if (!this.selectedCaseId) return;
+    try {
+      const { extractions } = await this.documentsApi.listIntakeForCase(this.selectedCaseId);
+      this.intakeFeatureAvailable = true;
+      this.intakeListError = null;
+      this.intakeByDocumentId = this.mergeLatestIntake(extractions);
+    } catch (e: unknown) {
+      const err = e as { status?: number; error?: { error?: string } };
+      if (err?.status === 503) {
+        this.intakeFeatureAvailable = false;
+        this.intakeByDocumentId = new Map();
+        this.intakeListError = null;
+        return;
+      }
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+        return;
+      }
+      this.intakeListError = err?.error?.error ?? 'Failed to load affidavit intake data';
+    }
+  }
+
+  intakeFor(doc: DocumentListItem): DocumentIntakeExtraction | undefined {
+    return this.intakeByDocumentId.get(doc.id);
+  }
+
+  intakeStatusLabel(status: string): string {
+    switch (status) {
+      case 'processing':
+        return 'Analyzing…';
+      case 'pending_review':
+        return 'Ready for review';
+      case 'failed':
+        return 'Intake failed';
+      case 'rejected':
+        return 'Rejected';
+      case 'applied':
+        return 'Applied';
+      default:
+        return status;
+    }
+  }
+
+  intakeTypeShort(docType: string): string {
+    switch (docType) {
+      case 'w2':
+        return 'W-2';
+      case 'mortgage_statement':
+        return 'Mortgage';
+      case 'utility_electric':
+        return 'Electric';
+      case 'credit_card_mastercard':
+        return 'Card stmt.';
+      case 'unknown':
+        return 'Unknown';
+      default:
+        return docType;
+    }
+  }
+
+  intakeSummaryLine(e: DocumentIntakeExtraction): string {
+    const p = e.rawPayload;
+    const classified = (p['classifiedType'] as string) || e.documentType;
+    const parts: string[] = [this.intakeTypeShort(classified)];
+    if (classified === 'w2' && p['box1WagesTipsOther'] != null) {
+      parts.push(`Box 1: $${p['box1WagesTipsOther']}`);
+    }
+    if (classified === 'mortgage_statement' && p['principalBalance'] != null) {
+      parts.push(`Balance: $${p['principalBalance']}`);
+    }
+    if (classified === 'utility_electric' && p['amountDue'] != null) {
+      parts.push(`Due: $${p['amountDue']}`);
+    }
+    if (classified === 'credit_card_mastercard' && p['statementBalance'] != null) {
+      parts.push(`Balance: $${p['statementBalance']}`);
+    }
+    return parts.join(' · ');
+  }
+
+  formatIntakePayloadJson(e: DocumentIntakeExtraction): string {
+    try {
+      return JSON.stringify(e.rawPayload, null, 2);
+    } catch {
+      return String(e.rawPayload);
+    }
+  }
+
+  async runIntakeAnalyze(doc: DocumentListItem): Promise<void> {
+    if (!this.selectedCaseId || !this.intakeFeatureAvailable) return;
+    this.intakeAnalyzeBusy[doc.id] = true;
+    try {
+      await this.documentsApi.analyzeIntake(this.selectedCaseId, doc.id);
+      await this.refreshIntakeForCase();
+      this.startPolling();
+    } catch (e: unknown) {
+      const err = e as { status?: number; error?: { error?: string } };
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+        return;
+      }
+      alert(err?.error?.error ?? 'Intake analysis could not be started');
+    } finally {
+      this.intakeAnalyzeBusy[doc.id] = false;
+    }
+  }
+
+  async rejectIntake(doc: DocumentListItem): Promise<void> {
+    if (!this.selectedCaseId || !this.intakeFeatureAvailable) return;
+    this.intakeRejectBusy[doc.id] = true;
+    try {
+      await this.documentsApi.rejectIntake(this.selectedCaseId, doc.id);
+      await this.refreshIntakeForCase();
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string } };
+      alert(err?.error?.error ?? 'Reject failed');
+    } finally {
+      this.intakeRejectBusy[doc.id] = false;
+    }
+  }
+
+  canStartIntakeAnalyze(doc: DocumentListItem): boolean {
+    const e = this.intakeFor(doc);
+    if (!e) return true;
+    return e.status !== 'processing';
+  }
+
+  intakeOcrNote(doc: DocumentListItem): string | null {
+    const e = this.intakeFor(doc);
+    if (!e?.rawPayload) return null;
+    const n = e.rawPayload['ocrNote'];
+    return typeof n === 'string' ? n : null;
+  }
+
+  intakeAnalyzeButtonLabel(doc: DocumentListItem): string {
+    if (this.intakeAnalyzeBusy[doc.id]) return 'Starting…';
+    const e = this.intakeFor(doc);
+    if (!e) return 'Analyze for affidavit';
+    if (e.status === 'processing') return 'Analyzing…';
+    return 'Re-analyze';
   }
 
   onFileSelected(event: Event): void {

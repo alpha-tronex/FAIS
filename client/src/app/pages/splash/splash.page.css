@@ -4,21 +4,21 @@
 }
 
 .splash {
-  --bg: #f5f6f8;
-  --ink: #1a2332;
-  --muted: #5c6b7a;
-  --line: rgba(26, 35, 50, 0.08);
-  --accent: #c45c26;
-  --accent-dark: #a04a1a;
-  --navy: #0d2137;
-  --navy-soft: #1e4976;
-  --shadow: 0 4px 24px rgba(13, 33, 55, 0.08);
-  --radius: 12px;
-  --radius-lg: 16px;
-  font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  /* Thomson Reuters Color Palette */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F4F5F7; /* Corporate light gray */
+  --bg-dark: #001838; /* TR Navy */
+  --ink: #111111;
+  --muted: #555555;
+  --line: #E0E0E0;
+  --accent: #FF8000; /* TR Orange */
+  --accent-dark: #CC6600;
+  
+  font-family: "Knowledge", "Inter", "Helvetica Neue", Arial, sans-serif;
   color: var(--ink);
   min-height: 100vh;
-  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 35%, #eef0f3 100%);
+  background: var(--bg-primary);
+  line-height: 1.6;
 }
 
 .splashHeader {
@@ -30,16 +30,17 @@
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 2.5rem;
+  background: #ffffff;
   border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(8px);
+  /* TR signature top bar */
+  border-top: 4px solid var(--accent);
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 1rem;
   text-decoration: none;
   color: inherit;
 }
@@ -47,38 +48,38 @@
 .brandMark {
   display: grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--radius);
-  background: var(--navy);
+  width: 2.8rem;
+  height: 2.8rem;
+  background: var(--bg-dark);
   color: #fff;
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 1.1rem;
+  font-weight: 800;
+  /* Square corners for a solid corporate feel */
+  border-radius: 0;
+  letter-spacing: 0.05em;
 }
 
 .brandText {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
 }
 
 .brandText strong {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .brandText span {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--muted);
+  font-weight: 500;
 }
 
 .splashNav {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -86,356 +87,349 @@
   color: var(--ink);
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
+  transition: color 0.2s;
 }
 
 .splashNav a:hover {
-  color: var(--navy-soft);
+  color: var(--accent);
 }
 
 .splashNavCta {
-  padding: 0.45rem 0.9rem;
-  border-radius: 6px;
-  border: 1px solid rgba(13, 33, 55, 0.2);
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--ink);
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.05em;
+  border-radius: 0;
+}
+.splashNavCta:hover {
+  background: var(--ink);
+  color: #fff !important;
 }
 
+/* Hero Section Container (Full width dark background) */
 .splashHero {
-  width: min(900px, calc(100% - 2.5rem));
-  margin: 0 auto;
-  padding: 3rem 0 2.5rem;
-  text-align: center;
+  width: 100%;
+  padding-top: 7rem;
+  padding-bottom: 6rem;
+  /* Instead of a wrapper div, use padding to center the content up to 1100px width */
+  padding-left: max(2.5rem, calc((100% - 1100px) / 2));
+  padding-right: max(2.5rem, calc((100% - 1100px) / 2));
+  background: var(--bg-dark);
+  /* TR often uses subtle geometric or gradient overlays on dark backgrounds, but solid navy is very capturing */
+  background: linear-gradient(135deg, #00122a 0%, var(--bg-dark) 100%);
+  text-align: left;
+  border-bottom: 4px solid var(--accent);
 }
 
 .splashEyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--accent-dark);
-  margin: 0 0 0.75rem;
+  color: var(--accent);
+  margin: 0 0 1rem;
+  display: block;
 }
 
 .splashHero h1 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(2.2rem, 5vw, 3.25rem);
-  font-weight: 700;
-  color: var(--navy);
-  line-height: 1.12;
-  margin: 0 0 1rem;
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
+  font-weight: 800;
+  color: #ffffff; /* White text for dark background */
+  line-height: 1.1;
+  margin: 0 0 1.5rem;
   letter-spacing: -0.02em;
 }
 
 .splashHeroSub {
-  color: var(--muted);
-  font-size: 1.12rem;
-  line-height: 1.65;
-  max-width: 52ch;
-  margin: 0 auto 1.75rem;
+  color: #d1d5db; /* Light gray for readability on navy */
+  font-size: 1.25rem;
+  line-height: 1.6;
+  max-width: 60ch;
+  margin: 0 0 2.5rem;
 }
 
 .splashHeroActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem;
-  justify-content: center;
-  margin-bottom: 1.25rem;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin: 0 0 2.5rem;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.65rem 1.35rem;
-  border-radius: 6px;
+  min-height: 3rem;
+  padding: 0.75rem 1.75rem;
   text-decoration: none;
   font-weight: 700;
-  font-size: 0.95rem;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn:hover {
-  box-shadow: 0 4px 16px rgba(13, 33, 55, 0.12);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  border-radius: 0; /* TR uses sharp buttons */
 }
 
 .btnPrimary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(196, 92, 38, 0.3);
+  border: 2px solid var(--accent);
 }
 
 .btnPrimary:hover {
   background: var(--accent-dark);
+  border-color: var(--accent-dark);
 }
 
 .btnSecondary {
-  background: #fff;
-  color: var(--navy);
-  border: 2px solid var(--navy);
+  background: transparent;
+  color: #ffffff; /* White text for outline button on dark bg */
+  border: 2px solid #ffffff;
+}
+
+.btnSecondary:hover {
+  background: #ffffff;
+  color: var(--bg-dark);
 }
 
 .btnGhost {
   background: transparent;
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 2px solid #fff;
+}
+.btnGhost:hover {
+  background: #fff;
+  color: var(--bg-dark);
 }
 
 .splashTrust {
-  font-size: 0.88rem;
-  color: var(--muted);
-  margin: 0;
+  font-size: 0.9rem;
+  color: #a0aec0; /* Subdued gray on dark bg */
+  margin: 0 auto;
+  margin-left: 0;
+  font-weight: 500;
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
 }
 
+/* Base Sections - TR uses full width bands */
 .splashSection {
-  width: min(1100px, calc(100% - 2.5rem));
-  margin: 0 auto 2rem;
-  padding: 2rem 2.25rem;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  padding: 5rem 2.5rem;
+  border-top: 1px solid var(--line);
+}
+
+/* Creating alternating backgrounds with the HTML structure provided */
+.splashSection:nth-of-type(even) {
+  background: var(--bg-secondary);
+}
+
+.sectionIntro {
+  max-width: 1100px;
+  margin: 0 auto 3rem;
+  text-align: left;
 }
 
 .sectionIntro h2 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(1.65rem, 3vw, 2.35rem);
-  font-weight: 700;
-  color: var(--navy);
-  margin: 0.35rem 0 0;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0.5rem 0 0;
   line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
+.splashList, .splashSteps, .splashFeatureGrid, .proofTable, .proofPlaceholder, .faqGrid {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Make lists cleaner and more readable */
 .splashList {
-  margin: 1rem 0 0;
-  padding-left: 1.25rem;
-  color: var(--muted);
-  line-height: 1.65;
+  padding-left: 1.5rem;
+  color: var(--ink);
+  font-size: 1.1rem;
 }
 
 .splashList li {
-  margin-bottom: 0.65rem;
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
 }
 
 .splashSteps {
   list-style: none;
-  margin: 1.25rem 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.25rem;
+  gap: 2rem;
 }
 
 .splashStep {
-  padding: 1.35rem;
-  border-radius: var(--radius);
-  background: #f8f9fa;
+  padding: 2.5rem 2rem;
+  background: #fff;
   border: 1px solid var(--line);
+  /* TR style top border accent for cards */
+  border-top: 4px solid var(--accent);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
 .stepNum {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--navy);
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--bg-dark);
   color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.splashStep h3, .splashFeature h3, .faqItem h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem;
+  color: var(--ink);
 }
 
-.splashStep h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1.1rem;
-  color: var(--navy);
-}
-
-.splashStep p {
+.splashStep p, .splashFeature p, .faqItem p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .splashFeatureGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1.25rem;
+  gap: 2rem;
 }
 
 .splashFeature {
-  padding: 1.25rem;
-  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+/* Proof Table styling */
+.proofTable {
   border: 1px solid var(--line);
   background: #fff;
-}
-
-.splashFeature h3 {
-  margin: 0 0 0.45rem;
-  font-size: 1.05rem;
-  color: var(--navy);
-}
-
-.splashFeature p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.55;
-}
-
-.proofTable {
-  margin-top: 1.25rem;
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid var(--line);
 }
 
 .proofRow {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-  gap: 1rem;
-  padding: 1rem 1.2rem;
-  font-size: 0.95rem;
+  gap: 2rem;
+  padding: 1.5rem 2rem;
+  font-size: 1.05rem;
+  border-bottom: 1px solid var(--line);
+}
+.proofRow:last-child {
+  border-bottom: none;
 }
 
 .proofHead {
-  background: var(--navy);
+  background: var(--bg-dark);
   color: #fff;
   font-weight: 700;
-}
-
-.proofRow:not(.proofHead):nth-child(even) {
-  background: rgba(245, 246, 248, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
 }
 
 .proofClaim {
   font-weight: 700;
-  color: var(--navy);
-}
-
-.proofRow:not(.proofHead) span:last-child {
-  color: var(--muted);
-  line-height: 1.5;
+  color: var(--ink);
 }
 
 .proofPlaceholder {
-  margin: 1rem 0 0;
+  margin-top: 1.5rem;
   font-size: 0.9rem;
   font-style: italic;
   color: var(--muted);
 }
 
+/* FAQ */
 .faqGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1.25rem;
+  gap: 1.5rem;
 }
 
 .faqItem {
-  padding: 1.15rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: #fafbfc;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--line);
 }
 
-.faqItem h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
-  color: var(--navy);
-  line-height: 1.35;
-}
-
-.faqItem p {
-  margin: 0;
-  font-size: 0.92rem;
-  color: var(--muted);
-  line-height: 1.55;
-}
-
+/* CTA Section */
 .splashCta {
-  width: min(900px, calc(100% - 2.5rem));
-  margin: 2rem auto 2.5rem;
-  padding: 2.5rem 2rem;
-  border-radius: var(--radius-lg);
-  background: var(--navy);
+  padding: 6rem 2.5rem;
+  background: var(--bg-dark);
   color: #fff;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(13, 33, 55, 0.22);
 }
 
 .splashCta h2 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  margin: 0 0 0.65rem;
-  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
 }
 
 .splashCta p {
-  margin: 0 0 1.35rem;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 1.05rem;
-  max-width: 42ch;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto 2.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.25rem;
+  max-width: 50ch;
+}
+
+.splashCta .splashHeroActions {
+  justify-content: center;
+  margin: 0 auto;
 }
 
 .splashFooter {
-  width: min(1100px, calc(100% - 2.5rem));
-  margin: 0 auto;
-  padding: 2rem 0 3rem;
+  padding: 3rem 2.5rem;
   text-align: center;
-  font-size: 0.9rem;
+  background: #fff;
+  border-top: 1px solid var(--line);
   color: var(--muted);
 }
 
-.splashFooter p {
-  margin: 0.35rem 0;
+.splashFooterMeta {
+  margin-top: 1rem;
 }
 
 .splashFooterMeta a {
-  color: var(--navy-soft);
+  color: var(--ink);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
+  margin: 0 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
 }
 
 .splashFooterMeta a:hover {
-  text-decoration: underline;
+  color: var(--accent);
 }
 
 @media (max-width: 900px) {
-  .splashSteps {
-    grid-template-columns: 1fr;
-  }
-
-  .splashFeatureGrid,
-  .faqGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .proofRow {
-    grid-template-columns: 1fr;
-  }
-
-  .proofHead span:last-child {
-    display: none;
-  }
+  .splashSteps { grid-template-columns: 1fr; }
+  .splashFeatureGrid, .faqGrid { grid-template-columns: 1fr; }
+  .proofRow { grid-template-columns: 1fr; gap: 0.5rem; }
+  .proofHead span:last-child { display: none; }
 }
 
 @media (max-width: 640px) {
-  .splashHeader {
-    padding: 1rem;
-  }
-
-  .splashNav {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .splashSection {
-    padding: 1.35rem;
-  }
+  .splashHeader { padding: 1rem 1.5rem; }
+  .splashNav { width: 100%; justify-content: flex-start; gap: 1rem; }
+  .splashSection { padding: 3rem 1.5rem; }
+  .splashHero { padding: 4rem 1.5rem 3rem; }
 }

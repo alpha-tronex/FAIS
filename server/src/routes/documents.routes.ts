@@ -6,9 +6,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
-import { CaseModel, DocumentModel, DocumentDeletionAuditModel } from '../models.js';
+import { CaseModel, DocumentModel, DocumentDeletionAuditModel, DocumentExtractionModel } from '../models.js';
 import { uploadBuffer, getPresignedGetUrl, isB2Configured } from '../lib/b2-storage.js';
 import { processDocument } from '../lib/document-processing.js';
+import {
+  isDocumentIntakeEnabled,
+  processDocumentIntake,
+  shouldRunIntakeOnUpload
+} from '../lib/document-intake/pipeline.js';
 import { queryDocuments } from '../lib/document-query.js';
 import { sendError, sendErrorWithMessage } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
@@ -42,6 +47,22 @@ function isPetitionerForCase(c: { petitionerId?: unknown }, auth: AuthPayload): 
   return toIdStr(c.petitionerId) === auth.sub;
 }
 
+/** Petitioner, petitioner attorney, legal assistant on the case, or administrator (any case). */
+function canUploadCaseDocuments(
+  c: {
+    petitionerId?: unknown;
+    petitionerAttId?: unknown;
+    legalAssistantId?: unknown;
+  },
+  auth: AuthPayload
+): boolean {
+  if (auth.roleTypeId === 5) return true;
+  if (isPetitionerForCase(c, auth)) return true;
+  if (toIdStr(c.petitionerAttId) === auth.sub) return true;
+  if (toIdStr(c.legalAssistantId) === auth.sub) return true;
+  return false;
+}
+
 function canRetry(c: { petitionerId?: unknown }, auth: AuthPayload): boolean {
   return auth.roleTypeId === 5 || isPetitionerForCase(c, auth);
 }
@@ -49,6 +70,38 @@ function canRetry(c: { petitionerId?: unknown }, auth: AuthPayload): boolean {
 /** Only admins may delete documents (e.g. when petitioner is unavailable). */
 function isAdmin(auth: AuthPayload): boolean {
   return auth.roleTypeId === 5;
+}
+
+function serializeExtraction(e: {
+  _id: unknown;
+  documentId: unknown;
+  caseId: unknown;
+  subjectUserId: unknown;
+  documentType: string;
+  status: string;
+  extractionVersion: number;
+  rawPayload: unknown;
+  fieldConfidences: unknown;
+  textQuality: unknown;
+  errorMessage?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}) {
+  return {
+    id: String(e._id),
+    documentId: String(e.documentId),
+    caseId: String(e.caseId),
+    subjectUserId: String(e.subjectUserId),
+    documentType: e.documentType,
+    status: e.status,
+    extractionVersion: e.extractionVersion,
+    rawPayload: e.rawPayload,
+    fieldConfidences: e.fieldConfidences,
+    textQuality: e.textQuality ?? null,
+    errorMessage: e.errorMessage ?? null,
+    createdAt: e.createdAt,
+    updatedAt: e.updatedAt
+  };
 }
 
 const upload = multer({
@@ -94,6 +147,44 @@ export function createDocumentsRouter(
     );
   });
 
+  /** List document intake extractions for a case (optional ?documentId= for one document's latest first). */
+  router.get('/cases/:caseId/document-intake', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as express.Request & { auth: AuthPayload }).auth;
+    const caseId = typeof req.params.caseId === 'string' ? req.params.caseId : undefined;
+    const documentIdQ =
+      typeof req.query.documentId === 'string' && mongoose.isValidObjectId(req.query.documentId)
+        ? req.query.documentId
+        : undefined;
+    if (!caseId || !mongoose.isValidObjectId(caseId)) {
+      return sendErrorWithMessage(res, 'Invalid case ID', 400);
+    }
+    if (!isDocumentIntakeEnabled()) {
+      return res.status(503).json({ error: 'Document intake is not enabled. Set DOCUMENT_INTAKE_ENABLED=true.' });
+    }
+    const caseDoc = await CaseModel.findById(caseId).lean();
+    if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
+    if (!canSeeCase(authPayload, caseDoc)) return res.status(403).json({ error: 'Forbidden' });
+
+    if (documentIdQ) {
+      const doc = await DocumentModel.findOne({
+        _id: new mongoose.Types.ObjectId(documentIdQ),
+        caseId: new mongoose.Types.ObjectId(caseId),
+        ...notDeletedFilter,
+      }).lean();
+      if (!doc) return res.status(404).json({ error: 'Document not found' });
+      const latest = await DocumentExtractionModel.findOne({ documentId: doc._id })
+        .sort({ extractionVersion: -1 })
+        .lean();
+      return res.json({ extractions: latest ? [serializeExtraction(latest as any)] : [] });
+    }
+
+    const extractions = await DocumentExtractionModel.find({ caseId: new mongoose.Types.ObjectId(caseId) })
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
+    res.json({ extractions: extractions.map((e) => serializeExtraction(e as any)) });
+  });
+
   router.post('/cases/:caseId/documents', auth.requireAuth, upload.single('file'), async (req, res) => {
     const authPayload = (req as express.Request & { auth: AuthPayload }).auth;
     const caseId = typeof req.params.caseId === 'string' ? req.params.caseId : undefined;
@@ -105,8 +196,11 @@ export function createDocumentsRouter(
     }
     const caseDoc = await CaseModel.findById(caseId).lean();
     if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
-    if (!isPetitionerForCase(caseDoc, authPayload)) {
-      return res.status(403).json({ error: 'Only the petitioner for this case can upload documents.' });
+    if (!canUploadCaseDocuments(caseDoc, authPayload)) {
+      return res.status(403).json({
+        error:
+          "Only administrators, the petitioner, the petitioner's attorney, or the assigned legal assistant can upload documents for this case."
+      });
     }
 
     const file = (req as express.Request & { file?: Express.Multer.File }).file;
@@ -144,6 +238,12 @@ export function createDocumentsRouter(
       console.error('[documents] Background processing failed for', documentId, err);
     });
 
+    if (isDocumentIntakeEnabled() && shouldRunIntakeOnUpload()) {
+      processDocumentIntake(documentId).catch((err) => {
+        console.error('[documents] Document intake failed for', documentId, err);
+      });
+    }
+
     res.status(201).json({
       id: doc._id.toString(),
       caseId: doc.caseId.toString(),
@@ -152,6 +252,114 @@ export function createDocumentsRouter(
       status: doc.status,
       createdAt: doc.createdAt,
     });
+  });
+
+  router.get('/cases/:caseId/documents/:documentId/intake', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as express.Request & { auth: AuthPayload }).auth;
+    const caseId = typeof req.params.caseId === 'string' ? req.params.caseId : undefined;
+    const documentId = typeof req.params.documentId === 'string' ? req.params.documentId : undefined;
+    if (!caseId || !documentId || !mongoose.isValidObjectId(caseId) || !mongoose.isValidObjectId(documentId)) {
+      return sendErrorWithMessage(res, 'Invalid case or document ID', 400);
+    }
+    if (!isDocumentIntakeEnabled()) {
+      return res.status(503).json({ error: 'Document intake is not enabled. Set DOCUMENT_INTAKE_ENABLED=true.' });
+    }
+    const caseDoc = await CaseModel.findById(caseId).lean();
+    if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
+    if (!canSeeCase(authPayload, caseDoc)) return res.status(403).json({ error: 'Forbidden' });
+
+    const doc = await DocumentModel.findOne({
+      _id: new mongoose.Types.ObjectId(documentId),
+      caseId: new mongoose.Types.ObjectId(caseId),
+      ...notDeletedFilter,
+    }).lean();
+    if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+    const latest = await DocumentExtractionModel.findOne({ documentId: doc._id })
+      .sort({ extractionVersion: -1 })
+      .lean();
+    if (!latest) return res.status(404).json({ error: 'No intake extraction for this document.' });
+    res.json(serializeExtraction(latest as any));
+  });
+
+  router.post('/cases/:caseId/documents/:documentId/intake/analyze', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as express.Request & { auth: AuthPayload }).auth;
+    const caseId = typeof req.params.caseId === 'string' ? req.params.caseId : undefined;
+    const documentId = typeof req.params.documentId === 'string' ? req.params.documentId : undefined;
+    if (!caseId || !documentId || !mongoose.isValidObjectId(caseId) || !mongoose.isValidObjectId(documentId)) {
+      return sendErrorWithMessage(res, 'Invalid case or document ID', 400);
+    }
+    if (!isDocumentIntakeEnabled()) {
+      return res.status(503).json({ error: 'Document intake is not enabled. Set DOCUMENT_INTAKE_ENABLED=true.' });
+    }
+    if (!isB2Configured()) {
+      return res.status(503).json({ error: 'Document storage is not configured.' });
+    }
+    const caseDoc = await CaseModel.findById(caseId).lean();
+    if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
+    if (!canSeeCase(authPayload, caseDoc)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const doc = await DocumentModel.findOne({
+      _id: new mongoose.Types.ObjectId(documentId),
+      caseId: new mongoose.Types.ObjectId(caseId),
+      ...notDeletedFilter,
+    }).lean();
+    if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+    const inflight = await DocumentExtractionModel.findOne({
+      documentId: doc._id,
+      status: 'processing',
+    }).lean();
+    if (inflight) {
+      return res.status(409).json({ error: 'Intake analysis already in progress for this document.' });
+    }
+
+    processDocumentIntake(doc._id).catch((err) => {
+      console.error('[documents] Intake analyze failed for', doc._id, err);
+    });
+
+    res.status(202).json({
+      accepted: true,
+      documentId: doc._id.toString(),
+      message: 'Intake analysis started. Poll GET .../documents/:documentId/intake for results.',
+    });
+  });
+
+  router.post('/cases/:caseId/documents/:documentId/intake/reject', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as express.Request & { auth: AuthPayload }).auth;
+    const caseId = typeof req.params.caseId === 'string' ? req.params.caseId : undefined;
+    const documentId = typeof req.params.documentId === 'string' ? req.params.documentId : undefined;
+    if (!caseId || !documentId || !mongoose.isValidObjectId(caseId) || !mongoose.isValidObjectId(documentId)) {
+      return sendErrorWithMessage(res, 'Invalid case or document ID', 400);
+    }
+    if (!isDocumentIntakeEnabled()) {
+      return res.status(503).json({ error: 'Document intake is not enabled. Set DOCUMENT_INTAKE_ENABLED=true.' });
+    }
+    const caseDoc = await CaseModel.findById(caseId).lean();
+    if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
+    if (!canSeeCase(authPayload, caseDoc)) return res.status(403).json({ error: 'Forbidden' });
+
+    const doc = await DocumentModel.findOne({
+      _id: new mongoose.Types.ObjectId(documentId),
+      caseId: new mongoose.Types.ObjectId(caseId),
+      ...notDeletedFilter,
+    }).lean();
+    if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+    const latest = await DocumentExtractionModel.findOne({ documentId: doc._id })
+      .sort({ extractionVersion: -1 })
+      .lean();
+    if (!latest || latest.status !== 'pending_review') {
+      return sendErrorWithMessage(res, 'No pending_review extraction to reject.', 400);
+    }
+
+    await DocumentExtractionModel.updateOne(
+      { _id: latest._id },
+      { $set: { status: 'rejected', updatedAt: new Date() } }
+    );
+    res.json({ ok: true, id: latest._id.toString(), status: 'rejected' });
   });
 
   router.get('/cases/:caseId/documents/:documentId/download', auth.requireAuth, async (req, res) => {

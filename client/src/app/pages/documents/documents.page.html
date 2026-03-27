@@ -2,6 +2,8 @@
   <h1>AI Document analysis</h1>
   <p class="description">
     Upload PDFs for a case; they are processed in the background and become searchable. Admins can ask questions across all documents.
+    Upload is allowed for the petitioner, the petitioner's attorney, the legal assistant assigned to the case, or an administrator (any case).
+    When enabled on the server, you can run <strong>affidavit intake</strong> on a PDF to classify it and extract draft fields for review (Phase 2 will apply them to the affidavit).
   </p>
 
   <section class="section">
@@ -48,6 +50,7 @@
     </div>
 
     <p *ngIf="listError" class="error">{{ listError }}</p>
+    <p *ngIf="intakeListError" class="error">{{ intakeListError }}</p>
 
     <div *ngIf="listBusy" class="busyMsg">Loading documents…</div>
 
@@ -57,6 +60,7 @@
           <th>Name</th>
           <th>Status</th>
           <th>Error</th>
+          <th *ngIf="intakeFeatureAvailable">Affidavit intake</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -65,6 +69,51 @@
           <td>{{ doc.originalName }}</td>
           <td>{{ statusLabel(doc.status) }}</td>
           <td class="errorCell">{{ doc.errorMessage ?? '—' }}</td>
+          <td *ngIf="intakeFeatureAvailable" class="intakeCell">
+            <ng-container *ngIf="intakeFor(doc) as ie">
+              <div class="intakeRow">
+                <span class="intakeChip" [class.intakeChipWarn]="ie.textQuality?.weak">{{ intakeStatusLabel(ie.status) }}</span>
+                <span class="intakeType" *ngIf="ie.status !== 'processing'">{{ intakeTypeShort(ie.documentType) }}</span>
+              </div>
+              <p *ngIf="ie.status === 'pending_review'" class="intakeSummary">{{ intakeSummaryLine(ie) }}</p>
+              <p *ngIf="ie.status === 'failed' && ie.errorMessage" class="intakeErr">{{ ie.errorMessage }}</p>
+              <p *ngIf="intakeOcrNote(doc) as ocr" class="intakeOcrNote">{{ ocr }}</p>
+              <details *ngIf="ie.status === 'pending_review'" class="intakeDetails">
+                <summary>View extracted JSON</summary>
+                <pre class="intakePre">{{ formatIntakePayloadJson(ie) }}</pre>
+              </details>
+              <div class="intakeActions">
+                <button
+                  type="button"
+                  class="actionBtn intakeBtn"
+                  (click)="runIntakeAnalyze(doc)"
+                  [disabled]="intakeAnalyzeBusy[doc.id] || !canStartIntakeAnalyze(doc)"
+                >
+                  {{ intakeAnalyzeButtonLabel(doc) }}
+                </button>
+                <button
+                  *ngIf="ie.status === 'pending_review'"
+                  type="button"
+                  class="actionBtn"
+                  (click)="rejectIntake(doc)"
+                  [disabled]="intakeRejectBusy[doc.id]"
+                >
+                  {{ intakeRejectBusy[doc.id] ? 'Rejecting…' : 'Reject' }}
+                </button>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!intakeFor(doc)">
+              <p class="intakeNone">Not analyzed</p>
+              <button
+                type="button"
+                class="actionBtn intakeBtn"
+                (click)="runIntakeAnalyze(doc)"
+                [disabled]="intakeAnalyzeBusy[doc.id] || !canStartIntakeAnalyze(doc)"
+              >
+                {{ intakeAnalyzeButtonLabel(doc) }}
+              </button>
+            </ng-container>
+          </td>
           <td class="actionsCell">
             <button type="button" class="actionBtn" (click)="download(doc)" [disabled]="doc.status !== 'ready'">
               Download
@@ -93,7 +142,7 @@
     </table>
 
     <p *ngIf="!listBusy && selectedCaseId && documents.length === 0 && !listError" class="hint">
-      No documents yet. Select a case and upload a PDF (petitioner only).
+      No documents yet. Select a case and upload a PDF if you are permitted to upload for that case.
     </p>
   </section>
 

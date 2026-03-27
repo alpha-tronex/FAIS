@@ -16,6 +16,10 @@ FAIS Downloads/
 #mongodb dump
 fais-dump/
 
+# Document intake R&D: sample PDFs may be third-party or contain PII.
+# Layout and usage: docs/samples/README.md
+docs/samples/**/*.pdf
+
 # Cursor (debug logs, etc.)
 .cursor/
 debug-fa0dc2.log

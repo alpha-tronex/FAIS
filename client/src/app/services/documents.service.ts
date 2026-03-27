@@ -19,6 +19,22 @@ export type DocumentQueryResponse = {
   sources: { documentName: string; page?: number }[];
 };
 
+export type DocumentIntakeExtraction = {
+  id: string;
+  documentId: string;
+  caseId: string;
+  subjectUserId: string;
+  documentType: string;
+  status: string;
+  extractionVersion: number;
+  rawPayload: Record<string, unknown>;
+  fieldConfidences: Record<string, number>;
+  textQuality: { charCount: number; weak: boolean } | null;
+  errorMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 @Injectable({ providedIn: 'root' })
 export class DocumentsService {
   private readonly apiBase = environment.apiUrl;
@@ -70,6 +86,42 @@ export class DocumentsService {
   query(question: string): Promise<DocumentQueryResponse> {
     return firstValueFrom(
       this.http.post<DocumentQueryResponse>(`${this.apiBase}/documents/query`, { question })
+    );
+  }
+
+  /** Returns 503 when `DOCUMENT_INTAKE_ENABLED` is not set on the server. */
+  listIntakeForCase(caseId: string): Promise<{ extractions: DocumentIntakeExtraction[] }> {
+    return firstValueFrom(
+      this.http.get<{ extractions: DocumentIntakeExtraction[] }>(
+        `${this.apiBase}/cases/${encodeURIComponent(caseId)}/document-intake`
+      )
+    );
+  }
+
+  getIntakeForDocument(caseId: string, documentId: string): Promise<DocumentIntakeExtraction> {
+    return firstValueFrom(
+      this.http.get<DocumentIntakeExtraction>(
+        `${this.apiBase}/cases/${encodeURIComponent(caseId)}/documents/${encodeURIComponent(documentId)}/intake`
+      )
+    );
+  }
+
+  /** 202 Accepted — poll `getIntakeForDocument` until status is not `processing`. */
+  analyzeIntake(caseId: string, documentId: string): Promise<{ accepted: boolean; documentId: string; message: string }> {
+    return firstValueFrom(
+      this.http.post<{ accepted: boolean; documentId: string; message: string }>(
+        `${this.apiBase}/cases/${encodeURIComponent(caseId)}/documents/${encodeURIComponent(documentId)}/intake/analyze`,
+        {}
+      )
+    );
+  }
+
+  rejectIntake(caseId: string, documentId: string): Promise<{ ok: boolean; id: string; status: string }> {
+    return firstValueFrom(
+      this.http.post<{ ok: boolean; id: string; status: string }>(
+        `${this.apiBase}/cases/${encodeURIComponent(caseId)}/documents/${encodeURIComponent(documentId)}/intake/reject`,
+        {}
+      )
     );
   }
 }

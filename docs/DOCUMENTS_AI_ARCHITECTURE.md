@@ -16,7 +16,7 @@ Background job: Text Extraction → Chunking → Embeddings → Vector Store (Mo
 Admin: Vector Search → LLM Q&A with citations
 ```
 
-- **Ownership:** Documents are tied to a **case**. Only **petitioners** (roleTypeId 1) can upload; only **admins** (roleTypeId 5) can run the global Q&A.
+- **Ownership:** Documents are tied to a **case**. **Upload** is allowed for **administrators** (any case), the **petitioner**, the **petitioner's attorney** (`petitionerAttId`), or the **legal assistant** (`legalAssistantId`) on that case. **Global Q&A** is limited to staff roles (see auth table).
 - **Query scope:** **Global** — admin searches across all documents in the system.
 - **Download:** Users with access to the document's case get a **presigned URL** (Option B) to download the original PDF from B2.
 - **Deletion:** **Soft delete** — only administrators may delete; the document is marked as deleted (retention for compliance). The file remains in B2; chunks remain but are excluded from search. Each deletion is recorded in an audit log.
@@ -27,7 +27,7 @@ Admin: Vector Search → LLM Q&A with citations
 
 | Action           | Who can do it |
 |-----------------|----------------|
-| Upload document | Petitioner for that case (`case.petitionerId === auth.sub`) |
+| Upload document | Administrator (any case), or petitioner, petitioner attorney, or legal assistant on that case |
 | List documents  | User with access to the case (petitioner, respondent, attorneys, admin). Only non–soft-deleted documents are listed. |
 | Download        | User with access to the case. Soft-deleted documents return 410 unless the user is an admin (for compliance access). |
 | Retry processing| Petitioner for that case or admin (not allowed for soft-deleted documents). |
