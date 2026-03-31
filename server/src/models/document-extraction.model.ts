@@ -50,7 +50,12 @@ const documentExtractionSchema = new mongoose.Schema(
       },
       default: null
     },
-    errorMessage: { type: String, default: null }
+    errorMessage: { type: String, default: null },
+    /** Phase 2: set when extraction is applied to an affidavit row. */
+    appliedAt: { type: Date, default: null },
+    appliedByUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    appliedAffidavitCollection: { type: String, default: null },
+    appliedAffidavitRowId: { type: String, default: null }
   },
   { timestamps: true, collection: 'document_extractions', strict: true }
 );

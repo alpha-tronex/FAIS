@@ -70,49 +70,9 @@
           <td>{{ statusLabel(doc.status) }}</td>
           <td class="errorCell">{{ doc.errorMessage ?? '—' }}</td>
           <td *ngIf="intakeFeatureAvailable" class="intakeCell">
-            <ng-container *ngIf="intakeFor(doc) as ie">
-              <div class="intakeRow">
-                <span class="intakeChip" [class.intakeChipWarn]="ie.textQuality?.weak">{{ intakeStatusLabel(ie.status) }}</span>
-                <span class="intakeType" *ngIf="ie.status !== 'processing'">{{ intakeTypeShort(ie.documentType) }}</span>
-              </div>
-              <p *ngIf="ie.status === 'pending_review'" class="intakeSummary">{{ intakeSummaryLine(ie) }}</p>
-              <p *ngIf="ie.status === 'failed' && ie.errorMessage" class="intakeErr">{{ ie.errorMessage }}</p>
-              <p *ngIf="intakeOcrNote(doc) as ocr" class="intakeOcrNote">{{ ocr }}</p>
-              <details *ngIf="ie.status === 'pending_review'" class="intakeDetails">
-                <summary>View extracted JSON</summary>
-                <pre class="intakePre">{{ formatIntakePayloadJson(ie) }}</pre>
-              </details>
-              <div class="intakeActions">
-                <button
-                  type="button"
-                  class="actionBtn intakeBtn"
-                  (click)="runIntakeAnalyze(doc)"
-                  [disabled]="intakeAnalyzeBusy[doc.id] || !canStartIntakeAnalyze(doc)"
-                >
-                  {{ intakeAnalyzeButtonLabel(doc) }}
-                </button>
-                <button
-                  *ngIf="ie.status === 'pending_review'"
-                  type="button"
-                  class="actionBtn"
-                  (click)="rejectIntake(doc)"
-                  [disabled]="intakeRejectBusy[doc.id]"
-                >
-                  {{ intakeRejectBusy[doc.id] ? 'Rejecting…' : 'Reject' }}
-                </button>
-              </div>
-            </ng-container>
-            <ng-container *ngIf="!intakeFor(doc)">
-              <p class="intakeNone">Not analyzed</p>
-              <button
-                type="button"
-                class="actionBtn intakeBtn"
-                (click)="runIntakeAnalyze(doc)"
-                [disabled]="intakeAnalyzeBusy[doc.id] || !canStartIntakeAnalyze(doc)"
-              >
-                {{ intakeAnalyzeButtonLabel(doc) }}
-              </button>
-            </ng-container>
+            <button type="button" class="intakeStatusLink" (click)="openIntakeDetail(doc)">
+              {{ intakeLinkLabel(doc) }}
+            </button>
           </td>
           <td class="actionsCell">
             <button type="button" class="actionBtn" (click)="download(doc)" [disabled]="doc.status !== 'ready'">
@@ -187,5 +147,21 @@
     [danger]="true"
     (confirm)="onConfirmDeleteDoc()"
     (cancel)="onCancelDeleteConfirm()"
+  />
+
+  <app-document-intake-detail-popup
+    [open]="intakeDetailOpen && intakeFeatureAvailable === true"
+    [documentName]="intakeDetailDoc?.originalName ?? ''"
+    [extraction]="intakeDetailExtraction"
+    [summaryLine]="intakeDetailSummary"
+    [analyzeBusy]="!!(intakeDetailDoc && intakeAnalyzeBusy[intakeDetailDoc.id])"
+    [rejectBusy]="!!(intakeDetailDoc && intakeRejectBusy[intakeDetailDoc.id])"
+    [applyBusy]="intakeApplyBusy"
+    [applySuccessMessage]="intakeApplySuccessMessage"
+    [applyErrorMessage]="intakeApplyError"
+    (closed)="closeIntakeDetail()"
+    (reAnalyze)="onIntakeDetailReAnalyze()"
+    (reject)="onIntakeDetailReject()"
+    (apply)="onIntakeDetailApply()"
   />
 </main>

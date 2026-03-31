@@ -10,6 +10,8 @@ import {
 } from '../../services/documents.service';
 
 const POLL_INTERVAL_MS = 3000;
+/** After apply succeeds, show message then close the intake popup. */
+const INTAKE_APPLY_SUCCESS_DISMISS_MS = 2500;
 
 @Component({
   standalone: false,
@@ -40,7 +42,16 @@ export class DocumentsPage implements OnInit, OnDestroy {
   intakeListError: string | null = null;
   intakeAnalyzeBusy: Record<string, boolean> = {};
   intakeRejectBusy: Record<string, boolean> = {};
+  intakeApplyBusy = false;
+  /** Shown in intake popup after successful apply; popup auto-closes after a short delay. */
+  intakeApplySuccessMessage: string | null = null;
+  /** Shown in intake popup when apply fails (replaces blocking alert). */
+  intakeApplyError: string | null = null;
+  /** Affidavit intake detail modal */
+  intakeDetailOpen = false;
+  intakeDetailDoc: DocumentListItem | null = null;
   private pollTimer: ReturnType<typeof setInterval> | null = null;
+  private intakeApplySuccessTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly auth: AuthService,
@@ -63,6 +74,14 @@ export class DocumentsPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopPolling();
+    this.clearIntakeApplySuccessTimer();
+  }
+
+  private clearIntakeApplySuccessTimer(): void {
+    if (this.intakeApplySuccessTimer) {
+      clearTimeout(this.intakeApplySuccessTimer);
+      this.intakeApplySuccessTimer = null;
+    }
   }
 
   private hasProcessingOrUploaded(): boolean {
@@ -172,6 +191,7 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   onCaseChange(): void {
+    this.closeIntakeDetail();
     this.documents = [];
     this.listError = null;
     this.intakeByDocumentId = new Map();
@@ -237,6 +257,96 @@ export class DocumentsPage implements OnInit, OnDestroy {
     return this.intakeByDocumentId.get(doc.id);
   }
 
+  get intakeDetailExtraction(): DocumentIntakeExtraction | null {
+    if (!this.intakeDetailDoc) return null;
+    return this.intakeFor(this.intakeDetailDoc) ?? null;
+  }
+
+  get intakeDetailSummary(): string | null {
+    const e = this.intakeDetailExtraction;
+    if (!e) return null;
+    return this.intakeSummaryLine(e);
+  }
+
+  openIntakeDetail(doc: DocumentListItem): void {
+    this.intakeApplyError = null;
+    this.intakeApplySuccessMessage = null;
+    this.clearIntakeApplySuccessTimer();
+    this.intakeDetailDoc = doc;
+    this.intakeDetailOpen = true;
+  }
+
+  closeIntakeDetail(): void {
+    this.clearIntakeApplySuccessTimer();
+    this.intakeApplySuccessMessage = null;
+    this.intakeApplyError = null;
+    this.intakeDetailOpen = false;
+    this.intakeDetailDoc = null;
+  }
+
+  intakeLinkLabel(doc: DocumentListItem): string {
+    const e = this.intakeFor(doc);
+    if (!e) return 'Not analyzed';
+    return this.intakeStatusLabel(e.status);
+  }
+
+  async onIntakeDetailReAnalyze(): Promise<void> {
+    const doc = this.intakeDetailDoc;
+    if (!doc || !this.intakeFeatureAvailable) return;
+    await this.runIntakeAnalyze(doc);
+  }
+
+  async onIntakeDetailReject(): Promise<void> {
+    const doc = this.intakeDetailDoc;
+    if (!doc || !this.intakeFeatureAvailable) return;
+    await this.rejectIntake(doc);
+    this.closeIntakeDetail();
+  }
+
+  async onIntakeDetailApply(): Promise<void> {
+    const doc = this.intakeDetailDoc;
+    if (!doc || !this.selectedCaseId || !this.intakeFeatureAvailable) return;
+    this.intakeApplyError = null;
+    this.intakeApplySuccessMessage = null;
+    this.clearIntakeApplySuccessTimer();
+    this.intakeApplyBusy = true;
+    try {
+      const result = await this.documentsApi.applyIntake(this.selectedCaseId, doc.id);
+      await this.refreshIntakeForCase();
+      const label = this.affidavitCollectionLabel(result.affidavitCollection);
+      const actionWord = result.applyAction === 'update' ? 'Updated' : 'Saved';
+      this.intakeApplySuccessMessage = `${actionWord} to ${label}. You can review or edit on the affidavit.`;
+      this.intakeApplySuccessTimer = setTimeout(() => {
+        this.intakeApplySuccessTimer = null;
+        this.intakeApplySuccessMessage = null;
+        this.closeIntakeDetail();
+      }, INTAKE_APPLY_SUCCESS_DISMISS_MS);
+    } catch (e: unknown) {
+      const err = e as { status?: number; error?: { error?: string } };
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+        return;
+      }
+      this.intakeApplyError = err?.error?.error ?? 'Apply failed';
+    } finally {
+      this.intakeApplyBusy = false;
+    }
+  }
+
+  private affidavitCollectionLabel(collection: string): string {
+    switch (collection) {
+      case 'employment':
+        return 'employment';
+      case 'liabilities':
+        return 'liabilities';
+      case 'monthlyhouseholdexpense':
+        return 'monthly household expenses';
+      default:
+        return collection;
+    }
+  }
+
   intakeStatusLabel(status: string): string {
     switch (status) {
       case 'processing':
@@ -290,14 +400,6 @@ export class DocumentsPage implements OnInit, OnDestroy {
     return parts.join(' · ');
   }
 
-  formatIntakePayloadJson(e: DocumentIntakeExtraction): string {
-    try {
-      return JSON.stringify(e.rawPayload, null, 2);
-    } catch {
-      return String(e.rawPayload);
-    }
-  }
-
   async runIntakeAnalyze(doc: DocumentListItem): Promise<void> {
     if (!this.selectedCaseId || !this.intakeFeatureAvailable) return;
     this.intakeAnalyzeBusy[doc.id] = true;
@@ -336,21 +438,6 @@ export class DocumentsPage implements OnInit, OnDestroy {
     const e = this.intakeFor(doc);
     if (!e) return true;
     return e.status !== 'processing';
-  }
-
-  intakeOcrNote(doc: DocumentListItem): string | null {
-    const e = this.intakeFor(doc);
-    if (!e?.rawPayload) return null;
-    const n = e.rawPayload['ocrNote'];
-    return typeof n === 'string' ? n : null;
-  }
-
-  intakeAnalyzeButtonLabel(doc: DocumentListItem): string {
-    if (this.intakeAnalyzeBusy[doc.id]) return 'Starting…';
-    const e = this.intakeFor(doc);
-    if (!e) return 'Analyze for affidavit';
-    if (e.status === 'processing') return 'Analyzing…';
-    return 'Re-analyze';
   }
 
   onFileSelected(event: Event): void {

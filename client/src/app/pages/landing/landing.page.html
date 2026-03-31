@@ -121,8 +121,8 @@
       </div>
     }
     @default {
-      <!-- Layout v1: Original structure -->
-      <div class="landing">
+      <!-- Layout v1; v=3 adds landingV3 (same structure, bookmark / A–B hook) -->
+      <div class="landing" [class.landingV3]="version === 3">
   <header class="landingHeader">
     <a class="brand" routerLink="/">
       <span class="brandMark">FAIS</span>

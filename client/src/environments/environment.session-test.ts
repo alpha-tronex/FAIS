@@ -5,7 +5,7 @@
  */
 export const environment = {
   production: false,
-  theme: 'style_fiori' as const,
+  theme: 'style_fas' as const,
   apiUrl: '/api',
   sessionIdleTimeoutMs: 25_000,
   sessionIdleWarningSec: 15,

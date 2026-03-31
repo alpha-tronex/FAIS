@@ -2,7 +2,8 @@ import type { IntakeDocumentType } from '../../models/document-extraction.model.
 
 export type { IntakeDocumentType };
 
-export const INTAKE_PIPELINE_VERSION = 1;
+/** Bumped when pipeline behavior changes (e.g. optional Textract OCR). */
+export const INTAKE_PIPELINE_VERSION = 2;
 
 export type IntakeHandlerResult = {
   payload: Record<string, unknown>;

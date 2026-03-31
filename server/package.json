@@ -15,10 +15,11 @@
     "migrate:non-marital-names": "tsx src/migrate/update-non-marital-types-names.ts",
     "seed:stress": "tsx src/migrate/seed-stress-data.ts",
     "run:rag-manus-once": "tsx src/scripts/run-rag-manus-job-once.ts",
-    "test": "node --import tsx --test src/lib/document-intake/intake-handlers.test.ts src/lib/child-support-calculator.test.ts"
+    "test": "node --import tsx --test src/lib/document-intake/intake-handlers.test.ts src/lib/document-intake/apply-intake.test.ts src/lib/document-intake/textract-ocr.test.ts src/lib/child-support-calculator.test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.700.0",
+    "@aws-sdk/client-textract": "^3.1019.0",
     "@aws-sdk/s3-request-presigner": "^3.700.0",
     "@langchain/core": "^1.1.30",
     "@langchain/openai": "^1.2.12",
@@ -30,13 +31,13 @@
     "jsonwebtoken": "^9.0.3",
     "langchain": "^1.2.29",
     "mongoose": "^9.2.1",
-    "multer": "^2.1.1",
     "mssql": "^11.0.1",
+    "multer": "^2.1.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.1",
     "openai": "^4.104.0",
-    "pdf-parse": "^1.1.1",
     "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
     "playwright": "^1.55.0",
     "zod": "^3.23.8"
   },

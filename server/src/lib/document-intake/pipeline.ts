@@ -1,6 +1,5 @@
 /**
- * Document intake: fetch PDF → extract text → classify → handler → persist document_extractions.
- * Phase 1: pdf-parse only; weak text records ocrNote (rasterize/OCR in a later phase).
+ * Document intake: fetch PDF → extract text → (optional Textract OCR if weak) → classify → handler → persist.
  */
 
 import mongoose from 'mongoose';
@@ -13,6 +12,11 @@ import { assessTextQuality } from './text-quality.js';
 import { classifyIntakeDocument } from './classify.js';
 import { runIntakeHandler } from './handlers/index.js';
 import { INTAKE_PIPELINE_VERSION } from './types.js';
+import {
+  extractTextWithTextract,
+  isTextractIntakeOcrEnabled,
+  TEXTRACT_SYNC_MAX_PDF_PAGES
+} from './textract-ocr.js';
 
 export function isDocumentIntakeEnabled(): boolean {
   return process.env.DOCUMENT_INTAKE_ENABLED === 'true';
@@ -49,20 +53,47 @@ export async function processDocumentIntake(documentId: mongoose.Types.ObjectId)
 
   try {
     const buffer = await getObject(doc.b2Key);
-    const { text } = await extractPdfText(buffer);
-    const textQuality = assessTextQuality(text);
-    const documentType = classifyIntakeDocument(text, doc.originalName);
-    const handlerResult = runIntakeHandler(documentType, text, doc.originalName);
+    const { text: pdfParseText, numPages } = await extractPdfText(buffer);
+    let workingText = pdfParseText;
+    let textQuality = assessTextQuality(workingText);
+    const textractMeta: Record<string, unknown> = {};
+    const pageCount = numPages ?? 1;
+
+    if (textQuality.weak && isTextractIntakeOcrEnabled()) {
+      if (pageCount > TEXTRACT_SYNC_MAX_PDF_PAGES) {
+        textractMeta.ocrTextractSkippedReason = 'pdf_exceeds_sync_page_limit';
+        textractMeta.ocrTextractMaxSyncPages = TEXTRACT_SYNC_MAX_PDF_PAGES;
+        textractMeta.ocrTextractPdfPages = pageCount;
+      } else {
+        try {
+          const ocrText = await extractTextWithTextract(buffer);
+          const trimmed = ocrText.trim();
+          if (trimmed.length > 0) {
+            workingText = ocrText;
+            textQuality = assessTextQuality(workingText);
+            textractMeta.ocrTextractApplied = true;
+          } else {
+            textractMeta.ocrTextractEmptyResponse = true;
+          }
+        } catch (e: unknown) {
+          textractMeta.ocrTextractError = e instanceof Error ? e.message : String(e);
+        }
+      }
+    }
+
+    const documentType = classifyIntakeDocument(workingText, doc.originalName);
+    const handlerResult = runIntakeHandler(documentType, workingText, doc.originalName);
 
     const rawPayload = {
       ...handlerResult.payload,
       pipelineVersion: INTAKE_PIPELINE_VERSION,
       classifiedType: documentType,
+      ...textractMeta,
       ...(subjectFallbackNote ? { subjectFallbackNote } : {}),
       ...(textQuality.weak
         ? {
             ocrNote:
-              'Extracted text is thin or low-quality (likely scan). Phase 2+ OCR recommended; values may be incomplete.'
+              'Extracted text is thin or low-quality (likely scan). Review carefully; enable DOCUMENT_INTAKE_TEXTRACT with AWS credentials for Amazon Textract recovery (sync PDFs up to 3 pages).'
           }
         : {})
     };

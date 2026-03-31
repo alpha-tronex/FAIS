@@ -5,7 +5,7 @@ import { DEFAULT_LAYOUT_VERSION } from '../../core/layout-version.config';
 
 const ASSET = (n: number) => `assets/images/demo-attorneys-clients-${n}.gif`;
 const PLACEHOLDER = (n: number) =>
-  `https://placehold.co/400x300/0d2137/f5f6f8?text=Attorneys+%26+clients+${n}`;
+  `https://placehold.co/400x300/115e59/eef4f0?text=Attorneys+%26+clients+${n}`;
 
 @Component({
   standalone: false,

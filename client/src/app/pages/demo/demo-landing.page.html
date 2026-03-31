@@ -44,7 +44,7 @@
       </main>
     }
     @default {
-      <main class="demoLanding" data-demo-page="landing">
+      <main class="demoLanding" [class.demoLandingV3]="version === 3" data-demo-page="landing">
   <a class="backLink" routerLink="/">← Back to FAIS overview</a>
 
   <section class="demoHero">

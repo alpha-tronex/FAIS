@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  theme: 'style_fiori' as const,
+  theme: 'style_fas' as const,
   apiUrl: '/api', // same origin; set to full API URL if backend is on another host
   /** Idle timeout (ms) before session expires due to inactivity. Default 15 min. */
   sessionIdleTimeoutMs: 15 * 60 * 1000,

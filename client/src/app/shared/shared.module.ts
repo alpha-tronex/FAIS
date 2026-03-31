@@ -6,6 +6,7 @@ import { SessionExpiryModalComponent } from './session-expiry-modal/session-expi
 import { AppointmentPickerComponent } from './appointment-picker/appointment-picker.component';
 import { AppointmentAvailabilityGridComponent } from './appointment-availability-grid/appointment-availability-grid.component';
 import { SchedulePopupComponent } from './schedule-popup/schedule-popup.component';
+import { DocumentIntakeDetailPopupComponent } from './document-intake-detail-popup/document-intake-detail-popup.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { SchedulePopupComponent } from './schedule-popup/schedule-popup.componen
     AppointmentPickerComponent,
     AppointmentAvailabilityGridComponent,
     SchedulePopupComponent,
+    DocumentIntakeDetailPopupComponent,
   ],
   exports: [
     ConfirmPopupComponent,
@@ -21,6 +23,7 @@ import { SchedulePopupComponent } from './schedule-popup/schedule-popup.componen
     AppointmentPickerComponent,
     AppointmentAvailabilityGridComponent,
     SchedulePopupComponent,
+    DocumentIntakeDetailPopupComponent,
   ],
   imports: [CommonModule, FormsModule]
 })

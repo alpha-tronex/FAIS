@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  theme: 'style_fiori' as const,
+  theme: 'style_fas' as const,
   apiUrl: '/api',
   /** Idle timeout (ms) before session expires due to inactivity. Default 15 min. */
   sessionIdleTimeoutMs: 15 * 60 * 1000,

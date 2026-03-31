@@ -2,21 +2,25 @@
   display: block;
 }
 
+.demoLanding.demoLandingV3 {
+  border-top: 3px solid var(--accent);
+}
+
 .demoLanding {
-  --ink: #1a2332;
-  --muted: #5c6b7a;
-  --accent: #c45c26;
-  --accent-dark: #a04a1a;
-  --navy: #0d2137;
-  --navy-soft: #1e4976;
+  --ink: #142420;
+  --muted: #5d6964;
+  --accent: #0f766e;
+  --accent-dark: #115e59;
+  --navy: #115e59;
+  --navy-soft: #0d9488;
   --radius: 12px;
   --radius-lg: 16px;
-  --shadow: 0 4px 24px rgba(13, 33, 55, 0.08);
+  --shadow: 0 4px 24px rgba(17, 94, 89, 0.09);
   width: min(1180px, calc(100% - 2.5rem));
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
   color: var(--ink);
-  background: linear-gradient(180deg, #ffffff 0%, #f5f6f8 40%);
+  background: linear-gradient(180deg, #ffffff 0%, #eef4f0 40%);
 }
 
 .btnCarousel {
@@ -34,7 +38,7 @@
 .btnCarousel.btnPrimary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(196, 92, 38, 0.3);
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.28);
 }
 
 .btnCarousel.btnPrimary:hover {
@@ -111,7 +115,7 @@
   padding: 0.9rem 1rem;
   border-radius: var(--radius);
   background: #f8f9fa;
-  border: 1px solid rgba(13, 33, 55, 0.08);
+  border: 1px solid rgba(17, 94, 89, 0.1);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -209,7 +213,7 @@
   background: var(--navy);
   color: #fff;
   text-align: left;
-  box-shadow: 0 8px 32px rgba(13, 33, 55, 0.25);
+  box-shadow: 0 8px 32px rgba(17, 94, 89, 0.26);
 }
 
 .demoClosingCard h2 {

@@ -4,17 +4,16 @@
 }
 
 .splash {
-  /* Thomson Reuters Color Palette */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F4F5F7; /* Corporate light gray */
-  --bg-dark: #001838; /* TR Navy */
-  --ink: #111111;
-  --muted: #555555;
-  --line: #E0E0E0;
-  --accent: #FF8000; /* TR Orange */
-  --accent-dark: #CC6600;
-  
-  font-family: "Knowledge", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --bg-primary: #ffffff;
+  --bg-secondary: #eef4f0;
+  --bg-dark: #115e59;
+  --ink: #142420;
+  --muted: #5d6964;
+  --line: #cfd9d3;
+  --accent: #14b8a6;
+  --accent-dark: #0f766e;
+
+  font-family: 'Plus Jakarta Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif;
   color: var(--ink);
   min-height: 100vh;
   background: var(--bg-primary);
@@ -33,7 +32,6 @@
   padding: 1rem 2.5rem;
   background: #ffffff;
   border-bottom: 1px solid var(--line);
-  /* TR signature top bar */
   border-top: 4px solid var(--accent);
 }
 
@@ -119,7 +117,7 @@
   padding-right: max(2.5rem, calc((100% - 1100px) / 2));
   background: var(--bg-dark);
   /* TR often uses subtle geometric or gradient overlays on dark backgrounds, but solid navy is very capturing */
-  background: linear-gradient(135deg, #00122a 0%, var(--bg-dark) 100%);
+  background: linear-gradient(135deg, #0f3d38 0%, var(--bg-dark) 100%);
   text-align: left;
   border-bottom: 4px solid var(--accent);
 }

@@ -1,0 +1,124 @@
+@if (open) {
+  <div
+    class="intakeDetailOverlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="intake-detail-title"
+    data-intake-detail-backdrop
+    (click)="onBackdropClick($event)"
+  >
+    <div class="intakeDetailPanel" (click)="$event.stopPropagation()">
+      <h2 id="intake-detail-title" class="panelTitle">Affidavit intake</h2>
+      <p class="intakeDocName">{{ documentName }}</p>
+
+      @if (!extraction) {
+        <p class="intakeMuted">This document has not been analyzed yet. Run analysis to classify it and extract draft fields.</p>
+      } @else {
+        <div class="intakeMetaGrid">
+          <div class="intakeMetaItem">
+            <span class="intakeMetaLabel">Status</span>
+            <span class="intakeMetaValue">{{ extraction.status }}</span>
+          </div>
+          <div class="intakeMetaItem">
+            <span class="intakeMetaLabel">Classification</span>
+            <span class="intakeMetaValue">{{ intakeTypeLabel(extraction.documentType) }}</span>
+          </div>
+          <div class="intakeMetaItem">
+            <span class="intakeMetaLabel">Extraction version</span>
+            <span class="intakeMetaValue">{{ extraction.extractionVersion }}</span>
+          </div>
+          @if (extraction.textQuality) {
+            <div class="intakeMetaItem">
+              <span class="intakeMetaLabel">Text quality</span>
+              <span class="intakeMetaValue">
+                {{ extraction.textQuality.charCount }} chars
+                @if (extraction.textQuality.weak) {
+                  <span class="intakeWarnBadge">weak</span>
+                }
+              </span>
+            </div>
+          }
+          @if (extraction.status === 'applied' && extraction.appliedAffidavitCollection) {
+            <div class="intakeMetaItem">
+              <span class="intakeMetaLabel">Applied to</span>
+              <span class="intakeMetaValue">{{ extraction.appliedAffidavitCollection }} · row {{ extraction.appliedAffidavitRowId ?? '—' }}</span>
+            </div>
+          }
+        </div>
+
+        @if (summaryLine) {
+          <p class="intakeSummaryLine">{{ summaryLine }}</p>
+        }
+
+        @if (extraction.errorMessage) {
+          <p class="intakeErrBanner">{{ extraction.errorMessage }}</p>
+        }
+
+        @if (ocrNote) {
+          <p class="intakeOcrBanner">{{ ocrNote }}</p>
+        }
+
+        @if (confidenceRows().length) {
+          <h3 class="intakeSectionTitle">Field confidence</h3>
+          <ul class="intakeKvList">
+            @for (row of confidenceRows(); track row.key) {
+              <li><span class="intakeKey">{{ row.key }}</span> {{ row.value }}</li>
+            }
+          </ul>
+        }
+
+        <h3 class="intakeSectionTitle">Extracted fields (list)</h3>
+        @if (payloadRows().length) {
+          <ul class="intakeKvList">
+            @for (row of payloadRows(); track row.key) {
+              <li>
+                <span class="intakeKey">{{ row.key }}</span>
+                <span class="intakeVal">{{ row.value }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="intakeMuted">No payload fields.</p>
+        }
+
+        <details class="intakeRawJson">
+          <summary>Raw JSON</summary>
+          <pre class="intakePre">{{ extraction.rawPayload | json }}</pre>
+        </details>
+      }
+
+      @if (extraction && showRejectAndApply && applyBlockedSummary) {
+        <p id="intake-apply-block-reason" class="intakeApplyBlocked" role="status">{{ applyBlockedSummary }}</p>
+      }
+
+      @if (applyErrorMessage) {
+        <p class="intakeApplyErr" role="alert">{{ applyErrorMessage }}</p>
+      }
+
+      @if (applySuccessMessage) {
+        <p class="intakeApplyOk" role="status" aria-live="polite">{{ applySuccessMessage }}</p>
+      }
+
+      <div class="rowActions intakeDetailActions">
+        <button type="button" class="intakeActionSecondary" (click)="closed.emit()">Close</button>
+        <button type="button" class="intakeActionSecondary" (click)="reAnalyze.emit()" [disabled]="reanalyzeDisabled">
+          {{ reanalyzeLabel }}
+        </button>
+        @if (extraction && showRejectAndApply) {
+          <button type="button" class="intakeActionSecondary" (click)="reject.emit()" [disabled]="rejectBusy">
+            {{ rejectBusy ? 'Rejecting…' : 'Reject' }}
+          </button>
+          <button
+            type="button"
+            class="submit"
+            (click)="apply.emit()"
+            [disabled]="applyDisabledOrBusy"
+            [attr.aria-describedby]="applyDisabled ? 'intake-apply-block-reason' : null"
+          >
+            {{ applyBusy ? 'Applying…' : applyFlowLabel(extraction.documentType) }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

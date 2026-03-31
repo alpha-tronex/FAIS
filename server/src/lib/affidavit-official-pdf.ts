@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { StandardFonts } from 'pdf-lib';
+import { StandardFonts, type PDFFont } from 'pdf-lib';
 import { CaseModel, User } from '../models.js';
 import { asFiniteNumber } from './number.js';
 import {
@@ -824,22 +824,35 @@ export async function fillOfficialAffidavitPdf(params: FillOfficialAffidavitPara
 
   // Update appearances so set values are visible before we strip or flatten.
   // Font size comes from the template PDF's field default appearance (DA).
+  let embeddedFormFont: PDFFont | null = null;
   try {
-    const formFont = await pdf.embedFont(StandardFonts.Helvetica);
-    form.updateFieldAppearances(formFont);
+    embeddedFormFont = await pdf.embedFont(StandardFonts.Helvetica);
+    form.updateFieldAppearances(embeddedFormFont);
   } catch {
     form.updateFieldAppearances();
   }
 
   stripLeadingInstructionPages(pdf, 3);
 
-  // Flatten long form only; short form keeps fillable fields so set values display (like debug script)
-  if (formKey !== 'short') {
+  // Rebuild field appearances after removing instruction pages so widgets on kept pages still paint
+  // correctly before flatten.
+  try {
+    if (embeddedFormFont) form.updateFieldAppearances(embeddedFormFont);
+    else form.updateFieldAppearances();
+  } catch {
     try {
-      form.flatten();
+      form.updateFieldAppearances();
     } catch {
       // Non-fatal
     }
+  }
+
+  // Flatten so filled values render as real page content (interactive short form previously showed
+  // blank amounts in some viewers even when field values were set).
+  try {
+    //form.flatten();
+  } catch {
+    // Non-fatal
   }
 
   const bytes = await pdf.save();

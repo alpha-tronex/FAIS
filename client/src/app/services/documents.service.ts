@@ -31,6 +31,10 @@ export type DocumentIntakeExtraction = {
   fieldConfidences: Record<string, number>;
   textQuality: { charCount: number; weak: boolean } | null;
   errorMessage: string | null;
+  appliedAt?: string | null;
+  appliedByUserId?: string | null;
+  appliedAffidavitCollection?: string | null;
+  appliedAffidavitRowId?: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -121,6 +125,41 @@ export class DocumentsService {
       this.http.post<{ ok: boolean; id: string; status: string }>(
         `${this.apiBase}/cases/${encodeURIComponent(caseId)}/documents/${encodeURIComponent(documentId)}/intake/reject`,
         {}
+      )
+    );
+  }
+
+  /**
+   * Phase 2: apply latest pending_review extraction to the affidavit.
+   * @param options.conflictPolicy `append` (default) always inserts; `merge_if_match` updates an existing row when employer/creditor/utility key matches.
+   */
+  applyIntake(
+    caseId: string,
+    documentId: string,
+    options?: { conflictPolicy?: 'append' | 'merge_if_match' }
+  ): Promise<{
+    ok: boolean;
+    conflictPolicy: string;
+    applyAction: 'insert' | 'update';
+    auditEventId: string | null;
+    affidavitCollection: string;
+    affidavitRowId: string;
+    extraction: DocumentIntakeExtraction | null;
+  }> {
+    const body =
+      options?.conflictPolicy === 'merge_if_match' ? { conflictPolicy: 'merge_if_match' as const } : {};
+    return firstValueFrom(
+      this.http.post<{
+        ok: boolean;
+        conflictPolicy: string;
+        applyAction: 'insert' | 'update';
+        auditEventId: string | null;
+        affidavitCollection: string;
+        affidavitRowId: string;
+        extraction: DocumentIntakeExtraction | null;
+      }>(
+        `${this.apiBase}/cases/${encodeURIComponent(caseId)}/documents/${encodeURIComponent(documentId)}/intake/apply`,
+        body
       )
     );
   }

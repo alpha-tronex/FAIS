@@ -314,6 +314,33 @@ describe('handlers v0', () => {
     assert.ok((fieldConfidences.amountDue ?? 0) < 0.7);
   });
 
+  it('extractUtilityElectricFromText handles multiline pay-this and Think Energy vendor', () => {
+    const { payload } = extractUtilityElectricFromText(
+      [
+        'Think Energy',
+        'ENGIE Retail',
+        'BILLING PERIOD',
+        'Sep 23 - Oct 25, 2021',
+        'AMOUNT DUE:',
+        'DUE DATE:',
+        'Pay This',
+        'Amount',
+        '$7.55',
+        'Total Amount Due',
+        'Amount due if paid after November 11, 2021',
+        '$7.93',
+        'Total Current Charges',
+        '$7.55',
+        'Think Energy Account Number',
+        '5610244109901',
+      ].join('\n')
+    );
+    assert.equal(payload.utilityName, 'Think Energy');
+    assert.equal(payload.amountDue, 7.55);
+    assert.equal(payload.accountNumber, '5610244109901');
+    assert.ok(String(payload.billingPeriodLabel ?? '').includes('Sep 23'));
+  });
+
   it('extractCreditCardMastercardFromText finds new balance', () => {
     const { payload } = extractCreditCardMastercardFromText(
       'Bank of Example\nNew Balance $1,234.56\nMinimum Payment Due $35.00'

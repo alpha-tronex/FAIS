@@ -6,7 +6,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
-import { CaseModel, DocumentModel, DocumentDeletionAuditModel, DocumentExtractionModel } from '../models.js';
+import {
+  CaseModel,
+  DocumentModel,
+  DocumentDeletionAuditModel,
+  DocumentExtractionModel,
+  IntakeApplyAuditModel
+} from '../models.js';
 import { uploadBuffer, getPresignedGetUrl, isB2Configured } from '../lib/b2-storage.js';
 import { processDocument } from '../lib/document-processing.js';
 import {
@@ -14,6 +20,12 @@ import {
   processDocumentIntake,
   shouldRunIntakeOnUpload
 } from '../lib/document-intake/pipeline.js';
+import {
+  applyIntakePlanWithPolicy,
+  buildAffidavitInsertPlan,
+  getIntakeApplyBlockReason,
+  parseIntakeConflictPolicy
+} from '../lib/document-intake/apply-intake.js';
 import { queryDocuments } from '../lib/document-query.js';
 import { sendError, sendErrorWithMessage } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
@@ -72,6 +84,28 @@ function isAdmin(auth: AuthPayload): boolean {
   return auth.roleTypeId === 5;
 }
 
+/**
+ * Petitioner (self), petitioner attorney, legal assistant for the case, or admin —
+ * for the affidavit subject tied to an extraction (typically petitioner).
+ */
+function canApplyDocumentIntake(
+  c: {
+    petitionerId?: unknown;
+    petitionerAttId?: unknown;
+    legalAssistantId?: unknown;
+  },
+  auth: AuthPayload,
+  subjectUserId: string
+): boolean {
+  if (auth.roleTypeId === 5) return true;
+  if (auth.sub === subjectUserId) return true;
+  const petitionerId = toIdStr(c.petitionerId);
+  if (!petitionerId || petitionerId !== subjectUserId) return false;
+  if (toIdStr(c.petitionerAttId) === auth.sub) return true;
+  if (toIdStr(c.legalAssistantId) === auth.sub) return true;
+  return false;
+}
+
 function serializeExtraction(e: {
   _id: unknown;
   documentId: unknown;
@@ -84,6 +118,10 @@ function serializeExtraction(e: {
   fieldConfidences: unknown;
   textQuality: unknown;
   errorMessage?: string | null;
+  appliedAt?: Date | null;
+  appliedByUserId?: unknown;
+  appliedAffidavitCollection?: string | null;
+  appliedAffidavitRowId?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }) {
@@ -99,6 +137,10 @@ function serializeExtraction(e: {
     fieldConfidences: e.fieldConfidences,
     textQuality: e.textQuality ?? null,
     errorMessage: e.errorMessage ?? null,
+    appliedAt: e.appliedAt ?? null,
+    appliedByUserId: e.appliedByUserId != null ? String(e.appliedByUserId) : null,
+    appliedAffidavitCollection: e.appliedAffidavitCollection ?? null,
+    appliedAffidavitRowId: e.appliedAffidavitRowId ?? null,
     createdAt: e.createdAt,
     updatedAt: e.updatedAt
   };
@@ -360,6 +402,114 @@ export function createDocumentsRouter(
       { $set: { status: 'rejected', updatedAt: new Date() } }
     );
     res.json({ ok: true, id: latest._id.toString(), status: 'rejected' });
+  });
+
+  /**
+   * Apply latest pending_review extraction to the subject user's affidavit.
+   * Body (optional): `{ "conflictPolicy": "append" | "merge_if_match" }` — default `append`.
+   */
+  router.post('/cases/:caseId/documents/:documentId/intake/apply', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as express.Request & { auth: AuthPayload }).auth;
+    const caseId = typeof req.params.caseId === 'string' ? req.params.caseId : undefined;
+    const documentId = typeof req.params.documentId === 'string' ? req.params.documentId : undefined;
+    if (!caseId || !documentId || !mongoose.isValidObjectId(caseId) || !mongoose.isValidObjectId(documentId)) {
+      return sendErrorWithMessage(res, 'Invalid case or document ID', 400);
+    }
+    if (!isDocumentIntakeEnabled()) {
+      return res.status(503).json({ error: 'Document intake is not enabled. Set DOCUMENT_INTAKE_ENABLED=true.' });
+    }
+    const caseDoc = await CaseModel.findById(caseId).lean();
+    if (!caseDoc) return res.status(404).json({ error: 'Case not found' });
+    if (!canSeeCase(authPayload, caseDoc)) return res.status(403).json({ error: 'Forbidden' });
+
+    const doc = await DocumentModel.findOne({
+      _id: new mongoose.Types.ObjectId(documentId),
+      caseId: new mongoose.Types.ObjectId(caseId),
+      ...notDeletedFilter,
+    }).lean();
+    if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+    const latest = await DocumentExtractionModel.findOne({ documentId: doc._id })
+      .sort({ extractionVersion: -1 })
+      .lean();
+    if (!latest || latest.status !== 'pending_review') {
+      return sendErrorWithMessage(res, 'No pending_review extraction to apply.', 400);
+    }
+
+    const subjectUserId = String(latest.subjectUserId);
+    if (!canApplyDocumentIntake(caseDoc, authPayload, subjectUserId)) {
+      return res.status(403).json({
+        error: 'Only the petitioner, their attorney, the assigned legal assistant, or an administrator can apply intake to the affidavit.'
+      });
+    }
+
+    const blockReason = getIntakeApplyBlockReason(latest as any);
+    if (blockReason) return res.status(400).json({ error: blockReason });
+
+    const plan = buildAffidavitInsertPlan(latest as any, latest.subjectUserId as mongoose.Types.ObjectId);
+    if (!plan) return res.status(400).json({ error: 'Could not build an affidavit row from this extraction.' });
+
+    const conflictPolicy = parseIntakeConflictPolicy(req.body);
+
+    let writeResult: Awaited<ReturnType<typeof applyIntakePlanWithPolicy>>;
+    try {
+      writeResult = await applyIntakePlanWithPolicy({
+        subjectUserId: latest.subjectUserId as mongoose.Types.ObjectId,
+        extraction: latest as any,
+        plan,
+        conflictPolicy
+      });
+    } catch (err) {
+      console.error('[documents] intake apply write failed', documentId, err);
+      return res.status(500).json({ error: 'Failed to save affidavit data.' });
+    }
+
+    const now = new Date();
+    await DocumentExtractionModel.updateOne(
+      { _id: latest._id },
+      {
+        $set: {
+          status: 'applied',
+          appliedAt: now,
+          appliedByUserId: new mongoose.Types.ObjectId(authPayload.sub),
+          appliedAffidavitCollection: plan.collection,
+          appliedAffidavitRowId: writeResult.rowId,
+          updatedAt: now
+        }
+      }
+    );
+
+    let auditEventId: string | null = null;
+    try {
+      const auditDoc = await IntakeApplyAuditModel.create({
+        documentId: doc._id,
+        caseId: new mongoose.Types.ObjectId(caseId),
+        subjectUserId: latest.subjectUserId as mongoose.Types.ObjectId,
+        extractionId: latest._id as mongoose.Types.ObjectId,
+        extractionVersion: latest.extractionVersion,
+        appliedByUserId: new mongoose.Types.ObjectId(authPayload.sub),
+        affidavitCollection: plan.collection,
+        affidavitRowId: writeResult.rowId,
+        action: writeResult.action,
+        conflictPolicy,
+        previousValues: writeResult.previousValues,
+        appliedValues: writeResult.appliedValues
+      });
+      auditEventId = auditDoc._id.toString();
+    } catch (err) {
+      console.error('[documents] intake apply audit log failed', documentId, err);
+    }
+
+    const updated = await DocumentExtractionModel.findById(latest._id).lean();
+    res.json({
+      ok: true,
+      conflictPolicy,
+      applyAction: writeResult.action,
+      auditEventId,
+      affidavitCollection: plan.collection,
+      affidavitRowId: writeResult.rowId,
+      extraction: updated ? serializeExtraction(updated as any) : null
+    });
   });
 
   router.get('/cases/:caseId/documents/:documentId/download', auth.requireAuth, async (req, res) => {

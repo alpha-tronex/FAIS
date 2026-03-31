@@ -1,5 +1,7 @@
-/* Global theme (fais_default/style_fiori) controlled by html[data-theme].
-	 fais_default = default FAIS; style_fiori = Fiori/law office (navy, gold, sand). */
+/* Global theme controlled by html[data-theme].
+   fais_default = default FAIS (cool neutral + sky accent)
+   style_fiori = Fiori/law office (navy, gold, sand)
+   style_fas = Friendly Accounting–style (sage surfaces, deep teal, warm amber) */
 :root {
 	--radius: 10px;
 
@@ -307,6 +309,123 @@ html[data-theme='style_fiori'] .footerBar {
 html[data-theme='style_fiori'] .footerBar .footerText,
 html[data-theme='style_fiori'] .footerBar .footerMuted {
 	color: rgba(255, 255, 255, 0.9);
+}
+
+/* style_fas — approachable accounting (teal primary, sand backgrounds, amber highlights) */
+html[data-theme='style_fas'] {
+	--bodyFontSize: 15px;
+	--pageMaxWidth: 1200px;
+	--pageMarginY: 22px;
+	--panelPadding: 16px;
+
+	--controlHeight: 36px;
+	--controlPaddingY: 7px;
+	--controlPaddingX: 12px;
+	--controlFontSize: 0.93rem;
+	--buttonFontWeight: 600;
+
+	--bg: #f2f5f3;
+	--surface: #ffffff;
+	--text: #142420;
+	--muted: #5d6964;
+	--border: #cfd9d3;
+	--border2: #dfe8e2;
+	--accent: #0f766e;
+	--accentAlt: #c2410c;
+	--danger: #b91c1c;
+	--focus: color-mix(in srgb, var(--accent) 28%, transparent);
+	--panelBorderWidth: 1px;
+	--tableBorderWidth: 1px;
+	--tableHeaderBg: #e8f0eb;
+}
+
+html[data-theme='style_fas'] body {
+	font-family: 'Plus Jakarta Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+html[data-theme='style_fas'] .submit {
+	border-color: #0f766e;
+	background: #0f766e;
+	color: #fff;
+}
+
+html[data-theme='style_fas'] .submit:hover {
+	background: #115e59;
+	border-color: #115e59;
+}
+
+html[data-theme='style_fas'] .link {
+	color: #0f766e;
+}
+
+html[data-theme='style_fas'] .table {
+	border-collapse: collapse;
+	border-radius: 8px;
+	border-color: var(--border);
+}
+
+html[data-theme='style_fas'] .th {
+	background: var(--tableHeaderBg);
+	color: var(--text);
+}
+
+html[data-theme='style_fas'] tbody tr:hover .td {
+	background: #e8f2ef;
+}
+
+html[data-theme='style_fas'] .confirmButton {
+	border-color: #0f766e;
+	background: #0f766e;
+	color: #fff;
+}
+
+html[data-theme='style_fas'] .confirmButton:hover {
+	background: #115e59;
+	border-color: #115e59;
+	color: #fff;
+}
+
+html[data-theme='style_fas'] .confirmButtonDanger {
+	border-color: #b91c1c;
+	background: #b91c1c;
+	color: #fff;
+}
+
+html[data-theme='style_fas'] .confirmButtonDanger:hover {
+	background: #991b1b;
+	border-color: #991b1b;
+	color: #fff;
+}
+
+html[data-theme='style_fas'] .headerBar {
+	background: #115e59;
+	border-bottom-color: #0f766e;
+}
+
+html[data-theme='style_fas'] .headerBar .welcome,
+html[data-theme='style_fas'] .headerBar .navLink,
+html[data-theme='style_fas'] .headerBar .navBtn {
+	color: #f0fdf9;
+}
+
+html[data-theme='style_fas'] .headerBar .navLink:hover,
+html[data-theme='style_fas'] .headerBar .navLink.navLinkActive,
+html[data-theme='style_fas'] .headerBar .navBtn:hover {
+	color: #fcd34d;
+}
+
+html[data-theme='style_fas'] .headerBar .sep {
+	color: rgba(240, 253, 249, 0.65);
+}
+
+html[data-theme='style_fas'] .footerBar {
+	background: #115e59;
+	border-top-color: #0f766e;
+}
+
+html[data-theme='style_fas'] .footerBar .footerText,
+html[data-theme='style_fas'] .footerBar .footerMuted {
+	color: rgba(240, 253, 249, 0.92);
 }
 
 .table {

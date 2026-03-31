@@ -240,103 +240,32 @@
   color: var(--text-secondary, #555);
 }
 
-/* Affidavit intake column */
+/* Affidavit intake column — status opens detail popup */
 .intakeCell {
-  max-width: 14rem;
   vertical-align: top;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
-.intakeRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.intakeChip {
-  display: inline-block;
-  padding: 0.15rem 0.45rem;
-  border-radius: 4px;
-  background: #e8f4e8;
-  color: #1a5c1a;
-  font-weight: 600;
-  font-size: 0.8rem;
-}
-
-.intakeChipWarn {
-  background: #fff4e5;
-  color: #8a5a00;
-}
-
-.intakeType {
-  color: var(--text-secondary, #555);
-  font-size: 0.8rem;
-}
-
-.intakeSummary {
-  margin: 0.35rem 0 0 0;
-  color: var(--text-secondary, #444);
-  line-height: 1.35;
-}
-
-.intakeErr {
-  margin: 0.35rem 0 0 0;
-  color: var(--error, #c00);
-  font-size: 0.8rem;
-}
-
-.intakeOcrNote {
-  margin: 0.35rem 0 0 0;
-  color: #856404;
-  background: #fff8e6;
-  padding: 0.35rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-
-.intakeNone {
-  margin: 0 0 0.35rem 0;
-  color: var(--text-secondary, #777);
-  font-size: 0.85rem;
-}
-
-.intakeDetails {
-  margin-top: 0.35rem;
-}
-
-.intakeDetails summary {
+.intakeStatusLink {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
   cursor: pointer;
   color: var(--accent, #0066cc);
-  font-size: 0.8rem;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.intakePre {
-  margin: 0.35rem 0 0 0;
-  padding: 0.5rem;
-  max-height: 10rem;
-  overflow: auto;
-  font-size: 0.72rem;
-  background: #f4f4f4;
-  border-radius: 4px;
-  border: 1px solid var(--border, #ddd);
+.intakeStatusLink:hover {
+  opacity: 0.88;
 }
 
-.intakeActions {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.intakeBtn {
-  background: var(--accent, #0066cc);
-  color: #fff;
-  border-color: transparent;
-}
-
-.intakeBtn:hover:not(:disabled) {
-  opacity: 0.92;
-  background: var(--accent, #0066cc);
+.intakeStatusLink:focus {
+  outline: 2px solid var(--focus, #06c);
+  outline-offset: 2px;
 }

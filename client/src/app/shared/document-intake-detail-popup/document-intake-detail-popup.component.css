@@ -1,0 +1,202 @@
+.intakeDetailOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--text) 35%, transparent);
+  cursor: default;
+}
+
+.intakeDetailPanel {
+  cursor: default;
+  width: 100%;
+  max-width: 42rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--panelPadding);
+  border: var(--panelBorderWidth) solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--text) 20%, transparent);
+}
+
+.intakeDocName {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.intakeMuted {
+  margin: 0 0 16px 0;
+  color: var(--muted);
+  font-size: var(--controlFontSize);
+  line-height: 1.45;
+}
+
+.intakeMetaGrid {
+  display: grid;
+  gap: 8px 16px;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  margin-bottom: 12px;
+}
+
+.intakeMetaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intakeMetaLabel {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.intakeMetaValue {
+  font-size: var(--controlFontSize);
+}
+
+.intakeWarnBadge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background: #fff4e5;
+  color: #8a5a00;
+}
+
+.intakeSummaryLine {
+  margin: 0 0 12px 0;
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  border-radius: 8px;
+  font-size: var(--controlFontSize);
+  line-height: 1.4;
+}
+
+.intakeErrBanner {
+  margin: 0 0 12px 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+  color: var(--danger);
+  font-size: var(--controlFontSize);
+  line-height: 1.4;
+}
+
+.intakeOcrBanner {
+  margin: 0 0 12px 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff8e6;
+  color: #5c4a00;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.intakeSectionTitle {
+  margin: 16px 0 8px 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.intakeKvList {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: var(--controlFontSize);
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.intakeKvList li {
+  margin-bottom: 6px;
+}
+
+.intakeKey {
+  font-family: ui-monospace, monospace;
+  font-size: 0.82em;
+  color: var(--muted);
+  margin-right: 6px;
+}
+
+.intakeVal {
+  word-break: break-word;
+}
+
+.intakeRawJson {
+  margin-top: 12px;
+}
+
+.intakeRawJson summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.88rem;
+}
+
+.intakePre {
+  margin: 8px 0 0 0;
+  padding: 10px;
+  max-height: 14rem;
+  overflow: auto;
+  font-size: 0.75rem;
+  background: color-mix(in srgb, var(--text) 5%, var(--surface));
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.intakeApplyBlocked {
+  margin: 16px 0 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.intakeApplyErr {
+  margin: 16px 0 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
+  color: var(--danger);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.intakeApplyOk {
+  margin: 16px 0 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, #2e7d32 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, #2e7d32 28%, var(--border));
+  color: #1b5e20;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.intakeDetailActions {
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.intakeActionSecondary {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.intakeActionSecondary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--text) 5%, var(--surface));
+}
