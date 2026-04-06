@@ -131,6 +131,64 @@
     </div>
     <p *ngIf="busy && cases.length === 0">Loading…</p>
 
+    <div class="casesListFilters" *ngIf="!busy && circuits.length > 0 && cases.length > 0">
+      <label class="filterField">
+        <span class="filterFieldLabel">Circuit</span>
+        <select
+          name="listFilterCircuitId"
+          [(ngModel)]="listFilterCircuitId"
+          (ngModelChange)="onCasesListCircuitFilterChange()"
+          class="input"
+          aria-label="Filter cases by circuit"
+        >
+          <option [ngValue]="null">All circuits</option>
+          <option *ngFor="let c of circuits" [ngValue]="c.id">{{ c.name }} ({{ c.id }})</option>
+        </select>
+      </label>
+      <label class="filterField">
+        <span class="filterFieldLabel">County</span>
+        <select
+          name="listFilterCountyId"
+          [(ngModel)]="listFilterCountyId"
+          (ngModelChange)="onCasesListFilterChange()"
+          class="input"
+          aria-label="Filter cases by county"
+        >
+          <option [ngValue]="null">All counties</option>
+          <option *ngFor="let c of listFilterCounties" [ngValue]="c.id">{{ c.name }} ({{ c.id }})</option>
+        </select>
+      </label>
+      <label class="filterField">
+        <span class="filterFieldLabel">Division</span>
+        <select
+          name="listFilterDivision"
+          [(ngModel)]="listFilterDivision"
+          (ngModelChange)="onCasesListFilterChange()"
+          class="input"
+          aria-label="Filter cases by division"
+        >
+          <option [ngValue]="''">All divisions</option>
+          <option *ngFor="let d of divisions" [ngValue]="d.name">{{ d.name }}</option>
+        </select>
+      </label>
+      <label class="filterField">
+        <span class="filterFieldLabel">Guidelines worksheet</span>
+        <select
+          name="listFilterWorksheet"
+          [(ngModel)]="listFilterWorksheet"
+          (ngModelChange)="onCasesListFilterChange()"
+          class="input"
+          aria-label="Filter by child support guidelines worksheet filed"
+        >
+          <option value="any">Any</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+          <option value="unspecified">Not specified</option>
+        </select>
+      </label>
+      <button type="button" class="clearFiltersBtn" (click)="clearCasesListFilters()">Clear filters</button>
+    </div>
+
     <table *ngIf="cases.length > 0" class="table">
       <thead>
         <tr>
@@ -156,7 +214,10 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let c of sortedCases">
+        <tr *ngIf="filteredCases.length === 0">
+          <td class="td muted" [attr.colspan]="casesView === 'archived' ? 6 : 5">No cases match the current filters.</td>
+        </tr>
+        <tr *ngFor="let c of pagedCases">
           <td class="td">{{ c.caseNumber }}</td>
           <td class="td">{{ c.division }}</td>
           <td class="td">{{ petitionerLabel(c) }}</td>
@@ -173,6 +234,13 @@
         </tr>
       </tbody>
     </table>
+    <div class="tablePagination mt8" *ngIf="cases.length > 0 && filteredCases.length > 0">
+      <span class="paginationSummary">Showing {{ casesRangeStart }}–{{ casesRangeEnd }} of {{ filteredCases.length }}</span>
+      <div class="paginationButtons" *ngIf="casesPageCount > 1">
+        <button type="button" (click)="casesPrevPage()" [disabled]="casesPageIndex === 0 || busy">Previous</button>
+        <button type="button" (click)="casesNextPage()" [disabled]="casesPageIndex >= casesPageCount - 1 || busy">Next</button>
+      </div>
+    </div>
   </section>
 
   <app-confirm-popup

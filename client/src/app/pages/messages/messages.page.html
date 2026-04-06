@@ -34,18 +34,29 @@
           type="search"
           class="recipientSearch"
           [(ngModel)]="recipientSearch"
+          (ngModelChange)="onRecipientSearchChange()"
           placeholder="Search recipients…"
           aria-label="Search recipients"
         />
-        <ul class="recipientList" *ngIf="recipients.length > 0">
-          <li *ngFor="let r of filteredRecipients">
-            <button type="button" class="recipientBtn" (click)="selectRecipient(r)">
-              {{ displayName(r) }}
-            </button>
-          </li>
-        </ul>
+        <div class="recipientListScroll" *ngIf="recipients.length > 0">
+          <ul class="recipientList">
+            <li *ngFor="let r of visibleRecipients">
+              <button type="button" class="recipientBtn" (click)="selectRecipient(r)">
+                {{ displayName(r) }}
+              </button>
+            </li>
+          </ul>
+          <button
+            *ngIf="hasMoreRecipients"
+            type="button"
+            class="recipientShowMore"
+            (click)="showMoreRecipients()"
+          >
+            Show more
+          </button>
+          <p *ngIf="filteredRecipients.length === 0" class="muted">No recipients match your search.</p>
+        </div>
         <p *ngIf="recipients.length === 0" class="muted">No recipients available.</p>
-        <p *ngIf="recipients.length > 0 && filteredRecipients.length === 0" class="muted">No recipients match your search.</p>
       </section>
     </aside>
 

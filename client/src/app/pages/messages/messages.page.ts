@@ -9,6 +9,7 @@ import {
 } from '../../services/messages.service';
 
 const PAGE_SIZE = 50;
+const RECIPIENT_LIST_PAGE_SIZE = 5;
 
 @Component({
   standalone: false,
@@ -31,6 +32,8 @@ export class MessagesPage implements OnInit, OnDestroy {
   markReadBusy = false;
   /** Search filter for Start new recipient list (admins, petitioner attorneys, legal assistants). */
   recipientSearch = '';
+  /** How many rows to show in Start new; grows by RECIPIENT_LIST_PAGE_SIZE via Show more. */
+  recipientVisibleCount = RECIPIENT_LIST_PAGE_SIZE;
 
   private sub: Subscription | null = null;
   /** Current user id for template (isFromMe, read label). */
@@ -80,6 +83,24 @@ export class MessagesPage implements OnInit, OnDestroy {
     });
   }
 
+  /** Subset of filtered recipients for the Start new list (paginated). */
+  get visibleRecipients(): MessageRecipient[] {
+    return this.filteredRecipients.slice(0, this.recipientVisibleCount);
+  }
+
+  get hasMoreRecipients(): boolean {
+    return this.filteredRecipients.length > this.recipientVisibleCount;
+  }
+
+  showMoreRecipients(): void {
+    this.recipientVisibleCount += RECIPIENT_LIST_PAGE_SIZE;
+  }
+
+  /** Reset paging when search changes or full recipient list reloads. */
+  onRecipientSearchChange(): void {
+    this.recipientVisibleCount = RECIPIENT_LIST_PAGE_SIZE;
+  }
+
   selectConversation(item: ConversationItem): void {
     const id = item.otherUser?.id;
     if (!id) return;
@@ -119,6 +140,7 @@ export class MessagesPage implements OnInit, OnDestroy {
       .getRecipients()
       .then((list) => {
         this.recipients = list;
+        this.onRecipientSearchChange();
       })
       .catch(() => {
         // non-blocking

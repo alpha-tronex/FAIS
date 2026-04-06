@@ -64,6 +64,21 @@ export class CasesPage implements OnInit, OnDestroy {
   /** 'active' = active cases (default), 'archived' = archived only (admin). */
   casesView: 'active' | 'archived' = 'active';
 
+  /** All cases table pagination (client-side over sorted list). */
+  readonly casesPageSize = 10;
+  casesPageIndex = 0;
+
+  /**
+   * Filters for the All cases table only (independent of create/edit form).
+   * Circuit + county are paired: county options follow the selected circuit.
+   */
+  listFilterCircuitId: number | null = null;
+  listFilterCountyId: number | null = null;
+  /** Empty string = any division. */
+  listFilterDivision = '';
+  /** Worksheet filed tri-state filter. */
+  listFilterWorksheet: 'any' | 'yes' | 'no' | 'unspecified' = 'any';
+
   showArchiveConfirm = false;
   caseToArchive: CaseListItem | null = null;
   showRestoreConfirm = false;
@@ -111,11 +126,52 @@ export class CasesPage implements OnInit, OnDestroy {
     return `${c.respondent.lastName ?? ''}, ${c.respondent.firstName ?? ''}`.trim();
   }
 
+  /** Counties available for the table’s circuit filter (all counties if no circuit selected). */
+  get listFilterCounties(): LookupItem[] {
+    if (this.listFilterCircuitId == null) {
+      return this.allCounties;
+    }
+    const filtered = this.allCounties.filter((c) => c.circuitId === this.listFilterCircuitId);
+    return filtered.length > 0 ? filtered : this.allCounties;
+  }
+
+  /** Cases after list filters (before sort). */
+  get filteredCases(): CaseListItem[] {
+    return this.cases.filter((c) => {
+      if (this.listFilterCircuitId != null && c.circuitId !== this.listFilterCircuitId) {
+        return false;
+      }
+      if (this.listFilterCountyId != null && c.countyId !== this.listFilterCountyId) {
+        return false;
+      }
+      if (this.listFilterDivision.trim() !== '' && (c.division ?? '') !== this.listFilterDivision) {
+        return false;
+      }
+      const ws = c.childSupportWorksheetFiled;
+      switch (this.listFilterWorksheet) {
+        case 'any':
+          break;
+        case 'yes':
+          if (ws !== true) return false;
+          break;
+        case 'no':
+          if (ws !== false) return false;
+          break;
+        case 'unspecified':
+          if (ws != null) return false;
+          break;
+        default:
+          break;
+      }
+      return true;
+    });
+  }
+
   /** Cases sorted by current casesSortColumn and casesSortDirection. */
   get sortedCases(): CaseListItem[] {
     const col = this.casesSortColumn;
     const dir = this.casesSortDirection === 'asc' ? 1 : -1;
-    return [...this.cases].sort((a, b) => {
+    return [...this.filteredCases].sort((a, b) => {
       let aVal: string | number;
       let bVal: string | number;
       switch (col) {
@@ -144,6 +200,38 @@ export class CasesPage implements OnInit, OnDestroy {
     });
   }
 
+  /** Rows for the current cases table page. */
+  get pagedCases(): CaseListItem[] {
+    const start = this.casesPageIndex * this.casesPageSize;
+    return this.sortedCases.slice(start, start + this.casesPageSize);
+  }
+
+  get casesPageCount(): number {
+    return Math.max(1, Math.ceil(this.sortedCases.length / this.casesPageSize));
+  }
+
+  get casesRangeStart(): number {
+    if (this.sortedCases.length === 0) return 0;
+    return this.casesPageIndex * this.casesPageSize + 1;
+  }
+
+  get casesRangeEnd(): number {
+    return Math.min((this.casesPageIndex + 1) * this.casesPageSize, this.sortedCases.length);
+  }
+
+  casesPrevPage(): void {
+    this.casesPageIndex = Math.max(0, this.casesPageIndex - 1);
+  }
+
+  casesNextPage(): void {
+    this.casesPageIndex = Math.min(this.casesPageCount - 1, this.casesPageIndex + 1);
+  }
+
+  private clampCasesPageIndex(): void {
+    const last = Math.max(0, this.casesPageCount - 1);
+    if (this.casesPageIndex > last) this.casesPageIndex = last;
+  }
+
   /** Toggle sort on column: same column flips direction, new column sets asc. */
   setCasesSort(column: 'caseNumber' | 'division' | 'petitioner' | 'respondent'): void {
     if (this.casesSortColumn === column) {
@@ -152,11 +240,35 @@ export class CasesPage implements OnInit, OnDestroy {
       this.casesSortColumn = column;
       this.casesSortDirection = 'asc';
     }
+    this.clampCasesPageIndex();
   }
 
   /** True if the given column is the current sort column. */
   isCasesSortColumn(column: 'caseNumber' | 'division' | 'petitioner' | 'respondent'): boolean {
     return this.casesSortColumn === column;
+  }
+
+  onCasesListFilterChange(): void {
+    this.casesPageIndex = 0;
+    this.clampCasesPageIndex();
+  }
+
+  onCasesListCircuitFilterChange(): void {
+    if (
+      this.listFilterCountyId != null &&
+      !this.listFilterCounties.some((x) => x.id === this.listFilterCountyId)
+    ) {
+      this.listFilterCountyId = null;
+    }
+    this.onCasesListFilterChange();
+  }
+
+  clearCasesListFilters(): void {
+    this.listFilterCircuitId = null;
+    this.listFilterCountyId = null;
+    this.listFilterDivision = '';
+    this.listFilterWorksheet = 'any';
+    this.onCasesListFilterChange();
   }
 
   private applyUserTypeFilters() {
@@ -265,6 +377,7 @@ export class CasesPage implements OnInit, OnDestroy {
           }
 
           this.applyCountyFilter();
+          this.clampCasesPageIndex();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load cases';
@@ -356,6 +469,7 @@ export class CasesPage implements OnInit, OnDestroy {
             this.division = this.divisions[0]!.name;
           }
           this.applyCountyFilter();
+          this.clampCasesPageIndex();
         },
         error: (e: any) => {
           const raw = e?.error?.error;
@@ -369,6 +483,7 @@ export class CasesPage implements OnInit, OnDestroy {
 
   setCasesView(view: 'active' | 'archived') {
     this.casesView = view;
+    this.casesPageIndex = 0;
     this.refresh();
   }
 

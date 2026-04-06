@@ -133,3 +133,40 @@
 	background: var(--danger-hover, #a00);
 	border-color: var(--danger-hover, #a00);
 }
+
+.tablePagination {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.paginationSummary {
+	font-size: 0.92rem;
+	color: var(--muted, #666);
+}
+
+.paginationButtons {
+	display: flex;
+	gap: 8px;
+}
+
+.paginationButtons button {
+	padding: 6px 12px;
+	font-size: 0.875rem;
+	border: 1px solid var(--border, #ccc);
+	border-radius: 4px;
+	background: var(--surface, #fff);
+	cursor: pointer;
+	font: inherit;
+}
+
+.paginationButtons button:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--accent, #0066cc) 8%, var(--surface, #fff));
+}
+
+.paginationButtons button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}

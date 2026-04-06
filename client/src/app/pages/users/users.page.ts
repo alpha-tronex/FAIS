@@ -59,6 +59,10 @@ export class UsersPage implements OnInit, OnDestroy {
   /** 'active' = active users (default), 'archived' = archived only (admin). */
   usersView: 'active' | 'archived' = 'active';
 
+  /** Table pagination (client-side over filtered/sorted list). */
+  readonly usersPageSize = 10;
+  usersPageIndex = 0;
+
   /** Archive confirm: user to archive. */
   showArchiveConfirm = false;
   userToArchive: UserListItem | null = null;
@@ -113,6 +117,7 @@ export class UsersPage implements OnInit, OnDestroy {
       .subscribe({
         next: (users) => {
           this.users = users;
+          this.clampUsersPageIndex();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to load users';
@@ -126,7 +131,12 @@ export class UsersPage implements OnInit, OnDestroy {
 
   setUsersView(view: 'active' | 'archived') {
     this.usersView = view;
+    this.usersPageIndex = 0;
     this.refresh();
+  }
+
+  onUsersRoleFilterChange(): void {
+    this.usersPageIndex = 0;
   }
 
   requestArchiveUser(u: UserListItem) {
@@ -241,6 +251,38 @@ export class UsersPage implements OnInit, OnDestroy {
     return list;
   }
 
+  /** Rows for the current users table page. */
+  get pagedUsers(): UserListItem[] {
+    const start = this.usersPageIndex * this.usersPageSize;
+    return this.filteredUsers.slice(start, start + this.usersPageSize);
+  }
+
+  get usersPageCount(): number {
+    return Math.max(1, Math.ceil(this.filteredUsers.length / this.usersPageSize));
+  }
+
+  get usersRangeStart(): number {
+    if (this.filteredUsers.length === 0) return 0;
+    return this.usersPageIndex * this.usersPageSize + 1;
+  }
+
+  get usersRangeEnd(): number {
+    return Math.min((this.usersPageIndex + 1) * this.usersPageSize, this.filteredUsers.length);
+  }
+
+  usersPrevPage(): void {
+    this.usersPageIndex = Math.max(0, this.usersPageIndex - 1);
+  }
+
+  usersNextPage(): void {
+    this.usersPageIndex = Math.min(this.usersPageCount - 1, this.usersPageIndex + 1);
+  }
+
+  private clampUsersPageIndex(): void {
+    const last = Math.max(0, this.usersPageCount - 1);
+    if (this.usersPageIndex > last) this.usersPageIndex = last;
+  }
+
   setSort(column: 'name' | 'uname' | 'email' | 'role') {
     if (this.sortBy === column) {
       this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
@@ -248,6 +290,7 @@ export class UsersPage implements OnInit, OnDestroy {
       this.sortBy = column;
       this.sortDir = 'asc';
     }
+    this.clampUsersPageIndex();
   }
 
   submitAskCreateUser(): void {
@@ -403,6 +446,7 @@ export class UsersPage implements OnInit, OnDestroy {
       .subscribe({
         next: (users) => {
           this.users = users;
+          this.clampUsersPageIndex();
         },
         error: (e: any) => {
           const msg = e?.error?.error;
@@ -448,6 +492,7 @@ export class UsersPage implements OnInit, OnDestroy {
       .subscribe({
         next: (users) => {
           this.users = users;
+          this.clampUsersPageIndex();
         },
         error: (e: any) => {
           const msg = e?.error?.error;
@@ -520,6 +565,7 @@ export class UsersPage implements OnInit, OnDestroy {
       .subscribe({
         next: (users) => {
           this.users = users;
+          this.clampUsersPageIndex();
         },
         error: (e: any) => {
           this.error = e?.error?.error ?? 'Failed to update user';

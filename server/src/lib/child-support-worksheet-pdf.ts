@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 import { CaseModel, User } from '../models.js';
-import { loadTemplatePdf, setTextIfExists, checkIfExists, formatMoneyDecimal } from './affidavit-pdf.js';
+import {
+  loadTemplatePdf,
+  setTextIfExists,
+  checkIfExists,
+  formatMoneyDecimal,
+  stripLeadingInstructionPages
+} from './affidavit-pdf.js';
 import { userDisplayName, caseIncludesUser } from './affidavit-helpers.js';
 import { getWorksheet } from './child-support-worksheet-store.js';
 import { resolveParentNetMonthlyIncomes } from './child-support-worksheet-values.js';
@@ -14,6 +20,9 @@ export type FillChildSupportWorksheetParams = {
   caseId?: string;
   auth: AuthPayload;
 };
+
+/** Instruction-only pages at the start of Form 12.902(e); omit from generated PDF like short/long affidavits. */
+const CHILD_SUPPORT_WORKSHEET_INSTRUCTION_PAGE_COUNT = 8;
 
 export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorksheetParams): Promise<Buffer> {
   const { targetUserObjectId, caseId: requestedCaseId } = params;
@@ -184,6 +193,29 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
   setTextIfExists(form as any, '21. Presumptive Child Support to be Paid', formatMoneyDecimal(calc.line21PresumptiveAmount));
 
   setTextByNeedle('date', new Date().toLocaleDateString('en-US'));
+
+  // Match short/long affidavit flow: paint fields, drop instruction pages, repaint, then flatten.
+  try {
+    form.updateFieldAppearances(font);
+  } catch {
+    try {
+      form.updateFieldAppearances();
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  stripLeadingInstructionPages(pdf, CHILD_SUPPORT_WORKSHEET_INSTRUCTION_PAGE_COUNT);
+
+  try {
+    form.updateFieldAppearances(font);
+  } catch {
+    try {
+      form.updateFieldAppearances();
+    } catch {
+      // Non-fatal
+    }
+  }
 
   try {
     form.flatten();

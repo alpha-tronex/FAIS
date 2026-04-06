@@ -12,6 +12,11 @@
   gap: 16px;
 }
 
+/* Global `.panel` adds margin-top; without this the sidebar starts lower than threadPanel. */
+.conversationsPanel > .panel:first-child {
+  margin-top: 0;
+}
+
 .conversationList,
 .recipientList {
   list-style: none;
@@ -87,6 +92,14 @@
   color: var(--muted, #999);
 }
 
+/* Fixed viewport so "Show more" adds scroll, not sidebar height. */
+.recipientListScroll {
+  max-height: 13.5rem;
+  overflow-y: auto;
+  padding-right: 2px;
+  margin-top: 2px;
+}
+
 .recipientBtn {
   display: block;
   width: 100%;
@@ -102,6 +115,24 @@
 
 .recipientBtn:hover {
   background: color-mix(in srgb, var(--accent, #0066cc) 10%, transparent);
+}
+
+.recipientShowMore {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.875rem;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  cursor: pointer;
+  color: var(--accent, #0066cc);
+}
+
+.recipientShowMore:hover {
+  background: color-mix(in srgb, var(--accent, #0066cc) 8%, var(--surface, #fff));
 }
 
 .threadPanel {

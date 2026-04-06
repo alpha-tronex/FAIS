@@ -121,7 +121,7 @@
     <div class="rowActions mt8" *ngIf="users.length > 0">
       <label class="filterLabel">
         Filter by role
-        <select name="roleFilter" [(ngModel)]="roleFilter" class="input" style="max-width: 200px;">
+        <select name="roleFilter" [(ngModel)]="roleFilter" (ngModelChange)="onUsersRoleFilterChange()" class="input" style="max-width: 200px;">
           <option [ngValue]="null">All roles</option>
           <option *ngFor="let rt of roleTypes" [ngValue]="rt.id">{{ rt.name }}</option>
         </select>
@@ -150,7 +150,7 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let u of filteredUsers">
+        <tr *ngFor="let u of pagedUsers">
           <td class="td">{{ u.lastName || '' }}, {{ u.firstName || '' }}</td>
           <td class="td">{{ u.uname }}</td>
           <td class="td">{{ u.email }}</td>
@@ -167,6 +167,13 @@
         </tr>
       </tbody>
     </table>
+    <div class="tablePagination mt8" *ngIf="filteredUsers.length > 0">
+      <span class="paginationSummary">Showing {{ usersRangeStart }}–{{ usersRangeEnd }} of {{ filteredUsers.length }}</span>
+      <div class="paginationButtons" *ngIf="usersPageCount > 1">
+        <button type="button" (click)="usersPrevPage()" [disabled]="usersPageIndex === 0 || busy">Previous</button>
+        <button type="button" (click)="usersNextPage()" [disabled]="usersPageIndex >= usersPageCount - 1 || busy">Next</button>
+      </div>
+    </div>
     <p *ngIf="!busy && users.length > 0 && filteredUsers.length === 0" class="muted mt8">No users match the selected role filter.</p>
   </section>
 

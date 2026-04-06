@@ -34,6 +34,49 @@
 	margin: 0;
 }
 
+.casesListFilters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 12px 16px;
+	margin-top: 12px;
+	margin-bottom: 8px;
+}
+
+.filterField {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.filterFieldLabel {
+	font-size: 0.85rem;
+	color: var(--muted, #666);
+}
+
+.casesListFilters .input {
+	min-width: 10rem;
+	max-width: 16rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.clearFiltersBtn {
+	padding: 6px 12px;
+	font-size: 0.875rem;
+	border: 1px solid var(--border, #ccc);
+	border-radius: 4px;
+	background: var(--surface, #fff);
+	cursor: pointer;
+	font: inherit;
+	align-self: flex-end;
+}
+
+.clearFiltersBtn:hover {
+	background: color-mix(in srgb, var(--accent, #0066cc) 8%, var(--surface, #fff));
+}
+
 .tabRow {
 	display: flex;
 	gap: 0;
@@ -84,4 +127,41 @@
 	border: 1px solid var(--border, #ccc);
 	border-radius: 8px;
 	margin-bottom: 1rem;
+}
+
+.tablePagination {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.paginationSummary {
+	font-size: 0.92rem;
+	color: var(--muted, #666);
+}
+
+.paginationButtons {
+	display: flex;
+	gap: 8px;
+}
+
+.paginationButtons button {
+	padding: 6px 12px;
+	font-size: 0.875rem;
+	border: 1px solid var(--border, #ccc);
+	border-radius: 4px;
+	background: var(--surface, #fff);
+	cursor: pointer;
+	font: inherit;
+}
+
+.paginationButtons button:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--accent, #0066cc) 8%, var(--surface, #fff));
+}
+
+.paginationButtons button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
