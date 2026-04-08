@@ -4,6 +4,7 @@ import { Subscription, finalize, from } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitService } from '../../services/affidavit.service';
+import { ChildSupportWorksheetService } from '../../services/child-support-worksheet.service';
 import { CasesService, CaseListItem } from '../../services/cases.service';
 import { FileSaveService } from '../../services/file-save.service';
 import { UsersService, UserListItem } from '../../services/users.service';
@@ -26,6 +27,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
   busy = false;
   casesBusy = false;
   pdfBusy = false;
+  worksheetPdfBusy = false;
   error: string | null = null;
 
   subscription: Subscription | null = null;
@@ -35,6 +37,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     private readonly auth: AuthService,
     private readonly usersApi: UsersService,
     private readonly affidavitApi: AffidavitService,
+    private readonly worksheetApi: ChildSupportWorksheetService,
     private readonly casesApi: CasesService,
     private readonly fileSave: FileSaveService,
     private readonly router: Router,
@@ -145,6 +148,13 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     this.selectedCaseId = null;
   }
 
+  worksheetQueryParams(): Record<string, string> {
+    const q: Record<string, string> = {};
+    if (this.selectedUserId) q['userId'] = this.selectedUserId;
+    if (this.selectedCaseId) q['caseId'] = this.selectedCaseId;
+    return q;
+  }
+
   private sanitizeFilenamePart(value: string): string {
     return value
       .trim()
@@ -189,7 +199,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
   async generatePdf() {
     if (!this.selectedUserId) return;
     if (!this.selectedCaseId) return;
-    if (this.pdfBusy) return;
+    if (this.pdfBusy || this.worksheetPdfBusy) return;
 
     this.pdfBusy = true;
     this.error = null;
@@ -205,6 +215,25 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
       }
     } finally {
       this.pdfBusy = false;
+    }
+  }
+
+  async generateWorksheetPdf(): Promise<void> {
+    if (!this.selectedUserId || !this.selectedCaseId || this.worksheetPdfBusy || this.pdfBusy) return;
+    this.worksheetPdfBusy = true;
+    this.error = null;
+    try {
+      const blob = await this.worksheetApi.generatePdf(this.selectedUserId, this.selectedCaseId);
+      await this.fileSave.savePdf(blob, 'child-support-guidelines-worksheet.pdf');
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to generate worksheet PDF';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    } finally {
+      this.worksheetPdfBusy = false;
     }
   }
 }

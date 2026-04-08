@@ -15,6 +15,52 @@
 
   <p *ngIf="error" class="error">{{ error }}</p>
 
+  <section *ngIf="showAffidavitPdfPanel" class="panel mt16">
+    <h2 class="panelTitle">Financial affidavit PDF</h2>
+    <p class="muted mt8" *ngIf="usesOfficialAffidavitPdf">
+      Downloads the official Florida financial affidavit form using your saved data.
+    </p>
+    <p class="muted mt8" *ngIf="!usesOfficialAffidavitPdf">
+      Downloads a summary PDF from your saved answers (not the court PDF template).
+    </p>
+    <div class="pdfGenRow mt12">
+      <label class="mr12">
+        Form
+        <select
+          name="officialPdfForm"
+          [(ngModel)]="officialPdfForm"
+          class="input ml4"
+          [disabled]="pdfBusy || worksheetPdfBusy || busy"
+        >
+          <option value="short">Short form</option>
+          <option value="long">Long form</option>
+          <option value="auto">Auto (by income)</option>
+        </select>
+      </label>
+      <button type="button" (click)="generateAffidavitPdf()" [disabled]="pdfBusy || worksheetPdfBusy || busy">
+        Generate PDF
+      </button>
+      <span *ngIf="pdfBusy" class="ml8">Generating…</span>
+    </div>
+    <p class="muted mt12">
+      <a routerLink="/affidavit" [queryParams]="summaryQueryParams()" class="link">Open summary overview</a>
+      for another review and PDF option.
+    </p>
+  </section>
+
+  <section *ngIf="showAffidavitPdfPanel" class="panel mt16">
+    <h2 class="panelTitle">Child support guidelines worksheet</h2>
+    <p class="muted mt8">View, edit, or generate the worksheet for this case (uses case data and affidavit income where available).</p>
+    <div class="pdfGenRow mt12">
+      <a [routerLink]="['/child-support-worksheet']" [queryParams]="summaryQueryParams()" class="link mr12">View worksheet</a>
+      <a [routerLink]="['/child-support-worksheet/edit']" [queryParams]="summaryQueryParams()" class="link mr12">Edit worksheet data</a>
+      <button type="button" (click)="generateWorksheetPdf()" [disabled]="pdfBusy || worksheetPdfBusy || busy">
+        Generate worksheet PDF
+      </button>
+      <span *ngIf="worksheetPdfBusy" class="ml8">Generating…</span>
+    </div>
+  </section>
+
   <section class="panel mt16">
     <h2 class="panelTitle">Step {{ currentStepIndex + 1 }} of {{ steps.length }}: {{ stepTitle() }}</h2>
 

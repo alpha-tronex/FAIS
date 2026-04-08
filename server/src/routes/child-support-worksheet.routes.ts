@@ -2,6 +2,10 @@ import express from 'express';
 import { z } from 'zod';
 import { loadTemplatePdf } from '../lib/affidavit-pdf.js';
 import { computeAffidavitSummary } from '../lib/affidavit-summary.js';
+import {
+  buildWorksheetDefaultsFromCaseAndAffidavits,
+  mergeStoredWorksheetWithDefaults
+} from '../lib/child-support-worksheet-defaults.js';
 import { getWorksheet, putWorksheet } from '../lib/child-support-worksheet-store.js';
 import { fillChildSupportWorksheetPdf } from '../lib/child-support-worksheet-pdf.js';
 import { resolveParentNetMonthlyIncomes } from '../lib/child-support-worksheet-values.js';
@@ -55,7 +59,12 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
           : (targetUser as { uname?: string }).uname ?? '')
         : '';
 
-      const worksheet = worksheetDoc?.data ?? {};
+      const worksheetStored = worksheetDoc?.data ?? {};
+      let worksheet = worksheetStored;
+      if (caseId && typeof caseId === 'string') {
+        const defaults = await buildWorksheetDefaultsFromCaseAndAffidavits(caseId);
+        worksheet = mergeStoredWorksheetWithDefaults(worksheetStored, defaults);
+      }
       const calc = await computeChildSupport({
         numberOfChildren: Number(worksheet.numberOfChildren ?? 1),
         parentANetMonthlyIncome: Number(worksheet.parentAMonthlyGrossIncome ?? netIncomeContext.parentANetMonthlyIncome),
@@ -109,7 +118,13 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
 
       const doc = await getWorksheet(targetUserObjectId, caseId ?? null);
-      res.json({ data: doc?.data ?? {} });
+      const stored = doc?.data ?? {};
+      let data = stored;
+      if (caseId && typeof caseId === 'string') {
+        const defaults = await buildWorksheetDefaultsFromCaseAndAffidavits(caseId);
+        data = mergeStoredWorksheetWithDefaults(stored, defaults);
+      }
+      res.json({ data });
     } catch (e) {
       sendError(res, e);
     }

@@ -63,8 +63,19 @@
       </p>
 
       <div class="rowActions mt12">
-        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy">{{ isRespondentViewer ? 'Print (HTML)' : 'Generate PDF' }}</button>
+        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy || worksheetPdfBusy">{{ isRespondentViewer ? 'Print (HTML)' : 'Generate PDF' }}</button>
         <span *ngIf="pdfBusy">Generating…</span>
+      </div>
+    </div>
+
+    <div *ngIf="summary && showWorksheetPanel" class="panel mt12">
+      <h2 class="panelTitle">Child support guidelines worksheet</h2>
+      <p class="muted mt8">Uses this case and affidavit data for the petitioner's worksheet.</p>
+      <div class="rowActions mt12">
+        <a [routerLink]="['/child-support-worksheet']" [queryParams]="navQueryParams()" class="link mr12">View worksheet</a>
+        <a [routerLink]="['/child-support-worksheet/edit']" [queryParams]="navQueryParams()" class="link mr12">Edit worksheet data</a>
+        <button type="button" (click)="generateWorksheetPdf()" [disabled]="busy || pdfBusy || worksheetPdfBusy">Generate worksheet PDF</button>
+        <span *ngIf="worksheetPdfBusy">Generating…</span>
       </div>
     </div>
 

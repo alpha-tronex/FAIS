@@ -53,6 +53,11 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
       this.caseId = qpCaseId;
     }
 
+    if (this.auth.hasRole(3, 6) && !this.caseId) {
+      void this.router.navigateByUrl('/my-cases');
+      return;
+    }
+
     if (this.isRespondentViewer && !this.caseId) {
       void this.router.navigateByUrl('/my-cases');
       return;
@@ -117,9 +122,11 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    void this.router.navigateByUrl(
-      this.isRespondentViewer || !this.auth.isAdmin() ? '/my-cases' : '/admin/child-support-worksheet'
-    );
+    if (this.isRespondentViewer || !this.auth.isAdmin()) {
+      void this.router.navigateByUrl('/my-cases');
+    } else {
+      void this.router.navigate(['/admin', 'affidavit'], { queryParams: this.navQueryParams() });
+    }
   }
 
   async generatePdf(): Promise<void> {

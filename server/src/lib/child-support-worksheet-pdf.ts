@@ -8,6 +8,10 @@ import {
   stripLeadingInstructionPages
 } from './affidavit-pdf.js';
 import { userDisplayName, caseIncludesUser } from './affidavit-helpers.js';
+import {
+  buildWorksheetDefaultsFromCaseAndAffidavits,
+  mergeStoredWorksheetWithDefaults
+} from './child-support-worksheet-defaults.js';
 import { getWorksheet } from './child-support-worksheet-store.js';
 import { resolveParentNetMonthlyIncomes } from './child-support-worksheet-values.js';
 import { computeChildSupport } from './child-support-calculator.js';
@@ -106,7 +110,12 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
     }
   }
 
-  const data: WorksheetData = worksheetDoc?.data ?? {};
+  const worksheetStored: WorksheetData = worksheetDoc?.data ?? {};
+  let data: WorksheetData = worksheetStored;
+  if (requestedCaseId) {
+    const defaults = await buildWorksheetDefaultsFromCaseAndAffidavits(requestedCaseId);
+    data = mergeStoredWorksheetWithDefaults(worksheetStored, defaults);
+  }
   const parentANetMonthlyIncome = data.parentAMonthlyGrossIncome ?? netIncomeContext.parentANetMonthlyIncome;
   const parentBNetMonthlyIncome = data.parentBMonthlyGrossIncome ?? netIncomeContext.parentBNetMonthlyIncome;
   const calc = await computeChildSupport({

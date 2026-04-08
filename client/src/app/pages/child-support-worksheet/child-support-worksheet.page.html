@@ -7,7 +7,13 @@
   <section class="mt16">
     <div class="rowActions">
       <a *ngIf="showBackToMyCases" routerLink="/my-cases" class="link">Back to My cases</a>
-      <a *ngIf="!showBackToMyCases" routerLink="/admin/child-support-worksheet" class="link">Back to Admin</a>
+      <a
+        *ngIf="!showBackToMyCases"
+        [routerLink]="['/admin', 'affidavit']"
+        [queryParams]="navQueryParams()"
+        class="link"
+        >Back to Admin affidavit</a
+      >
       <span *ngIf="busy">Loading…</span>
     </div>
 
@@ -25,7 +31,7 @@
         <strong>{{ summary.grossAnnualIncome | number:'1.2-2' }}</strong>
       </p>
       <p *ngIf="summary.worksheet && summary.worksheet.numberOfChildren != null" class="mt8">
-        Number of children (worksheet):
+        Number of children (case / worksheet):
         <strong>{{ summary.worksheet.numberOfChildren }}</strong>
       </p>
       <p *ngIf="summary.netMonthlyIncome" class="mt8">
@@ -47,7 +53,7 @@
           <strong>{{ summary.calculated.line2BasicMonthlyObligation | number:'1.2-2' }}</strong>
         </p>
         <p>
-          Line 3 (responsibility %):
+          Line 3 (responsibility %, petitioner / respondent):
           <strong>
             {{ formatPercent(summary.calculated.line3PercentA) }} /
             {{ formatPercent(summary.calculated.line3PercentB) }}

@@ -117,6 +117,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.auth.hasRole(2, 4);
   }
 
+  /** Admin only: shortcut to My cases for affidavit workflow (attorneys use My cases / edit page PDF). */
+  get showFinancialAffidavitNav(): boolean {
+    return this.auth.hasRole(5);
+  }
+
   /** Petitioner (1), Petitioner Attorney (3), Legal Assistant (6), or Admin (5): show Upcoming Events link. */
   get showUpcomingEventsLink(): boolean {
     return this.auth.hasRole(1, 3, 5, 6);

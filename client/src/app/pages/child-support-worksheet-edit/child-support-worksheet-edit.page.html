@@ -12,10 +12,22 @@
 
     <form *ngIf="!busy" (ngSubmit)="save()" class="panel mt12">
       <h2 class="panelTitle">Worksheet data</h2>
-      <p class="muted mt8">These values are used when generating the filled PDF. Leave blank to use affidavit income where applicable.</p>
+      <p class="muted mt8">
+        These values are used when generating the filled PDF. <strong>Number of children</strong> and <strong>monthly gross
+        income</strong> (petitioner / respondent) are read-only here and come from the case and financial affidavits. Use
+        the tooltips below for where to edit them. Other fields below can be edited and saved.
+      </p>
 
       <div class="formGroup mt12">
-        <label for="numberOfChildren">Number of children</label>
+        <label for="numberOfChildren" class="labelLine">
+          Number of children
+          <span
+            class="labelTooltip"
+            title="Edit the number of children on the Cases page (case record). This field stays in sync with the case."
+            aria-label="Edit the number of children on the Cases page (case record). This field stays in sync with the case."
+            >ⓘ</span
+          >
+        </label>
         <input
           id="numberOfChildren"
           type="number"
@@ -23,12 +35,22 @@
           max="99"
           [(ngModel)]="data.numberOfChildren"
           name="numberOfChildren"
-          class="input"
+          class="input inputReadonly"
+          readonly
+          tabindex="0"
         />
       </div>
 
       <div class="formGroup mt12">
-        <label for="parentAMonthlyGrossIncome">Parent A monthly gross income</label>
+        <label for="parentAMonthlyGrossIncome" class="labelLine">
+          Petitioner monthly gross income
+          <span
+            class="labelTooltip"
+            title="Edit in the financial affidavit workflow: open the petitioner’s affidavit and update the Monthly income section."
+            aria-label="Edit in the financial affidavit workflow: open the petitioner’s affidavit and update the Monthly income section."
+            >ⓘ</span
+          >
+        </label>
         <input
           id="parentAMonthlyGrossIncome"
           type="number"
@@ -36,12 +58,22 @@
           min="0"
           [(ngModel)]="data.parentAMonthlyGrossIncome"
           name="parentAMonthlyGrossIncome"
-          class="input"
+          class="input inputReadonly"
+          readonly
+          tabindex="0"
         />
       </div>
 
       <div class="formGroup mt12">
-        <label for="parentBMonthlyGrossIncome">Parent B monthly gross income</label>
+        <label for="parentBMonthlyGrossIncome" class="labelLine">
+          Respondent monthly gross income
+          <span
+            class="labelTooltip"
+            title="Edit in the financial affidavit workflow: open the respondent’s affidavit and update the Monthly income section."
+            aria-label="Edit in the financial affidavit workflow: open the respondent’s affidavit and update the Monthly income section."
+            >ⓘ</span
+          >
+        </label>
         <input
           id="parentBMonthlyGrossIncome"
           type="number"
@@ -49,12 +81,14 @@
           min="0"
           [(ngModel)]="data.parentBMonthlyGrossIncome"
           name="parentBMonthlyGrossIncome"
-          class="input"
+          class="input inputReadonly"
+          readonly
+          tabindex="0"
         />
       </div>
 
       <div class="formGroup mt12">
-        <label for="overnightsParentA">Overnights with Parent A (per year)</label>
+        <label for="overnightsParentA">Overnights with petitioner (per year)</label>
         <input
           id="overnightsParentA"
           type="number"
@@ -67,7 +101,7 @@
       </div>
 
       <div class="formGroup mt12">
-        <label for="overnightsParentB">Overnights with Parent B (per year)</label>
+        <label for="overnightsParentB">Overnights with respondent (per year)</label>
         <input
           id="overnightsParentB"
           type="number"
@@ -80,7 +114,7 @@
       </div>
 
       <div class="formGroup mt12">
-        <label for="timesharingPercentageParentA">Timesharing % Parent A</label>
+        <label for="timesharingPercentageParentA">Timesharing % (petitioner)</label>
         <input
           id="timesharingPercentageParentA"
           type="number"
@@ -94,7 +128,7 @@
       </div>
 
       <div class="formGroup mt12">
-        <label for="timesharingPercentageParentB">Timesharing % Parent B</label>
+        <label for="timesharingPercentageParentB">Timesharing % (respondent)</label>
         <input
           id="timesharingPercentageParentB"
           type="number"

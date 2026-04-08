@@ -17,6 +17,12 @@ export type AffidavitSummary = {
   monthlyIncomeBreakdown: { typeId: number | null; typeName: string; amount: number; ifOther: string | null }[];
 };
 
+/** Sum of monthly income section rows (affidavit “gross” monthly from that block). */
+export async function sumGrossMonthlyIncomeFromAffidavitRows(userObjectId: string): Promise<number> {
+  const monthlyIncomeRows = await listAffidavitRows('monthlyincome', userScopedFilter(userObjectId));
+  return monthlyIncomeRows.reduce((sum: number, r: { amount?: unknown }) => sum + Number(r?.amount ?? 0), 0);
+}
+
 export async function computeAffidavitSummary(userObjectId: string): Promise<AffidavitSummary> {
   const employmentRows = await listEmploymentRowsForUser(userObjectId);
   const employmentAnnual = employmentRows.reduce((sum: number, row: { payRate?: unknown; payFrequencyTypeId?: unknown }) => {

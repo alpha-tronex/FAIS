@@ -52,6 +52,11 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
       this.caseId = qpCaseId;
     }
 
+    if (this.auth.hasRole(3, 6) && !this.caseId) {
+      void this.router.navigateByUrl('/my-cases');
+      return;
+    }
+
     if (this.auth.hasRole(2, 4)) {
       void this.router.navigateByUrl('/my-cases');
       return;

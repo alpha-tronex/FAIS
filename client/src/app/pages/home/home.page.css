@@ -24,6 +24,34 @@
   padding: 0;
 }
 
+/* Admin: three columns, rows Users/Cases/Affidavit | Documents/AI Query | Upcoming/Messages; board centered, tiles start at left of each cell */
+.tileGrid.tileGridAdmin {
+  grid-template-columns: repeat(3, minmax(200px, 220px));
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  justify-items: stretch;
+}
+
+.tileGrid.tileGridAdmin .tile {
+  width: 100%;
+  max-width: 220px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 720px) {
+  .tileGrid.tileGridAdmin {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    width: auto;
+    margin-inline: 0;
+    justify-items: stretch;
+  }
+
+  .tileGrid.tileGridAdmin .tile {
+    max-width: none;
+  }
+}
+
 .tile {
   position: relative;
   display: flex;

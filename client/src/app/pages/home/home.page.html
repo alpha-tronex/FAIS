@@ -2,7 +2,7 @@
   <h1 class="homeTitle">Home</h1>
   <p class="homeIntro">Choose an option below to get started.</p>
 
-  <div class="tileGrid" role="list">
+  <div class="tileGrid" [class.tileGridAdmin]="isAdminTileLayout()" role="list">
     <ng-container *ngFor="let tile of tiles">
       <a
         *ngIf="!tile.comingSoon && tile.route"

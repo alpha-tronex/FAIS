@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, from } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitService, AffidavitSummary } from '../../services/affidavit.service';
+import { ChildSupportWorksheetService } from '../../services/child-support-worksheet.service';
 import { FileSaveService } from '../../services/file-save.service';
 
 @Component({
@@ -18,6 +19,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
 
   busy = false;
   pdfBusy = false;
+  worksheetPdfBusy = false;
   error: string | null = null;
 
   subscription: Subscription | null = null;
@@ -25,6 +27,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
   constructor(
     private readonly auth: AuthService,
     private readonly affidavitApi: AffidavitService,
+    private readonly worksheetApi: ChildSupportWorksheetService,
     private readonly fileSave: FileSaveService,
     private readonly route: ActivatedRoute,
     private readonly router: Router
@@ -66,6 +69,11 @@ export class AffidavitPage implements OnInit, OnDestroy {
   /** True when back link should go to My cases (non-admin or respondent). */
   get showBackToMyCases(): boolean {
     return this.isRespondentViewer || !this.auth.isAdmin();
+  }
+
+  /** Worksheet tools for petitioner-side roles with a case context. */
+  get showWorksheetPanel(): boolean {
+    return Boolean(this.caseId) && !this.isRespondentViewer;
   }
 
   navQueryParams(): Record<string, string> {
@@ -113,6 +121,25 @@ export class AffidavitPage implements OnInit, OnDestroy {
   logout() {
     this.auth.logout();
     void this.router.navigateByUrl('/login');
+  }
+
+  async generateWorksheetPdf(): Promise<void> {
+    if (!this.caseId || this.worksheetPdfBusy || this.pdfBusy || this.busy) return;
+    this.worksheetPdfBusy = true;
+    this.error = null;
+    try {
+      const blob = await this.worksheetApi.generatePdf(this.userId || undefined, this.caseId || undefined);
+      await this.fileSave.savePdf(blob, 'child-support-guidelines-worksheet.pdf');
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to generate worksheet PDF';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    } finally {
+      this.worksheetPdfBusy = false;
+    }
   }
 
   async generatePdf() {

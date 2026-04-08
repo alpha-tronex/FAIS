@@ -27,3 +27,29 @@
   margin-left: 0.25em;
   font-weight: bold;
 }
+
+.muted {
+  color: var(--muted);
+}
+
+.pdfGenRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Label + select on one row so the control lines up with adjacent buttons (global .input is block + margin-top). */
+.pdfGenRow label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pdfGenRow label .input {
+  display: inline-block;
+  width: auto;
+  min-width: 11rem;
+  margin-top: 0;
+  vertical-align: middle;
+}

@@ -1,5 +1,15 @@
 <main class="page">
   <h1>My cases</h1>
+  <p *ngIf="!isRespondentViewer" class="muted mt8">
+    <strong>Select</strong> opens the affidavit editor (affidavit and child-support worksheet actions there).
+    <strong>Summary</strong> opens an overview with PDF options.
+    <ng-container *ngIf="showWorksheetTableButton">
+      <strong>Worksheet</strong> opens the guidelines worksheet for that case.
+    </ng-container>
+    <ng-container *ngIf="!showWorksheetTableButton">
+      Use <strong>Select</strong> or <strong>Summary</strong> for child-support worksheet view, edit, and PDF.
+    </ng-container>
+  </p>
 
   <p *ngIf="error" class="error">{{ error }}</p>
 
@@ -12,17 +22,47 @@
     <table *ngIf="cases.length > 0" class="table mt12">
       <thead>
         <tr>
-          <th class="th">Case #</th>
-          <th class="th">Division</th>
-          <th class="th">Petitioner</th>
-          <th class="th">Respondent</th>
-          <th class="th">Created</th>
-          <th class="th">Actions</th>
+          <th class="th" [class.thSortable]="isCaseTableSortable" scope="col" [attr.aria-sort]="isCaseTableSortable ? ariaSortFor('caseNumber') : null">
+            <button *ngIf="isCaseTableSortable" type="button" class="sortHeaderBtn" (click)="toggleSort('caseNumber')">
+              Case #
+              <span class="sortCaret" *ngIf="sortKey === 'caseNumber'" aria-hidden="true">{{ sortDir === 'asc' ? '▲' : '▼' }}</span>
+            </button>
+            <ng-container *ngIf="!isCaseTableSortable">Case #</ng-container>
+          </th>
+          <th class="th" [class.thSortable]="isCaseTableSortable" scope="col" [attr.aria-sort]="isCaseTableSortable ? ariaSortFor('division') : null">
+            <button *ngIf="isCaseTableSortable" type="button" class="sortHeaderBtn" (click)="toggleSort('division')">
+              Division
+              <span class="sortCaret" *ngIf="sortKey === 'division'" aria-hidden="true">{{ sortDir === 'asc' ? '▲' : '▼' }}</span>
+            </button>
+            <ng-container *ngIf="!isCaseTableSortable">Division</ng-container>
+          </th>
+          <th class="th" [class.thSortable]="isCaseTableSortable" scope="col" [attr.aria-sort]="isCaseTableSortable ? ariaSortFor('petitioner') : null">
+            <button *ngIf="isCaseTableSortable" type="button" class="sortHeaderBtn" (click)="toggleSort('petitioner')">
+              Petitioner
+              <span class="sortCaret" *ngIf="sortKey === 'petitioner'" aria-hidden="true">{{ sortDir === 'asc' ? '▲' : '▼' }}</span>
+            </button>
+            <ng-container *ngIf="!isCaseTableSortable">Petitioner</ng-container>
+          </th>
+          <th class="th" [class.thSortable]="isCaseTableSortable" scope="col" [attr.aria-sort]="isCaseTableSortable ? ariaSortFor('respondent') : null">
+            <button *ngIf="isCaseTableSortable" type="button" class="sortHeaderBtn" (click)="toggleSort('respondent')">
+              Respondent
+              <span class="sortCaret" *ngIf="sortKey === 'respondent'" aria-hidden="true">{{ sortDir === 'asc' ? '▲' : '▼' }}</span>
+            </button>
+            <ng-container *ngIf="!isCaseTableSortable">Respondent</ng-container>
+          </th>
+          <th class="th" [class.thSortable]="isCaseTableSortable" scope="col" [attr.aria-sort]="isCaseTableSortable ? ariaSortFor('createdAt') : null">
+            <button *ngIf="isCaseTableSortable" type="button" class="sortHeaderBtn" (click)="toggleSort('createdAt')">
+              Created
+              <span class="sortCaret" *ngIf="sortKey === 'createdAt'" aria-hidden="true">{{ sortDir === 'asc' ? '▲' : '▼' }}</span>
+            </button>
+            <ng-container *ngIf="!isCaseTableSortable">Created</ng-container>
+          </th>
+          <th class="th" scope="col">Actions</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let c of cases">
+        <tr *ngFor="let c of sortedCases">
           <td class="td">{{ c.caseNumber }}</td>
           <td class="td">{{ c.division }}</td>
           <td class="td">
@@ -36,6 +76,7 @@
             <span class="caseActions">
               <button *ngIf="!isRespondentViewer" type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">Select</button>
               <button type="button" (click)="viewSummary(c.id)" [disabled]="busy" class="submit">Summary</button>
+              <button *ngIf="showWorksheetTableButton" type="button" (click)="openWorksheet(c.id)" [disabled]="busy" class="submit">Worksheet</button>
             </span>
           </td>
         </tr>

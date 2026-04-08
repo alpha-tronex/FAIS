@@ -11,8 +11,6 @@
       <span class="sep">|</span>
       <a routerLink="/admin/affidavit" class="navLink" routerLinkActive="navLinkActive">Affidavit</a>
       <span class="sep">|</span>
-      <a routerLink="/admin/child-support-worksheet" class="navLink" routerLinkActive="navLinkActive">Child support worksheet</a>
-      <span class="sep">|</span>
       <a routerLink="/admin/query" class="navLink" routerLinkActive="navLinkActive">AI Query</a>
       <ng-container *ngIf="showUpcomingEventsLink">
         <span class="sep">|</span>
@@ -33,6 +31,18 @@
       <a routerLink="/home" class="navLink" routerLinkActive="navLinkActive" [routerLinkActiveOptions]="{ exact: true }">Home</a>
       <span class="sep">|</span>
       <a routerLink="/my-cases" [queryParams]="navQueryParams" class="navLink" routerLinkActive="navLinkActive" [routerLinkActiveOptions]="{ exact: true }">My cases</a>
+      <ng-container *ngIf="showFinancialAffidavitNav">
+        <span class="sep">|</span>
+        <a
+          routerLink="/my-cases"
+          [queryParams]="navQueryParams"
+          class="navLink"
+          routerLinkActive="navLinkActive"
+          [routerLinkActiveOptions]="{ exact: true }"
+          title="Choose a case, then use Select to edit the affidavit or Summary to review. Generate PDF from the edit page or Admin affidavit."
+          >Financial affidavit</a
+        >
+      </ng-container>
       <span class="sep">|</span>
       <a [routerLink]="['/profile']" [queryParams]="profileQueryParams" class="navLink" routerLinkActive="navLinkActive">Profile</a>
       <ng-container *ngIf="showUpcomingEventsLink">

@@ -3,3 +3,23 @@
   display: block;
   margin-bottom: 4px;
 }
+
+.labelLine {
+  display: block;
+}
+
+.labelTooltip {
+  display: inline;
+  margin-left: 4px;
+  cursor: help;
+  color: var(--muted, #666);
+  font-size: 0.95em;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.inputReadonly {
+  background: color-mix(in srgb, var(--muted, #666) 8%, var(--surface, #fff));
+  color: var(--text);
+  cursor: not-allowed;
+}

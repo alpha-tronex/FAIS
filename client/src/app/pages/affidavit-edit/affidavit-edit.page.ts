@@ -3,7 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, forkJoin, from, map, of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AffidavitDataService, AssetRow, ContingentAssetRow, ContingentLiabilityRow, EmploymentRow, LiabilityRow, MonthlyLineRow } from '../../services/affidavit-data.service';
-import { CasesService } from '../../services/cases.service';
+import { AffidavitService } from '../../services/affidavit.service';
+import { ChildSupportWorksheetService } from '../../services/child-support-worksheet.service';
+import { CasesService, type CaseListItem } from '../../services/cases.service';
+import { FileSaveService } from '../../services/file-save.service';
 import { LookupsService, LookupItem } from '../../services/lookups.service';
 import { AssetCreatePayload } from './sections/affidavit-assets-section.component';
 import { EmploymentCreatePayload } from './sections/affidavit-employment-section.component';
@@ -25,6 +28,14 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
   /** Full name of the petitioner when editing in case context (from case list). */
   petitionerDisplayName: string | null = null;
+
+  /** Case row from list API (for PDF filename). */
+  private resolvedCase: CaseListItem | null = null;
+
+  /** Official / HTML PDF form choice for generate button. */
+  officialPdfForm: 'auto' | 'short' | 'long' = 'auto';
+  pdfBusy = false;
+  worksheetPdfBusy = false;
 
   steps = [
     { key: 'employment', title: 'Employment' },
@@ -116,7 +127,10 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   constructor(
     private readonly auth: AuthService,
     private readonly api: AffidavitDataService,
+    private readonly affidavitApi: AffidavitService,
+    private readonly worksheetApi: ChildSupportWorksheetService,
     private readonly casesApi: CasesService,
+    private readonly fileSave: FileSaveService,
     private readonly lookups: LookupsService,
     private readonly route: ActivatedRoute,
     private readonly router: Router
@@ -154,11 +168,13 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   private loadPetitionerDisplayName(): void {
     if (!this.caseId) {
       this.petitionerDisplayName = null;
+      this.resolvedCase = null;
       return;
     }
     from(this.casesApi.list()).subscribe({
       next: (cases) => {
         const c = cases.find((x) => x.id === this.caseId);
+        this.resolvedCase = c ?? null;
         if (c?.petitioner) {
           const p = c.petitioner;
           const name = [p.lastName?.trim(), p.firstName?.trim()].filter(Boolean).join(', ');
@@ -169,8 +185,93 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       },
       error: () => {
         this.petitionerDisplayName = null;
+        this.resolvedCase = null;
       }
     });
+  }
+
+  /** PDF panel: party edit route with a case; hidden when embedded in admin (duplicate controls there). */
+  get showAffidavitPdfPanel(): boolean {
+    return Boolean(this.caseId) && !this.hideNav && !this.auth.hasRole(2, 4);
+  }
+
+  /** True when server returns official Florida form PDF (not HTML summary). */
+  get usesOfficialAffidavitPdf(): boolean {
+    return this.auth.hasRole(3, 5, 6);
+  }
+
+  private sanitizeFilenamePart(value: string): string {
+    return value
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[^a-zA-Z0-9._ -]+/g, '_')
+      .replace(/_+/g, '_')
+      .trim();
+  }
+
+  private buildAffidavitPdfFilename(): string {
+    const c = this.resolvedCase;
+    const p = c?.petitioner;
+    const petitionerPart = p
+      ? this.sanitizeFilenamePart(
+          [p.lastName, p.firstName].filter(Boolean).join('-').trim() || p.uname || 'petitioner'
+        )
+      : this.sanitizeFilenamePart(this.petitionerDisplayName || 'petitioner');
+    const casePart = this.sanitizeFilenamePart(c?.caseNumber || this.caseId || 'case');
+    const divPart = c?.division ? this.sanitizeFilenamePart(c.division) : '';
+    const parts = ['financial-affidavit', petitionerPart, casePart];
+    if (divPart) parts.push(divPart);
+    const base = parts.filter(Boolean).join('-').slice(0, 180);
+    return `${base}.pdf`;
+  }
+
+  async generateAffidavitPdf(): Promise<void> {
+    if (!this.caseId || this.pdfBusy || this.busy) return;
+    this.pdfBusy = true;
+    this.error = null;
+    try {
+      const blob = await this.affidavitApi.generatePdf(
+        this.officialPdfForm,
+        this.userId || undefined,
+        this.caseId || undefined
+      );
+      await this.fileSave.savePdf(blob, this.buildAffidavitPdfFilename());
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to generate PDF';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    } finally {
+      this.pdfBusy = false;
+    }
+  }
+
+  summaryQueryParams(): Record<string, string> {
+    const q: Record<string, string> = {};
+    if (this.caseId) q['caseId'] = this.caseId;
+    if (this.userId) q['userId'] = this.userId;
+    return q;
+  }
+
+  async generateWorksheetPdf(): Promise<void> {
+    if (!this.caseId || this.worksheetPdfBusy || this.busy || this.pdfBusy) return;
+    this.worksheetPdfBusy = true;
+    this.error = null;
+    try {
+      const blob = await this.worksheetApi.generatePdf(this.userId || undefined, this.caseId || undefined);
+      await this.fileSave.savePdf(blob, 'child-support-guidelines-worksheet.pdf');
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to generate worksheet PDF';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    } finally {
+      this.worksheetPdfBusy = false;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

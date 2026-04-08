@@ -12,18 +12,57 @@
       Case: <strong>{{ selectedCaseLabel() }}</strong>
     </p>
 
-    <div class="rowActions mt12">
-      <label class="mr12">
-        Form
-        <select name="officialPdfForm" [(ngModel)]="officialPdfForm" class="input ml4" [disabled]="pdfBusy">
-          <option value="short">Short form</option>
-          <option value="long">Long form</option>
-          <option value="auto">Auto (by income)</option>
-        </select>
-      </label>
-      <button type="button" (click)="clearCaseSelection()" [disabled]="pdfBusy">Change selection</button>
-      <button type="button" (click)="generatePdf()" [disabled]="pdfBusy">Generate PDF</button>
-      <span *ngIf="pdfBusy">Generating…</span>
+    <div class="docActionRow mt12">
+      <span class="docActionLabel">Financial affidavit</span>
+      <div class="rowActions">
+        <label class="mr12">
+          Form
+          <select
+            name="officialPdfForm"
+            [(ngModel)]="officialPdfForm"
+            class="input ml4"
+            [disabled]="pdfBusy || worksheetPdfBusy"
+          >
+            <option value="short">Short form</option>
+            <option value="long">Long form</option>
+            <option value="auto">Auto (by income)</option>
+          </select>
+        </label>
+        <button type="button" (click)="generatePdf()" [disabled]="pdfBusy || worksheetPdfBusy">
+          Generate affidavit PDF
+        </button>
+        <span *ngIf="pdfBusy">Generating…</span>
+      </div>
+    </div>
+
+    <div class="docActionRow mt12">
+      <span class="docActionLabel">Child support guidelines worksheet</span>
+      <div class="rowActions">
+        <a
+          [routerLink]="['/child-support-worksheet']"
+          [queryParams]="worksheetQueryParams()"
+          class="link mr12"
+          >View worksheet</a
+        >
+        <a
+          [routerLink]="['/child-support-worksheet/edit']"
+          [queryParams]="worksheetQueryParams()"
+          class="link mr12"
+          >Edit worksheet data</a
+        >
+        <button type="button" (click)="generateWorksheetPdf()" [disabled]="pdfBusy || worksheetPdfBusy">
+          Generate worksheet PDF
+        </button>
+        <span *ngIf="worksheetPdfBusy">Generating…</span>
+      </div>
+    </div>
+
+    <div class="docActionRow mt12">
+      <div class="rowActions">
+        <button type="button" (click)="clearCaseSelection()" [disabled]="pdfBusy || worksheetPdfBusy">
+          Change selection
+        </button>
+      </div>
     </div>
   </section>
 
@@ -46,7 +85,12 @@
     <div class="rowActions mt12">
       <label class="mr12">
         Form
-        <select name="officialPdfForm2" [(ngModel)]="officialPdfForm" class="input ml4" [disabled]="busy || pdfBusy">
+        <select
+          name="officialPdfForm2"
+          [(ngModel)]="officialPdfForm"
+          class="input ml4"
+          [disabled]="busy || pdfBusy || worksheetPdfBusy"
+        >
           <option value="short">Short form</option>
           <option value="long">Long form</option>
           <option value="auto">Auto (by income)</option>
@@ -56,9 +100,9 @@
       <button
         type="button"
         (click)="generatePdf()"
-        [disabled]="busy || casesBusy || pdfBusy || !selectedUserId || !selectedCaseId"
+        [disabled]="busy || casesBusy || pdfBusy || worksheetPdfBusy || !selectedUserId || !selectedCaseId"
       >
-        Generate PDF
+        Generate affidavit PDF
       </button>
       <span *ngIf="pdfBusy">Generating…</span>
     </div>
