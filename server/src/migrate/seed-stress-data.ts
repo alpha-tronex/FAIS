@@ -174,7 +174,8 @@ async function main(): Promise<void> {
       division: 'Family',
       circuitId,
       countyId,
-      numChildren: i % 4,
+      // First case (STRESS-2025-00001) uses 3 children so CS worksheet prompts/tests match expectations.
+      numChildren: i === 0 ? 3 : i % 4,
       childSupportWorksheetFiled: false,
       formTypeId: 1,
       petitionerId: petitionerIds[i],

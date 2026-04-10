@@ -12,11 +12,12 @@
       Case: <strong>{{ selectedCaseLabel() }}</strong>
     </p>
 
+    <hr class="mb-4">
+
     <div class="docActionRow mt12">
-      <span class="docActionLabel">Financial affidavit</span>
+      <span><strong>Financial affidavit</strong></span>
       <div class="rowActions">
         <label class="mr12">
-          Form
           <select
             name="officialPdfForm"
             [(ngModel)]="officialPdfForm"
@@ -35,8 +36,10 @@
       </div>
     </div>
 
-    <div class="docActionRow mt12">
-      <span class="docActionLabel">Child support guidelines worksheet</span>
+    <hr *ngIf="selectedCase && (selectedCase.numChildren ?? 0) > 0" class="mb-4">
+
+    <div *ngIf="selectedCase && (selectedCase.numChildren ?? 0) > 0 && selectedCase.childSupportWorksheetFiled === true" class="docActionRow mt12">
+      <span><strong>Child support guidelines worksheet</strong></span>
       <div class="rowActions">
         <a
           [routerLink]="['/child-support-worksheet']"
@@ -56,6 +59,48 @@
         <span *ngIf="worksheetPdfBusy">Generating…</span>
       </div>
     </div>
+
+    <div *ngIf="selectedCase && (selectedCase.numChildren ?? 0) > 0 && selectedCase.childSupportWorksheetFiled !== true" class="muted mt12 presumptiveLine">
+      <p class="muted">
+        <strong>Children are involved in this case. Should a Child Support Guidelines Worksheet be filed?</strong>
+      </p>
+      <label class="mr12">
+        <input
+          type="radio"
+          name="adminWorksheetFiled"
+          [ngModel]="worksheetFiledRadioValue()"
+          value="yes"
+          (ngModelChange)="onWorksheetFiledRadioChange($event)"
+          [disabled]="pdfBusy || worksheetPdfBusy || worksheetFiledBusy"
+        />
+        Yes
+      </label>&nbsp;
+      <label class="mr12">
+        <input
+          type="radio"
+          name="adminWorksheetFiled"
+          [ngModel]="worksheetFiledRadioValue()"
+          value="no"
+          (ngModelChange)="onWorksheetFiledRadioChange($event)"
+          [disabled]="pdfBusy || worksheetPdfBusy || worksheetFiledBusy"
+        />
+        No
+      </label>&nbsp;
+      <label>
+        <input
+          type="radio"
+          name="adminWorksheetFiled"
+          [ngModel]="worksheetFiledRadioValue()"
+          value="unset"
+          (ngModelChange)="onWorksheetFiledRadioChange($event)"
+          [disabled]="pdfBusy || worksheetPdfBusy || worksheetFiledBusy"
+        />
+        Not specified
+      </label>
+      <span *ngIf="worksheetFiledBusy" class="ml8">Saving…</span>
+    </div>
+
+    <hr class="mb-4">
 
     <div class="docActionRow mt12">
       <div class="rowActions">

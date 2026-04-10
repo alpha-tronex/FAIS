@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 import { z } from 'zod';
 import { CaseModel, User } from '../models.js';
 import { toUserSummaryDTO } from '../mappers/user.mapper.js';
+import {
+  canSeeCase,
+  canUpdateChildSupportWorksheetFiled
+} from '../lib/case-permissions.js';
 import { sendError } from './error.js';
 import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 
@@ -21,31 +25,21 @@ const caseCreateSchema = z.object({
   legalAssistantId: z.string().optional(),
 });
 
-const caseUpdateSchema = caseCreateSchema.partial();
+const caseUpdateSchema = caseCreateSchema
+  .partial()
+  .extend({
+    childSupportWorksheetFiled: z.boolean().nullable().optional()
+  });
 
-function canSeeCase(auth: AuthPayload, c: any): boolean {
-  if (auth.roleTypeId === 5) return true;
+const childSupportWorksheetFiledPatchSchema = z.object({
+  childSupportWorksheetFiled: z.boolean().nullable()
+});
 
-  const userId = auth.sub;
-  const petitionerObjId = c.petitionerId?._id?.toString?.() ?? c.petitionerId?.toString?.();
-  const respondentObjId = c.respondentId?._id?.toString?.() ?? c.respondentId?.toString?.();
-  const petitionerAttObjId = c.petitionerAttId?._id?.toString?.() ?? c.petitionerAttId?.toString?.();
-  const respondentAttObjId = c.respondentAttId?._id?.toString?.() ?? c.respondentAttId?.toString?.();
-  const legalAssistantObjId = c.legalAssistantId?._id?.toString?.() ?? c.legalAssistantId?.toString?.();
-
-  const isPetitionerByObjId = petitionerObjId === userId;
-  const isRespondentByObjId = respondentObjId === userId;
-  const isPetitionerAttorneyByObjId = petitionerAttObjId === userId;
-  const isRespondentAttorneyByObjId = respondentAttObjId === userId;
-  const isLegalAssistantByObjId = legalAssistantObjId === userId;
-
-  return (
-    isPetitionerByObjId ||
-    isRespondentByObjId ||
-    isPetitionerAttorneyByObjId ||
-    isRespondentAttorneyByObjId ||
-    isLegalAssistantByObjId
-  );
+function worksheetFiledAuditIso(c: any): string | null {
+  const d = c?.childSupportWorksheetFiledUpdatedAt;
+  if (d instanceof Date) return d.toISOString();
+  if (typeof d === 'string') return d;
+  return null;
 }
 
 function toUserSummary(u: any): { id: string; uname: string; firstName?: string; lastName?: string } {
@@ -143,6 +137,11 @@ export function createCasesRouter(
         countyId: c.countyId,
         numChildren: c.numChildren,
         childSupportWorksheetFiled: c.childSupportWorksheetFiled,
+        childSupportWorksheetFiledUpdatedAt: worksheetFiledAuditIso(c),
+        childSupportWorksheetFiledUpdatedBy:
+          c.childSupportWorksheetFiledUpdatedBy?._id?.toString?.() ??
+          c.childSupportWorksheetFiledUpdatedBy?.toString?.() ??
+          null,
         formTypeId: c.formTypeId,
         petitioner: (() => {
           const id = c.petitionerId?._id?.toString?.() ?? c.petitionerId?.toString?.();
@@ -218,6 +217,15 @@ export function createCasesRouter(
       sendError(res, e, 400);
     }
 
+    const worksheetAudit =
+      Object.prototype.hasOwnProperty.call(parsed.data, 'childSupportWorksheetFiled') &&
+      parsed.data.childSupportWorksheetFiled !== undefined
+        ? {
+            childSupportWorksheetFiledUpdatedAt: new Date(),
+            childSupportWorksheetFiledUpdatedBy: new mongoose.Types.ObjectId(authPayload.sub)
+          }
+        : {};
+
     const created = await CaseModel.create({
       caseNumber: parsed.data.caseNumber,
       division: parsed.data.division,
@@ -225,6 +233,7 @@ export function createCasesRouter(
       countyId: parsed.data.countyId,
       numChildren: parsed.data.numChildren,
       childSupportWorksheetFiled: parsed.data.childSupportWorksheetFiled,
+      ...worksheetAudit,
       formTypeId: parsed.data.formTypeId,
       petitionerId,
       respondentId,
@@ -252,6 +261,11 @@ export function createCasesRouter(
       countyId: c.countyId,
       numChildren: c.numChildren,
       childSupportWorksheetFiled: c.childSupportWorksheetFiled,
+      childSupportWorksheetFiledUpdatedAt: worksheetFiledAuditIso(c),
+      childSupportWorksheetFiledUpdatedBy:
+        c.childSupportWorksheetFiledUpdatedBy?._id?.toString?.() ??
+        c.childSupportWorksheetFiledUpdatedBy?.toString?.() ??
+        null,
       formTypeId: c.formTypeId,
       petitionerId: (c.petitionerId?._id?.toString?.() ?? c.petitionerId?.toString?.()) ?? null,
       respondentId: (c.respondentId?._id?.toString?.() ?? c.respondentId?.toString?.()) ?? null,
@@ -294,10 +308,24 @@ export function createCasesRouter(
   });
 
   router.patch('/cases/:id', auth.requireAuth, auth.requireStaffOrAdmin, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
     const parsed = caseUpdateSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Invalid payload' });
 
     const update: any = { ...parsed.data };
+    let unsetWorksheetFiled = false;
+    if (
+      Object.prototype.hasOwnProperty.call(update, 'childSupportWorksheetFiled') &&
+      update.childSupportWorksheetFiled === null
+    ) {
+      unsetWorksheetFiled = true;
+      delete update.childSupportWorksheetFiled;
+    }
+    if (Object.prototype.hasOwnProperty.call(parsed.data, 'childSupportWorksheetFiled')) {
+      update.childSupportWorksheetFiledUpdatedAt = new Date();
+      update.childSupportWorksheetFiledUpdatedBy = new mongoose.Types.ObjectId(authPayload.sub);
+    }
+
     for (const key of ['petitionerId', 'respondentId', 'petitionerAttId', 'respondentAttId', 'legalAssistantId'] as const) {
       if (key in update) {
         if (update[key] == null || update[key] === '') {
@@ -311,10 +339,66 @@ export function createCasesRouter(
       }
     }
 
-    const updated = await CaseModel.findByIdAndUpdate(req.params.id, { $set: update }, { new: true }).lean();
+    const mongoOp: Record<string, unknown> = { $set: update };
+    if (unsetWorksheetFiled) {
+      mongoOp.$unset = { childSupportWorksheetFiled: '' };
+    }
+
+    const updated = await CaseModel.findByIdAndUpdate(req.params.id, mongoOp as any, { new: true }).lean();
     if (!updated) return res.status(404).json({ error: 'Not found' });
 
     res.json({ ok: true });
+  });
+
+  /**
+   * Update only whether a guidelines worksheet will be filed (petitioner, petitioner attorney,
+   * legal assistant, or admin). Sets audit fields on the case.
+   */
+  router.patch('/cases/:id/child-support-worksheet-filed', auth.requireAuth, async (req, res) => {
+    const authPayload = (req as any).auth as AuthPayload;
+    const parsed = childSupportWorksheetFiledPatchSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: 'Invalid payload' });
+
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid case id' });
+    }
+
+    const c = await CaseModel.findById(req.params.id).lean<any>();
+    if (!c) return res.status(404).json({ error: 'Not found' });
+    if (!canSeeCase(authPayload, c)) return res.status(403).json({ error: 'Forbidden' });
+    if (!canUpdateChildSupportWorksheetFiled(authPayload, c)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const now = new Date();
+    const by = new mongoose.Types.ObjectId(authPayload.sub);
+    const val = parsed.data.childSupportWorksheetFiled;
+
+    if (val === null) {
+      await CaseModel.updateOne(
+        { _id: req.params.id },
+        {
+          $unset: { childSupportWorksheetFiled: '' },
+          $set: {
+            childSupportWorksheetFiledUpdatedAt: now,
+            childSupportWorksheetFiledUpdatedBy: by
+          }
+        }
+      );
+    } else {
+      await CaseModel.updateOne(
+        { _id: req.params.id },
+        {
+          $set: {
+            childSupportWorksheetFiled: val,
+            childSupportWorksheetFiledUpdatedAt: now,
+            childSupportWorksheetFiledUpdatedBy: by
+          }
+        }
+      );
+    }
+
+    return res.json({ ok: true });
   });
 
   return router;

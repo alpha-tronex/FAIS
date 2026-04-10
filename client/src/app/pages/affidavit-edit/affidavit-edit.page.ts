@@ -32,6 +32,16 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   /** Case row from list API (for PDF filename). */
   private resolvedCase: CaseListItem | null = null;
 
+  // #region agent log
+  private debugAgentLog(payload: Record<string, unknown>): void {
+    fetch('http://127.0.0.1:7318/ingest/23b71836-33fe-4597-8b8a-9987a483089e', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'e78b26' },
+      body: JSON.stringify({ sessionId: 'e78b26', ...payload, timestamp: Date.now() })
+    }).catch(() => {});
+  }
+  // #endregion
+
   /** Official / HTML PDF form choice for generate button. */
   officialPdfForm: 'auto' | 'short' | 'long' = 'auto';
   pdfBusy = false;
@@ -123,6 +133,8 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   pendingNoneStepKey: (typeof this.steps)[number]['key'] | null = null;
 
   subscription: Subscription | null = null;
+  /** Standalone route: sync query params when navigating between cases without recreating the component. */
+  private routeParamsSub: Subscription | null = null;
 
   constructor(
     private readonly auth: AuthService,
@@ -139,6 +151,35 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
       void this.router.navigateByUrl('/login');
+      return;
+    }
+
+    if (!this.hideNav) {
+      this.routeParamsSub = this.route.queryParamMap.subscribe((params) => {
+        const qpUserId = params.get('userId')?.trim();
+        if (qpUserId) {
+          if (!this.auth.isAdmin()) {
+            void this.router.navigateByUrl('/my-cases');
+            return;
+          }
+          this.userId = qpUserId;
+        } else {
+          this.userId = null;
+        }
+
+        const qpCaseId = params.get('caseId')?.trim() || null;
+        this.caseId = qpCaseId;
+
+        if (this.userId && !this.auth.isAdmin()) {
+          void this.router.navigateByUrl('/my-cases');
+          return;
+        }
+
+        this.loadPetitionerDisplayName();
+        this.syncCurrentStepKey();
+        this.loadNoneSelections();
+        this.refresh();
+      });
       return;
     }
 
@@ -175,6 +216,23 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
       next: (cases) => {
         const c = cases.find((x) => x.id === this.caseId);
         this.resolvedCase = c ?? null;
+        // #region agent log
+        this.debugAgentLog({
+          runId: 'investigate-edit',
+          hypothesisId: 'E1,E2',
+          location: 'affidavit-edit.page.ts:loadPetitionerDisplayName:next',
+          message: 'resolved case from /cases list',
+          data: {
+            caseId: this.caseId,
+            casesCount: cases.length,
+            resolvedCaseFound: Boolean(c),
+            childSupportWorksheetFiled: c?.childSupportWorksheetFiled ?? null,
+            numChildren: c?.numChildren ?? null,
+            isRespondentViewer: this.isRespondentViewer,
+            worksheetAllowed: !this.caseId || ((c?.numChildren ?? 0) > 0 && c?.childSupportWorksheetFiled === true)
+          }
+        });
+        // #endregion
         if (c?.petitioner) {
           const p = c.petitioner;
           const name = [p.lastName?.trim(), p.firstName?.trim()].filter(Boolean).join(', ');
@@ -183,7 +241,20 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
           this.petitionerDisplayName = null;
         }
       },
-      error: () => {
+      error: (e: unknown) => {
+        // #region agent log
+        this.debugAgentLog({
+          runId: 'investigate-edit',
+          hypothesisId: 'E1',
+          location: 'affidavit-edit.page.ts:loadPetitionerDisplayName:error',
+          message: '/cases list failed; resolvedCase cleared',
+          data: {
+            caseId: this.caseId,
+            isRespondentViewer: this.isRespondentViewer,
+            errStatus: (e as { status?: unknown })?.status ?? null
+          }
+        });
+        // #endregion
         this.petitionerDisplayName = null;
         this.resolvedCase = null;
       }
@@ -193,6 +264,41 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   /** PDF panel: party edit route with a case; hidden when embedded in admin (duplicate controls there). */
   get showAffidavitPdfPanel(): boolean {
     return Boolean(this.caseId) && !this.hideNav && !this.auth.hasRole(2, 4);
+  }
+
+  get isRespondentViewer(): boolean {
+    return this.auth.hasRole(2, 4);
+  }
+
+  get canEditChildSupportWorksheetFiled(): boolean {
+    return this.auth.isAdmin() || this.auth.hasRole(1, 3, 6);
+  }
+
+  /** Worksheet tools are available only when children exist and worksheet-filed is explicitly Yes. */
+  get worksheetAllowed(): boolean {
+    return !this.caseId || ((this.resolvedCase?.numChildren ?? 0) > 0 && this.resolvedCase?.childSupportWorksheetFiled === true);
+  }
+
+  get showWorksheetCasePrompt(): boolean {
+    if (!this.showAffidavitPdfPanel || !this.resolvedCase || !this.canEditChildSupportWorksheetFiled) {
+      return false;
+    }
+    return (
+      (this.resolvedCase.numChildren ?? 0) > 0 && this.resolvedCase.childSupportWorksheetFiled !== true
+    );
+  }
+
+  /** View/PDF worksheet tools only when worksheet is filed for a case with children. */
+  get showWorksheetTools(): boolean {
+    return Boolean(this.caseId) && !this.hideNav && this.worksheetAllowed;
+  }
+
+  get worksheetFiledSelectValue(): boolean | null {
+    if (!this.resolvedCase) return null;
+    const v = this.resolvedCase.childSupportWorksheetFiled;
+    if (v === true) return true;
+    if (v === false) return false;
+    return null;
   }
 
   /** True when server returns official Florida form PDF (not HTML summary). */
@@ -255,8 +361,24 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     return q;
   }
 
+  async onWorksheetFiledModelChange(value: boolean | null): Promise<void> {
+    if (!this.caseId || !this.canEditChildSupportWorksheetFiled) return;
+    this.error = null;
+    try {
+      await this.casesApi.patchChildSupportWorksheetFiled(this.caseId, value);
+      this.loadPetitionerDisplayName();
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to update worksheet filing flag';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    }
+  }
+
   async generateWorksheetPdf(): Promise<void> {
-    if (!this.caseId || this.worksheetPdfBusy || this.busy || this.pdfBusy) return;
+    if (!this.caseId || !this.worksheetAllowed || this.worksheetPdfBusy || this.busy || this.pdfBusy) return;
     this.worksheetPdfBusy = true;
     this.error = null;
     try {
@@ -288,6 +410,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
     if (changes['caseId'] && !changes['caseId'].firstChange) {
       this.loadPetitionerDisplayName();
+      if (this.hideNav) {
+        this.refresh();
+      }
     }
   }
 
@@ -540,6 +665,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.routeParamsSub?.unsubscribe();
   }
 
   private loadAll(userId?: string, caseId?: string) {

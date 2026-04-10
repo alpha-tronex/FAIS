@@ -12,7 +12,8 @@ import { fillOfficialAffidavitPdf } from '../lib/affidavit-official-pdf.js';
 import { resolveAffidavitTarget } from './affidavit-middleware.js';
 import { sendError } from './error.js';
 import type { AuthMiddlewares } from './middleware.js';
-import { User } from '../models.js';
+import { User, CaseModel } from '../models.js';
+import { canSeeCase, normalizeChildSupportWorksheetFiledTriState } from '../lib/case-permissions.js';
 import { createAffidavitEmploymentRouter } from './affidavit-employment.routes.js';
 import { registerAffidavitMonthlyLinesRoutes } from './affidavit-monthly-lines.routes.js';
 import { createAffidavitAssetsRouter } from './affidavit-assets.routes.js';
@@ -37,7 +38,7 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
 
   router.get('/affidavit/summary', authMw.requireAuth, async (req, res) => {
     try {
-      const { targetUserObjectId } = await resolveAffidavitTarget(req);
+      const { auth, targetUserObjectId } = await resolveAffidavitTarget(req);
       const summary = await computeAffidavitSummary(targetUserObjectId);
       const targetUser = await User.findById(targetUserObjectId).select({ firstName: 1, lastName: 1, uname: 1 }).lean();
       const targetUserDisplayName = targetUser
@@ -45,7 +46,37 @@ export function createAffidavitRouter(authMw: Pick<AuthMiddlewares, 'requireAuth
           ? [targetUser.lastName?.trim(), targetUser.firstName?.trim()].filter(Boolean).join(', ')
           : (targetUser as { uname?: string }).uname ?? '')
         : '';
-      res.json({ ...summary, targetUserDisplayName });
+
+      const requestedCaseId = typeof req.query.caseId === 'string' ? req.query.caseId.trim() : '';
+      let caseWorksheet: {
+        caseId: string;
+        numChildren: number;
+        childSupportWorksheetFiled: boolean | null;
+      } | null = null;
+      if (requestedCaseId && mongoose.isValidObjectId(requestedCaseId)) {
+        const c = await CaseModel.findById(requestedCaseId).lean<any>();
+        if (c && canSeeCase(auth, c)) {
+          const raw = c.numChildren;
+          const numChildren =
+            raw == null || raw === ''
+              ? 0
+              : typeof raw === 'number' && Number.isFinite(raw)
+                ? Math.max(0, Math.trunc(raw))
+                : (() => {
+                    const x = Number(raw);
+                    return Number.isFinite(x) ? Math.max(0, Math.trunc(x)) : 0;
+                  })();
+          const rawFiled = c.childSupportWorksheetFiled;
+          const childSupportWorksheetFiled = normalizeChildSupportWorksheetFiledTriState(rawFiled);
+          caseWorksheet = {
+            caseId: c._id.toString(),
+            numChildren,
+            childSupportWorksheetFiled
+          };
+        }
+      }
+
+      res.json({ ...summary, targetUserDisplayName, caseWorksheet });
     } catch (e) {
       sendError(res, e);
     }

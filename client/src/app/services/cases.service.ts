@@ -16,6 +16,8 @@ export type CaseListItem = {
   countyId?: number;
   numChildren?: number;
   childSupportWorksheetFiled?: boolean;
+  childSupportWorksheetFiledUpdatedAt?: string | null;
+  childSupportWorksheetFiledUpdatedBy?: string | null;
   formTypeId?: number;
   createdAt: string | null;
   /** Set when case is archived. */
@@ -31,6 +33,8 @@ export type CaseDetail = {
   countyId?: number;
   numChildren?: number;
   childSupportWorksheetFiled?: boolean;
+  childSupportWorksheetFiledUpdatedAt?: string | null;
+  childSupportWorksheetFiledUpdatedBy?: string | null;
   formTypeId?: number;
   petitionerId: string | null;
   respondentId: string | null;
@@ -53,6 +57,10 @@ export type CreateCaseRequest = {
   petitionerAttId?: string;
   respondentAttId?: string;
   legalAssistantId?: string;
+};
+
+export type UpdateCaseRequest = Omit<Partial<CreateCaseRequest>, 'childSupportWorksheetFiled'> & {
+  childSupportWorksheetFiled?: boolean | null;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -78,8 +86,20 @@ export class CasesService {
     return await firstValueFrom(this.http.get<CaseDetail>(`${this.apiBase}/cases/${caseId}`));
   }
 
-  async update(caseId: string, req: Partial<CreateCaseRequest>): Promise<{ ok: true } | { ok: boolean }> {
+  async update(caseId: string, req: UpdateCaseRequest): Promise<{ ok: true } | { ok: boolean }> {
     return await firstValueFrom(this.http.patch<{ ok: boolean }>(`${this.apiBase}/cases/${caseId}`, req));
+  }
+
+  /** Narrow update for worksheet-filed flag; allowed for staff on the case (not admin-only). */
+  async patchChildSupportWorksheetFiled(
+    caseId: string,
+    childSupportWorksheetFiled: boolean | null
+  ): Promise<{ ok: boolean }> {
+    return await firstValueFrom(
+      this.http.patch<{ ok: boolean }>(`${this.apiBase}/cases/${caseId}/child-support-worksheet-filed`, {
+        childSupportWorksheetFiled
+      })
+    );
   }
 
   /** Archive case (soft delete). Staff or admin only. */

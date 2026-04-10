@@ -10,6 +10,14 @@ export type MonthlyIncomeBreakdownRow = {
   ifOther: string | null;
 };
 
+/** Case fields for child-support worksheet UI when `caseId` was sent and the user may see that case. */
+export type AffidavitSummaryCaseWorksheet = {
+  caseId: string;
+  numChildren: number;
+  /** Tri-state: null = unset in DB */
+  childSupportWorksheetFiled: boolean | null;
+};
+
 export type AffidavitSummary = {
   legacyUserId?: number;
   grossAnnualIncome: number;
@@ -21,6 +29,8 @@ export type AffidavitSummary = {
   monthlyIncomeBreakdown?: MonthlyIncomeBreakdownRow[];
   /** Full name of the person whose affidavit this is (petitioner when viewing as respondent/attorney). */
   targetUserDisplayName?: string;
+  /** Present when summary was requested with `caseId` and the user passes `canSeeCase` for that case. */
+  caseWorksheet?: AffidavitSummaryCaseWorksheet | null;
 };
 
 @Injectable({ providedIn: 'root' })

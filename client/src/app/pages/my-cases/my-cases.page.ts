@@ -86,6 +86,30 @@ export class MyCasesPage implements OnInit, OnDestroy {
     return !this.isRespondentViewer && !this.auth.hasRole(3, 6);
   }
 
+  /** Admin or party staff (1/3/6), not respondent-side: may PATCH worksheet-filed on a visible case. */
+  get canEditChildSupportWorksheetFiled(): boolean {
+    return !this.isRespondentViewer && (this.auth.isAdmin() || this.auth.hasRole(1, 3, 6));
+  }
+
+  worksheetRowShortcutVisible(c: CaseListItem): boolean {
+    return this.showWorksheetTableButton && c.childSupportWorksheetFiled === true;
+  }
+
+  showWorksheetCasePrompt(c: CaseListItem): boolean {
+    return (
+      !this.isRespondentViewer &&
+      this.canEditChildSupportWorksheetFiled &&
+      (c.numChildren ?? 0) > 0 &&
+      c.childSupportWorksheetFiled !== true
+    );
+  }
+
+  worksheetFiledSelectKey(c: CaseListItem): string {
+    if (c.childSupportWorksheetFiled === true) return 'true';
+    if (c.childSupportWorksheetFiled === false) return 'false';
+    return '';
+  }
+
   /** Petitioner attorney (3) and legal assistant (6): sortable case table headers. */
   get isCaseTableSortable(): boolean {
     return this.auth.hasRole(3, 6);
@@ -158,5 +182,26 @@ export class MyCasesPage implements OnInit, OnDestroy {
 
   openWorksheet(caseId: string) {
     void this.router.navigate(['/child-support-worksheet'], { queryParams: { caseId } });
+  }
+
+  async onWorksheetFiledSelectChange(c: CaseListItem, raw: string): Promise<void> {
+    let value: boolean | null;
+    if (raw === '') value = null;
+    else if (raw === 'true') value = true;
+    else value = false;
+    this.busy = true;
+    this.error = null;
+    try {
+      await this.casesApi.patchChildSupportWorksheetFiled(c.id, value);
+      this.cases = await this.casesApi.list();
+    } catch (e: any) {
+      this.error = e?.error?.error ?? 'Failed to update worksheet filing flag';
+      if (e?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    } finally {
+      this.busy = false;
+    }
   }
 }

@@ -4,10 +4,10 @@
     <strong>Select</strong> opens the affidavit editor (affidavit and child-support worksheet actions there).
     <strong>Summary</strong> opens an overview with PDF options.
     <ng-container *ngIf="showWorksheetTableButton">
-      <strong>Worksheet</strong> opens the guidelines worksheet for that case.
+      <strong>Worksheet</strong> appears when the case marks the guidelines worksheet as filed.
     </ng-container>
     <ng-container *ngIf="!showWorksheetTableButton">
-      Use <strong>Select</strong> or <strong>Summary</strong> for child-support worksheet view, edit, and PDF.
+      Use <strong>Select</strong> or <strong>Summary</strong> for child-support worksheet view, edit, and PDF once the case flag is Yes.
     </ng-container>
   </p>
 
@@ -73,10 +73,35 @@
           </td>
           <td class="td">{{ c.createdAt | date:'short' }}</td>
           <td class="td">
-            <span class="caseActions">
-              <button *ngIf="!isRespondentViewer" type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">Select</button>
-              <button type="button" (click)="viewSummary(c.id)" [disabled]="busy" class="submit">Summary</button>
-              <button *ngIf="showWorksheetTableButton" type="button" (click)="openWorksheet(c.id)" [disabled]="busy" class="submit">Worksheet</button>
+            <span class="caseActions caseActionsStack">
+              <span class="caseActionsRow">
+                <button *ngIf="!isRespondentViewer" type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">Select</button>
+                <button type="button" (click)="viewSummary(c.id)" [disabled]="busy" class="submit">Summary</button>
+                <!-- <button
+                  *ngIf="worksheetRowShortcutVisible(c)"
+                  type="button"
+                  (click)="openWorksheet(c.id)"
+                  [disabled]="busy"
+                  class="submit"
+                >
+                  Worksheet
+                </button> -->
+              </span>
+              <!-- <span *ngIf="showWorksheetCasePrompt(c)" class="worksheetPrompt mt8">
+                <label class="worksheetPromptLabel">
+                  Worksheet filed
+                  <select
+                    class="input ml4"
+                    [disabled]="busy"
+                    [ngModel]="worksheetFiledSelectKey(c)"
+                    (ngModelChange)="onWorksheetFiledSelectChange(c, $event)"
+                  >
+                    <option value="">Not specified</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+                </label>
+              </span> -->
             </span>
           </td>
         </tr>

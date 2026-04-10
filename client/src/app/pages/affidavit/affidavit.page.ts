@@ -2,8 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, from } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { AffidavitService, AffidavitSummary } from '../../services/affidavit.service';
+import {
+  AffidavitService,
+  type AffidavitSummary,
+  type AffidavitSummaryCaseWorksheet
+} from '../../services/affidavit.service';
 import { ChildSupportWorksheetService } from '../../services/child-support-worksheet.service';
+import { CasesService } from '../../services/cases.service';
 import { FileSaveService } from '../../services/file-save.service';
 
 @Component({
@@ -23,11 +28,14 @@ export class AffidavitPage implements OnInit, OnDestroy {
   error: string | null = null;
 
   subscription: Subscription | null = null;
+  /** Keeps `caseId` / `userId` in sync when only query params change (same route reuse). */
+  private routeParamsSub: Subscription | null = null;
 
   constructor(
     private readonly auth: AuthService,
     private readonly affidavitApi: AffidavitService,
     private readonly worksheetApi: ChildSupportWorksheetService,
+    private readonly casesApi: CasesService,
     private readonly fileSave: FileSaveService,
     private readonly route: ActivatedRoute,
     private readonly router: Router
@@ -39,26 +47,28 @@ export class AffidavitPage implements OnInit, OnDestroy {
       return;
     }
 
-    const qpUserId = this.route.snapshot.queryParamMap.get('userId');
-    if (qpUserId) {
-      if (!this.auth.isAdmin()) {
+    this.routeParamsSub = this.route.queryParamMap.subscribe((params) => {
+      const qpUserId = params.get('userId')?.trim();
+      if (qpUserId) {
+        if (!this.auth.isAdmin()) {
+          void this.router.navigateByUrl('/my-cases');
+          return;
+        }
+        this.userId = qpUserId;
+      } else {
+        this.userId = null;
+      }
+
+      const qpCaseId = params.get('caseId')?.trim() || null;
+      this.caseId = qpCaseId;
+
+      if (this.isRespondentViewer && !this.caseId) {
         void this.router.navigateByUrl('/my-cases');
         return;
       }
-      this.userId = qpUserId;
-    }
 
-    const qpCaseId = this.route.snapshot.queryParamMap.get('caseId');
-    if (qpCaseId) {
-      this.caseId = qpCaseId;
-    }
-
-    if (this.isRespondentViewer && !this.caseId) {
-      void this.router.navigateByUrl('/my-cases');
-      return;
-    }
-
-    this.refresh();
+      this.refresh();
+    });
   }
 
   /** Respondent (2) or Respondent Attorney (4): view-only petitioner's affidavit, HTML print only. */
@@ -71,9 +81,48 @@ export class AffidavitPage implements OnInit, OnDestroy {
     return this.isRespondentViewer || !this.auth.isAdmin();
   }
 
-  /** Worksheet tools for petitioner-side roles with a case context. */
+  /** Admin, attorney (1), petitioner (3), co-petitioner (6): may set worksheet-filed on the case. */
+  get canEditChildSupportWorksheetFiled(): boolean {
+    return this.auth.isAdmin() || this.auth.hasRole(1, 3, 6);
+  }
+
+  /**
+   * Worksheet gating from `/affidavit/summary` (same `canSeeCase` as `GET /cases/:id`), avoiding a second request that could fail silently.
+   */
+  private get worksheetCaseGate(): AffidavitSummaryCaseWorksheet | null {
+    const cw = this.summary?.caseWorksheet;
+    if (!this.caseId || !cw) return null;
+    const a = this.caseId.trim().toLowerCase();
+    const b = cw.caseId.trim().toLowerCase();
+    if (a !== b) return null;
+    return cw;
+  }
+
+  /** Worksheet links/PDF only when case has children and worksheet-filed is Yes. */
   get showWorksheetPanel(): boolean {
-    return Boolean(this.caseId) && !this.isRespondentViewer;
+    const w = this.worksheetCaseGate;
+    return Boolean(this.caseId) && w != null && w.numChildren > 0 && w.childSupportWorksheetFiled === true;
+  }
+
+  /**
+   * Case has children but worksheet not marked filed; eligible users can set the flag here.
+   */
+  get showWorksheetCasePrompt(): boolean {
+    if (!this.caseId || this.isRespondentViewer || !this.canEditChildSupportWorksheetFiled) {
+      return false;
+    }
+    const w = this.worksheetCaseGate;
+    if (w == null) return false;
+    return w.numChildren > 0 && w.childSupportWorksheetFiled !== true;
+  }
+
+  get worksheetFiledSelectValue(): boolean | null {
+    const w = this.worksheetCaseGate;
+    if (!w) return null;
+    const v = w.childSupportWorksheetFiled;
+    if (v === true) return true;
+    if (v === false) return false;
+    return null;
   }
 
   navQueryParams(): Record<string, string> {
@@ -85,6 +134,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.routeParamsSub?.unsubscribe();
   }
 
   refresh() {
@@ -93,7 +143,10 @@ export class AffidavitPage implements OnInit, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    this.subscription = from(this.affidavitApi.summary(this.userId || undefined, this.caseId || undefined))
+    const summaryUserId = this.userId || undefined;
+    const summaryCaseId = this.caseId || undefined;
+
+    this.subscription = from(this.affidavitApi.summary(summaryUserId, summaryCaseId))
       .pipe(
         finalize(() => {
           this.busy = false;
@@ -102,6 +155,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
       .subscribe({
         next: (summary) => {
           this.summary = summary;
+          const cw = summary.caseWorksheet;
         },
         error: (e: any) => {
           this.summary = null;
@@ -114,6 +168,22 @@ export class AffidavitPage implements OnInit, OnDestroy {
       });
   }
 
+  async onWorksheetFiledModelChange(value: boolean | null): Promise<void> {
+    if (!this.caseId || !this.canEditChildSupportWorksheetFiled) return;
+    this.error = null;
+    try {
+      await this.casesApi.patchChildSupportWorksheetFiled(this.caseId, value);
+      this.summary = await this.affidavitApi.summary(this.userId || undefined, this.caseId || undefined);
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to update worksheet filing flag';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    }
+  }
+
   goBack() {
     void this.router.navigateByUrl(this.isRespondentViewer || !this.auth.isAdmin() ? '/my-cases' : '/admin/users');
   }
@@ -124,7 +194,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
   }
 
   async generateWorksheetPdf(): Promise<void> {
-    if (!this.caseId || this.worksheetPdfBusy || this.pdfBusy || this.busy) return;
+    if (!this.showWorksheetPanel || this.worksheetPdfBusy || this.pdfBusy || this.busy) return;
     this.worksheetPdfBusy = true;
     this.error = null;
     try {

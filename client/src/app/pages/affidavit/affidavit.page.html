@@ -68,12 +68,34 @@
       </div>
     </div>
 
+    <div *ngIf="summary && showWorksheetCasePrompt" class="panel mt12">
+      <h2 class="panelTitle">Child support guidelines worksheet</h2>
+      <p class="muted mt8">
+        This case has children. Set this to Yes when a guidelines worksheet should be available for this case.
+      </p>
+      <label class="mt12">
+        Worksheet will be filed for this case
+        <select
+          name="affidavitChildSupportWorksheetFiled"
+          class="input ml4"
+          [ngModel]="worksheetFiledSelectValue"
+          (ngModelChange)="onWorksheetFiledModelChange($event)"
+          [disabled]="busy || pdfBusy || worksheetPdfBusy"
+        >
+          <option [ngValue]="null">Not specified</option>
+          <option [ngValue]="true">Yes</option>
+          <option [ngValue]="false">No</option>
+        </select>
+      </label>
+    </div>
+
     <div *ngIf="summary && showWorksheetPanel" class="panel mt12">
       <h2 class="panelTitle">Child support guidelines worksheet</h2>
       <p class="muted mt8">Uses this case and affidavit data for the petitioner's worksheet.</p>
+      <p *ngIf="isRespondentViewer" class="muted mt8">You can view or print the worksheet. Only petitioner-side parties edit worksheet data.</p>
       <div class="rowActions mt12">
         <a [routerLink]="['/child-support-worksheet']" [queryParams]="navQueryParams()" class="link mr12">View worksheet</a>
-        <a [routerLink]="['/child-support-worksheet/edit']" [queryParams]="navQueryParams()" class="link mr12">Edit worksheet data</a>
+        <a *ngIf="!isRespondentViewer" [routerLink]="['/child-support-worksheet/edit']" [queryParams]="navQueryParams()" class="link mr12">Edit worksheet data</a>
         <button type="button" (click)="generateWorksheetPdf()" [disabled]="busy || pdfBusy || worksheetPdfBusy">Generate worksheet PDF</button>
         <span *ngIf="worksheetPdfBusy">Generating…</span>
       </div>

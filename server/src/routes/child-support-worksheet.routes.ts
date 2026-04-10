@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { z } from 'zod';
 import { loadTemplatePdf } from '../lib/affidavit-pdf.js';
 import { computeAffidavitSummary } from '../lib/affidavit-summary.js';
@@ -10,9 +11,14 @@ import { getWorksheet, putWorksheet } from '../lib/child-support-worksheet-store
 import { fillChildSupportWorksheetPdf } from '../lib/child-support-worksheet-pdf.js';
 import { resolveParentNetMonthlyIncomes } from '../lib/child-support-worksheet-values.js';
 import { computeChildSupport } from '../lib/child-support-calculator.js';
+import {
+  canSeeCase,
+  findCaseForWorksheetContext,
+  isChildSupportWorksheetApiAllowed
+} from '../lib/case-permissions.js';
 import { resolveAffidavitTarget } from './affidavit-middleware.js';
 import { sendError } from './error.js';
-import type { AuthMiddlewares } from './middleware.js';
+import type { AuthMiddlewares, AuthPayload } from './middleware.js';
 import { User } from '../models.js';
 
 const worksheetDataSchema = z.object({
@@ -38,6 +44,34 @@ function isRespondentViewer(roleTypeId: number): boolean {
   return roleTypeId === 2 || roleTypeId === 4;
 }
 
+async function assertChildSupportWorksheetAllowedForRequest(
+  req: express.Request,
+  targetUserObjectId: string,
+  caseId: string | undefined
+): Promise<void> {
+  const auth = (req as express.Request & { auth?: AuthPayload }).auth as AuthPayload;
+  if (caseId && !mongoose.isValidObjectId(caseId)) {
+    throw Object.assign(new Error('Invalid caseId'), { status: 400 });
+  }
+  const caseDoc = await findCaseForWorksheetContext(targetUserObjectId, caseId);
+  if (caseId && mongoose.isValidObjectId(caseId)) {
+    if (!caseDoc || caseDoc._id?.toString() !== caseId) {
+      throw Object.assign(new Error('Case not found'), { status: 404 });
+    }
+  }
+  if (caseDoc && !canSeeCase(auth, caseDoc)) {
+    throw Object.assign(new Error('Forbidden'), { status: 403 });
+  }
+  if (!isChildSupportWorksheetApiAllowed(caseDoc)) {
+    throw Object.assign(
+      new Error(
+        'Child support guidelines worksheet is not enabled for this case. Set Will a Child Support Guidelines Worksheet be filed? to Yes on the case, then try again.'
+      ),
+      { status: 403 }
+    );
+  }
+}
+
 export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 'requireAuth'>): express.Router {
   const router = express.Router();
 
@@ -45,6 +79,7 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
     try {
       const { targetUserObjectId } = await resolveAffidavitTarget(req);
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
+      await assertChildSupportWorksheetAllowedForRequest(req, targetUserObjectId, caseId);
 
       const [targetUser, worksheetDoc, affidavitSummary, netIncomeContext] = await Promise.all([
         User.findById(targetUserObjectId).select({ firstName: 1, lastName: 1, uname: 1 }).lean(),
@@ -97,6 +132,7 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
     try {
       const { auth, targetUserObjectId } = await resolveAffidavitTarget(req);
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
+      await assertChildSupportWorksheetAllowedForRequest(req, targetUserObjectId, caseId);
 
       const pdfBuffer = await fillChildSupportWorksheetPdf({
         targetUserObjectId,
@@ -116,6 +152,7 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
     try {
       const { targetUserObjectId } = await resolveAffidavitTarget(req);
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
+      await assertChildSupportWorksheetAllowedForRequest(req, targetUserObjectId, caseId);
 
       const doc = await getWorksheet(targetUserObjectId, caseId ?? null);
       const stored = doc?.data ?? {};
@@ -139,6 +176,7 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
 
       const { targetUserObjectId } = await resolveAffidavitTarget(req);
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
+      await assertChildSupportWorksheetAllowedForRequest(req, targetUserObjectId, caseId);
 
       const parsed = putBodySchema.safeParse(req.body);
       if (!parsed.success) {

@@ -423,13 +423,12 @@ export class CasesPage implements OnInit, OnDestroy {
     this.busy = true;
     this.error = null;
 
-    const req = {
+    const reqBase = {
       caseNumber: this.caseNumber.trim(),
       division: this.division.trim(),
       circuitId: this.circuitId,
       countyId: this.countyId,
       numChildren: this.numChildren ?? undefined,
-      childSupportWorksheetFiled: this.childSupportWorksheetFiled ?? undefined,
       petitionerId: this.petitionerId || undefined,
       respondentId: this.respondentId || undefined,
       petitionerAttId: this.petitionerAttId || undefined,
@@ -439,8 +438,20 @@ export class CasesPage implements OnInit, OnDestroy {
 
     const save$ = (
       this.editingCaseId
-        ? from(this.casesApi.update(this.editingCaseId, req))
-        : from(this.casesApi.create(req))
+        ? from(
+            this.casesApi.update(this.editingCaseId, {
+              ...reqBase,
+              // Preserve explicit null ("not specified") so server can unset the field.
+              childSupportWorksheetFiled: this.childSupportWorksheetFiled
+            })
+          )
+        : from(
+            this.casesApi.create({
+              ...reqBase,
+              // Create payload only allows boolean|undefined.
+              childSupportWorksheetFiled: this.childSupportWorksheetFiled ?? undefined
+            })
+          )
     ) as Observable<unknown>;
 
     this.subscription = save$

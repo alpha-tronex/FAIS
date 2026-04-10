@@ -24,6 +24,7 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
   saveSuccess = false;
 
   subscription: Subscription | null = null;
+  private routeParamsSub: Subscription | null = null;
 
   constructor(
     private readonly auth: AuthService,
@@ -38,31 +39,33 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
       return;
     }
 
-    const qpUserId = this.route.snapshot.queryParamMap.get('userId');
-    if (qpUserId) {
-      if (!this.auth.isAdmin()) {
+    this.routeParamsSub = this.route.queryParamMap.subscribe((params) => {
+      const qpUserId = params.get('userId')?.trim();
+      if (qpUserId) {
+        if (!this.auth.isAdmin()) {
+          void this.router.navigateByUrl('/my-cases');
+          return;
+        }
+        this.userId = qpUserId;
+      } else {
+        this.userId = null;
+      }
+
+      const qpCaseId = params.get('caseId')?.trim() || null;
+      this.caseId = qpCaseId;
+
+      if (this.auth.hasRole(3, 6) && !this.caseId) {
         void this.router.navigateByUrl('/my-cases');
         return;
       }
-      this.userId = qpUserId;
-    }
 
-    const qpCaseId = this.route.snapshot.queryParamMap.get('caseId');
-    if (qpCaseId) {
-      this.caseId = qpCaseId;
-    }
+      if (this.auth.hasRole(2, 4)) {
+        void this.router.navigateByUrl('/my-cases');
+        return;
+      }
 
-    if (this.auth.hasRole(3, 6) && !this.caseId) {
-      void this.router.navigateByUrl('/my-cases');
-      return;
-    }
-
-    if (this.auth.hasRole(2, 4)) {
-      void this.router.navigateByUrl('/my-cases');
-      return;
-    }
-
-    this.load();
+      this.load();
+    });
   }
 
   navQueryParams(): Record<string, string> {
@@ -74,6 +77,7 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.routeParamsSub?.unsubscribe();
   }
 
   load(): void {
@@ -91,7 +95,13 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
         },
         error: (e: unknown) => {
           const err = e as { error?: { error?: string }; status?: number };
-          this.error = err?.error?.error ?? 'Failed to load worksheet';
+          if (err?.status === 403) {
+            this.error =
+              err?.error?.error ??
+              'The worksheet is not enabled for this case. Set Worksheet filed to Yes on the case when a guidelines worksheet applies.';
+          } else {
+            this.error = err?.error?.error ?? 'Failed to load worksheet';
+          }
           if (err?.status === 401) {
             this.auth.logout();
             void this.router.navigateByUrl('/login');
@@ -115,7 +125,13 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
       this.saveSuccess = true;
     } catch (e: unknown) {
       const err = e as { error?: { error?: string }; status?: number };
-      this.error = err?.error?.error ?? 'Failed to save worksheet';
+      if (err?.status === 403) {
+        this.error =
+          err?.error?.error ??
+          'The worksheet is not enabled for this case. Set Worksheet filed to Yes on the case when a guidelines worksheet applies.';
+      } else {
+        this.error = err?.error?.error ?? 'Failed to save worksheet';
+      }
       if (err?.status === 401) {
         this.auth.logout();
         void this.router.navigateByUrl('/login');

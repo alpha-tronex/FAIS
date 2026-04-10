@@ -8,6 +8,9 @@ export const caseSchema = new mongoose.Schema(
     countyId: { type: Number },
     numChildren: { type: Number },
     childSupportWorksheetFiled: { type: Boolean },
+    /** Last time `childSupportWorksheetFiled` was set (including to / from “not specified”). */
+    childSupportWorksheetFiledUpdatedAt: { type: Date, default: null },
+    childSupportWorksheetFiledUpdatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     formTypeId: { type: Number },
 
     petitionerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

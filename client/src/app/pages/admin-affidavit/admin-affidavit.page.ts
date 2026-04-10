@@ -28,6 +28,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
   casesBusy = false;
   pdfBusy = false;
   worksheetPdfBusy = false;
+  worksheetFiledBusy = false;
   error: string | null = null;
 
   subscription: Subscription | null = null;
@@ -155,6 +156,11 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     return q;
   }
 
+  get selectedCase(): CaseListItem | null {
+    if (!this.selectedCaseId) return null;
+    return this.cases.find((c) => c.id === this.selectedCaseId) ?? null;
+  }
+
   private sanitizeFilenamePart(value: string): string {
     return value
       .trim()
@@ -220,6 +226,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
 
   async generateWorksheetPdf(): Promise<void> {
     if (!this.selectedUserId || !this.selectedCaseId || this.worksheetPdfBusy || this.pdfBusy) return;
+    if ((this.selectedCase?.numChildren ?? 0) <= 0) return;
     this.worksheetPdfBusy = true;
     this.error = null;
     try {
@@ -234,6 +241,41 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
       }
     } finally {
       this.worksheetPdfBusy = false;
+    }
+  }
+
+  worksheetFiledRadioValue(): 'unset' | 'yes' | 'no' {
+    const v = this.selectedCase?.childSupportWorksheetFiled;
+    if (v === true) return 'yes';
+    if (v === false) return 'no';
+    return 'unset';
+  }
+
+  worksheetFiledDebugValue(): 'true' | 'false' | 'unset' {
+    const v = this.selectedCase?.childSupportWorksheetFiled;
+    if (v === true) return 'true';
+    if (v === false) return 'false';
+    return 'unset';
+  }
+
+  async onWorksheetFiledRadioChange(value: 'unset' | 'yes' | 'no'): Promise<void> {
+    if (!this.selectedCaseId || this.worksheetFiledBusy || this.pdfBusy || this.worksheetPdfBusy) return;
+    const nextValue = value === 'yes' ? true : value === 'no' ? false : null;
+    this.worksheetFiledBusy = true;
+    this.error = null;
+    try {
+      await this.casesApi.patchChildSupportWorksheetFiled(this.selectedCaseId, nextValue);
+      const c = this.selectedCase;
+      if (c) c.childSupportWorksheetFiled = nextValue ?? undefined;
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to update worksheet filed value';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    } finally {
+      this.worksheetFiledBusy = false;
     }
   }
 }
