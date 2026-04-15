@@ -92,7 +92,10 @@
     <div *ngIf="summary && showWorksheetPanel" class="panel mt12">
       <h2 class="panelTitle">Child support guidelines worksheet</h2>
       <p class="muted mt8">Uses this case and affidavit data for the petitioner's worksheet.</p>
-      <p *ngIf="isRespondentViewer" class="muted mt8">You can view or print the worksheet. Only petitioner-side parties edit worksheet data.</p>
+      <p *ngIf="isRespondentViewer" class="muted mt8">
+        You can view or print the worksheet. On the worksheet page you may enter respondent gross and net income; other
+        worksheet fields are edited by the petitioner side.
+      </p>
       <div class="rowActions mt12">
         <a [routerLink]="['/child-support-worksheet']" [queryParams]="navQueryParams()" class="link mr12">View worksheet</a>
         <a *ngIf="!isRespondentViewer" [routerLink]="['/child-support-worksheet/edit']" [queryParams]="navQueryParams()" class="link mr12">Edit worksheet data</a>

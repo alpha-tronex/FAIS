@@ -5,15 +5,18 @@ import {
   setTextIfExists,
   checkIfExists,
   formatMoneyDecimal,
+  lookupName,
   stripLeadingInstructionPages
 } from './affidavit-pdf.js';
+import { asFiniteNumber } from './number.js';
 import { userDisplayName, caseIncludesUser } from './affidavit-helpers.js';
 import {
   buildWorksheetDefaultsFromCaseAndAffidavits,
   mergeStoredWorksheetWithDefaults
 } from './child-support-worksheet-defaults.js';
+import { sumGrossMonthlyIncomeFromAffidavitRows } from './affidavit-summary.js';
 import { getWorksheet } from './child-support-worksheet-store.js';
-import { resolveParentNetMonthlyIncomes } from './child-support-worksheet-values.js';
+import { resolveParentNetMonthlyIncomes, worksheetParentBNetMonthlyForGuidelines } from './child-support-worksheet-values.js';
 import { computeChildSupport } from './child-support-calculator.js';
 import { setTextByWidgetIndex } from './pdf-multi-widget.js';
 import type { AuthPayload } from '../routes/middleware.js';
@@ -27,6 +30,37 @@ export type FillChildSupportWorksheetParams = {
 
 /** Instruction-only pages at the start of Form 12.902(e); omit from generated PDF like short/long affidavits. */
 const CHILD_SUPPORT_WORKSHEET_INSTRUCTION_PAGE_COUNT = 8;
+
+/** Uppercase letters for caption/header fields (matches official affidavit PDF). */
+function toFormalCaps(s: string): string {
+  return String(s ?? '')
+    .split('')
+    .map((c) => (/[a-z]/i.test(c) ? c.toUpperCase() : c))
+    .join('');
+}
+
+function objectIdString(v: unknown): string | null {
+  const fromSub = (v as { _id?: { toString?: () => string } })?._id?.toString?.();
+  if (fromSub && mongoose.isValidObjectId(fromSub)) return fromSub;
+  const s = (v as { toString?: () => string })?.toString?.();
+  if (s && mongoose.isValidObjectId(s)) return s;
+  return null;
+}
+
+/**
+ * User id for "Other party or his/her attorney" contact block: opposing party, preferring their attorney when set.
+ * `viewerObjectId` is the party context for this PDF (see resolveAffidavitTarget).
+ */
+function resolveWorksheetOtherPartyUserObjectId(caseDoc: any, viewerObjectId: string): string | null {
+  const petitionId = objectIdString(caseDoc?.petitionerId);
+  const respId = objectIdString(caseDoc?.respondentId);
+  const respondentAttId = objectIdString(caseDoc?.respondentAttId);
+  const petitionerAttId = objectIdString(caseDoc?.petitionerAttId);
+  const viewer = String(viewerObjectId ?? '');
+  if (petitionId && viewer === petitionId) return respondentAttId ?? respId;
+  if (respId && viewer === respId) return petitionerAttId ?? petitionId;
+  return respondentAttId ?? respId ?? petitionId;
+}
 
 export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorksheetParams): Promise<Buffer> {
   const { targetUserObjectId, caseId: requestedCaseId } = params;
@@ -116,8 +150,41 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
     const defaults = await buildWorksheetDefaultsFromCaseAndAffidavits(requestedCaseId);
     data = mergeStoredWorksheetWithDefaults(worksheetStored, defaults);
   }
+
+  const petitionIdForGross = caseDoc ? objectIdString(caseDoc.petitionerId) : null;
+  const respondIdForGross = caseDoc ? objectIdString(caseDoc.respondentId) : null;
+  let grossPetitioner: number | null =
+    data.parentAMonthlyGrossIncome != null && Number.isFinite(Number(data.parentAMonthlyGrossIncome))
+      ? Number(data.parentAMonthlyGrossIncome)
+      : null;
+  let grossRespondent: number | null =
+    data.parentBMonthlyGrossIncome != null && Number.isFinite(Number(data.parentBMonthlyGrossIncome))
+      ? Number(data.parentBMonthlyGrossIncome)
+      : null;
+  if (grossPetitioner == null && petitionIdForGross) {
+    const g = await sumGrossMonthlyIncomeFromAffidavitRows(petitionIdForGross);
+    grossPetitioner = Number.isFinite(g) ? g : null;
+  }
+  if (grossRespondent == null && respondIdForGross) {
+    const g = await sumGrossMonthlyIncomeFromAffidavitRows(respondIdForGross);
+    grossRespondent = Number.isFinite(g) ? g : null;
+  }
+  if (grossPetitioner != null) {
+    setTextIfExists(form, 'Petitioner Gross Monthly Income', formatMoneyDecimal(grossPetitioner));
+  }
+  if (grossRespondent != null) {
+    setTextIfExists(form, 'Respondent Gross Monthly Income', formatMoneyDecimal(grossRespondent));
+  }
+  if (grossPetitioner != null || grossRespondent != null) {
+    setTextIfExists(
+      form,
+      'Total Gross Monthly Income',
+      formatMoneyDecimal((grossPetitioner ?? 0) + (grossRespondent ?? 0))
+    );
+  }
+
   const parentANetMonthlyIncome = data.parentAMonthlyGrossIncome ?? netIncomeContext.parentANetMonthlyIncome;
-  const parentBNetMonthlyIncome = data.parentBMonthlyGrossIncome ?? netIncomeContext.parentBNetMonthlyIncome;
+  const parentBNetMonthlyIncome = worksheetParentBNetMonthlyForGuidelines(data, netIncomeContext.parentBNetMonthlyIncome);
   const calc = await computeChildSupport({
     numberOfChildren: Number(data.numberOfChildren ?? 1),
     parentANetMonthlyIncome,
@@ -134,8 +201,77 @@ export async function fillChildSupportWorksheetPdf(params: FillChildSupportWorks
     const respondentName = userDisplayName(caseDoc.respondentId);
     if (caseDoc.caseNumber) setTextByNeedle('case', String(caseDoc.caseNumber).trim());
     if (caseDoc.division) setTextByNeedle('division', String(caseDoc.division).trim());
-    if (petitionerName) setTextByNeedle('petitioner', petitionerName);
-    if (respondentName) setTextByNeedle('respondent', respondentName);
+    // Do not use setTextByNeedle('petitioner'|'respondent'): the first partial match is
+    // e.g. "overnight stays with the Petitioner", not the caption or full legal name fields.
+    if (petitionerName) {
+      setTextIfExists(form, 'full legal name', petitionerName);
+      setTextIfExists(form, 'Petitioner', toFormalCaps(petitionerName));
+    }
+    if (respondentName) {
+      setTextIfExists(form, 'Respondent', toFormalCaps(respondentName));
+    }
+
+    const otherPartyId = resolveWorksheetOtherPartyUserObjectId(caseDoc, targetUserObjectId);
+    if (otherPartyId && mongoose.isValidObjectId(otherPartyId)) {
+      const otherPartyUser = await User.findById(otherPartyId)
+        .select({
+          firstName: 1,
+          lastName: 1,
+          uname: 1,
+          addressLine1: 1,
+          addressLine2: 1,
+          city: 1,
+          state: 1,
+          zipCode: 1,
+          phone: 1,
+          email: 1
+        })
+        .lean<any>();
+      if (otherPartyUser) {
+        const otherName = userDisplayName(otherPartyUser);
+        const addrLine = [String(otherPartyUser?.addressLine1 ?? '').trim(), String(otherPartyUser?.addressLine2 ?? '').trim()]
+          .filter(Boolean)
+          .join(', ');
+        const cityStateZip = [otherPartyUser?.city, otherPartyUser?.state, otherPartyUser?.zipCode].filter(Boolean).join(', ');
+        if (otherName) setTextIfExists(form, 'Name', otherName);
+        if (addrLine) setTextIfExists(form, 'Address', addrLine);
+        if (cityStateZip) setTextIfExists(form, 'City State Zip', cityStateZip);
+        if (otherPartyUser?.phone) setTextIfExists(form, 'Telephone Number', String(otherPartyUser.phone).trim());
+        if (otherPartyUser?.email) setTextIfExists(form, 'Email Addresses', String(otherPartyUser.email).trim());
+      }
+    }
+
+    const [circuitName, countyName] = await Promise.all([
+      lookupName('lookup_circuits', asFiniteNumber(caseDoc?.circuitId)),
+      lookupName('lookup_counties', asFiniteNumber(caseDoc?.countyId))
+    ]);
+    if (circuitName) {
+      const c = toFormalCaps(circuitName);
+      setTextIfExists(form, 'Circuit No', c);
+      setTextIfExists(form, 'IN THE CIRCUIT COURT OF THE', c);
+      setTextByNeedle('circuit', c);
+    }
+    if (countyName) {
+      const c = toFormalCaps(countyName);
+      setTextIfExists(form, 'county', c);
+      setTextIfExists(form, 'County', c);
+      setTextIfExists(form, 'IN AND FOR', c);
+      setTextByNeedle('county', c);
+    }
+  }
+
+  // Signature of party: contact for the user generating the worksheet (target user).
+  {
+    const printedName = userDisplayName(user);
+    const addr2 = [String(user?.addressLine1 ?? '').trim(), String(user?.addressLine2 ?? '').trim()]
+      .filter(Boolean)
+      .join(', ');
+    const cityStateZip2 = [user?.city, user?.state, user?.zipCode].filter(Boolean).join(', ');
+    if (printedName) setTextIfExists(form, 'Printed Name', printedName);
+    if (addr2) setTextIfExists(form, 'Address_2', addr2);
+    if (cityStateZip2) setTextIfExists(form, 'City State Zip_2', cityStateZip2);
+    if (user?.phone) setTextIfExists(form, 'Telephone Number_2', String(user.phone).trim());
+    if (user?.email) setTextIfExists(form, 'Email Addresses_2', String(user.email).trim());
   }
 
   if (data.numberOfChildren != null && Number.isFinite(data.numberOfChildren)) {

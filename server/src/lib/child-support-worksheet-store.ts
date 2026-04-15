@@ -8,6 +8,8 @@ export type WorksheetData = {
   childDatesOfBirth?: string[];
   parentAMonthlyGrossIncome?: number;
   parentBMonthlyGrossIncome?: number;
+  /** When set, guideline Line 1 (respondent) uses this net amount; otherwise gross field or affidavit net. */
+  parentBMonthlyNetIncome?: number;
   overnightsParentA?: number;
   overnightsParentB?: number;
   timesharingPercentageParentA?: number;
@@ -27,6 +29,8 @@ export type WorksheetDocument = {
   data: WorksheetData;
   createdAt: Date;
   updatedAt: Date;
+  createdBy?: mongoose.Types.ObjectId;
+  updatedBy?: mongoose.Types.ObjectId;
 };
 
 function filterForUserAndCase(userId: string, caseId?: string | null): Record<string, unknown> {
@@ -48,29 +52,44 @@ export async function getWorksheet(userId: string, caseId?: string | null): Prom
 export async function putWorksheet(
   userId: string,
   data: WorksheetData,
-  caseId?: string | null
+  caseId?: string | null,
+  audit?: { updatedBy?: string | null }
 ): Promise<void> {
   const col = mongoose.connection.collection(COLLECTION);
   const now = new Date();
   const filter = filterForUserAndCase(userId, caseId);
+  const auditOid =
+    audit?.updatedBy && mongoose.isValidObjectId(audit.updatedBy)
+      ? new mongoose.Types.ObjectId(audit.updatedBy)
+      : null;
+
+  const setDoc: Record<string, unknown> = {
+    data,
+    updatedAt: now
+  };
+  if (auditOid) {
+    setDoc.updatedBy = auditOid;
+  }
 
   const update: Record<string, unknown> = {
-    $set: {
-      data,
-      updatedAt: now
-    }
+    $set: setDoc
   };
 
   const existing = await col.findOne(filter);
   if (existing) {
     await col.updateOne(filter, update);
   } else {
-    await col.insertOne({
+    const insertDoc: Record<string, unknown> = {
       userId: new mongoose.Types.ObjectId(userId),
       ...(caseId && mongoose.isValidObjectId(caseId) ? { caseId: new mongoose.Types.ObjectId(caseId) } : {}),
       data,
       createdAt: now,
       updatedAt: now
-    });
+    };
+    if (auditOid) {
+      insertDoc.createdBy = auditOid;
+      insertDoc.updatedBy = auditOid;
+    }
+    await col.insertOne(insertDoc);
   }
 }

@@ -23,6 +23,12 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
   pdfBusy = false;
   error: string | null = null;
 
+  /** Respondent / respondent attorney: editable worksheet income (saved to case worksheet). */
+  respondentGross: number | null = null;
+  respondentNet: number | null = null;
+  saveIncomeBusy = false;
+  saveIncomeSuccess = false;
+
   subscription: Subscription | null = null;
   private routeParamsSub: Subscription | null = null;
 
@@ -73,8 +79,17 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
     return this.auth.hasRole(2, 4);
   }
 
+  get isRespondentAttorney(): boolean {
+    return this.auth.hasRole(4);
+  }
+
   get showBackToMyCases(): boolean {
     return this.isRespondentViewer || !this.auth.isAdmin();
+  }
+
+  /** Matches server-side official worksheet PDF role gate. */
+  get canGetOfficialPdf(): boolean {
+    return this.auth.hasRole(3, 5, 6);
   }
 
   navQueryParams(): Record<string, string> {
@@ -87,6 +102,19 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.routeParamsSub?.unsubscribe();
+  }
+
+  private syncRespondentIncomeFromWorksheet(summary: ChildSupportWorksheetSummary): void {
+    const w = summary.worksheet;
+    if (!w) {
+      this.respondentGross = null;
+      this.respondentNet = null;
+      return;
+    }
+    const g = w.parentBMonthlyGrossIncome;
+    const n = w.parentBMonthlyNetIncome;
+    this.respondentGross = g != null && Number.isFinite(Number(g)) ? Number(g) : null;
+    this.respondentNet = n != null && Number.isFinite(Number(n)) ? Number(n) : null;
   }
 
   formatPercent(value: number | null | undefined): string {
@@ -112,6 +140,7 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
       .subscribe({
         next: (summary) => {
           this.summary = summary;
+          this.syncRespondentIncomeFromWorksheet(summary);
         },
         error: (e: unknown) => {
           this.summary = null;
@@ -139,6 +168,41 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
     }
   }
 
+  async saveRespondentIncome(): Promise<void> {
+    if (!this.isRespondentViewer || !this.caseId || this.saveIncomeBusy) return;
+    this.saveIncomeBusy = true;
+    this.error = null;
+    this.saveIncomeSuccess = false;
+
+    const payload: { parentBMonthlyGrossIncome?: number; parentBMonthlyNetIncome?: number } = {};
+    if (this.respondentGross != null && Number.isFinite(this.respondentGross) && this.respondentGross >= 0) {
+      payload.parentBMonthlyGrossIncome = this.respondentGross;
+    }
+    if (this.respondentNet != null && Number.isFinite(this.respondentNet) && this.respondentNet >= 0) {
+      payload.parentBMonthlyNetIncome = this.respondentNet;
+    }
+    if (Object.keys(payload).length === 0) {
+      this.error = 'Enter at least one value: monthly gross income and/or monthly net income (non-negative numbers).';
+      this.saveIncomeBusy = false;
+      return;
+    }
+
+    try {
+      await this.worksheetApi.saveRespondentIncomeFields(payload, this.caseId);
+      this.saveIncomeSuccess = true;
+      this.refresh();
+    } catch (e: unknown) {
+      const err = e as { error?: { error?: string }; status?: number };
+      this.error = err?.error?.error ?? 'Failed to save income';
+      if (err?.status === 401) {
+        this.auth.logout();
+        void this.router.navigateByUrl('/login');
+      }
+    } finally {
+      this.saveIncomeBusy = false;
+    }
+  }
+
   async generatePdf(): Promise<void> {
     if (this.pdfBusy) return;
     this.pdfBusy = true;
@@ -155,7 +219,7 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
       if (err?.status === 403) {
         this.error =
           err?.error?.error ??
-          'The worksheet is not enabled for this case. Set Worksheet filed to Yes on the case when a guidelines worksheet applies.';
+          'Official worksheet PDF is unavailable for this role. Use Print (HTML) instead.';
       } else {
         this.error = err?.error?.error ?? 'Failed to generate PDF';
       }
@@ -166,5 +230,9 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
     } finally {
       this.pdfBusy = false;
     }
+  }
+
+  printFriendlyHtml(): void {
+    window.print();
   }
 }

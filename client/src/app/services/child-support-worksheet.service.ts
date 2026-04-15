@@ -9,6 +9,7 @@ export type WorksheetData = {
   childDatesOfBirth?: string[];
   parentAMonthlyGrossIncome?: number;
   parentBMonthlyGrossIncome?: number;
+  parentBMonthlyNetIncome?: number;
   overnightsParentA?: number;
   overnightsParentB?: number;
   timesharingPercentageParentA?: number;
@@ -81,6 +82,18 @@ export class ChildSupportWorksheetService {
     if (caseId) params['caseId'] = caseId;
     return firstValueFrom(
       this.http.put<{ ok: boolean }>(`${this.apiBase}/child-support-worksheet`, { data }, { params })
+    );
+  }
+
+  /** Respondent (2) or respondent attorney (4): merge-only update of gross/net; requires caseId. */
+  saveRespondentIncomeFields(
+    fields: { parentBMonthlyGrossIncome?: number; parentBMonthlyNetIncome?: number },
+    caseId: string
+  ): Promise<{ ok: boolean }> {
+    return firstValueFrom(
+      this.http.put<{ ok: boolean }>(`${this.apiBase}/child-support-worksheet`, { data: fields }, {
+        params: { caseId }
+      })
     );
   }
 

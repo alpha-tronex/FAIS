@@ -13,9 +13,10 @@
     <form *ngIf="!busy" (ngSubmit)="save()" class="panel mt12">
       <h2 class="panelTitle">Worksheet data</h2>
       <p class="muted mt8">
-        These values are used when generating the filled PDF. <strong>Number of children</strong> and <strong>monthly gross
-        income</strong> (petitioner / respondent) are read-only here and come from the case and financial affidavits. Use
-        the tooltips below for where to edit them. Other fields below can be edited and saved.
+        These values are used when generating the filled PDF. <strong>Number of children</strong> and petitioner
+        <strong>monthly gross income</strong> are read-only here (case and petitioner affidavit). Respondent
+        <strong>monthly gross</strong> and <strong>monthly net</strong> (guideline Line 1) are editable here or by the
+        respondent on the worksheet view page. Other fields below can be edited and saved.
       </p>
 
       <div class="formGroup mt12">
@@ -69,8 +70,8 @@
           Respondent monthly gross income
           <span
             class="labelTooltip"
-            title="Edit in the financial affidavit workflow: open the respondent’s affidavit and update the Monthly income section."
-            aria-label="Edit in the financial affidavit workflow: open the respondent’s affidavit and update the Monthly income section."
+            title="Shown on the guidelines worksheet PDF as gross. May also be entered by the respondent or respondent attorney on the worksheet summary page."
+            aria-label="Shown on the guidelines worksheet PDF as gross. May also be entered by the respondent or respondent attorney on the worksheet summary page."
             >ⓘ</span
           >
         </label>
@@ -81,9 +82,28 @@
           min="0"
           [(ngModel)]="data.parentBMonthlyGrossIncome"
           name="parentBMonthlyGrossIncome"
-          class="input inputReadonly"
-          readonly
-          tabindex="0"
+          class="input"
+        />
+      </div>
+
+      <div class="formGroup mt12">
+        <label for="parentBMonthlyNetIncome" class="labelLine">
+          Respondent monthly net income (Line 1)
+          <span
+            class="labelTooltip"
+            title="Used for Florida guideline child support calculations. If left empty, the gross field above is used for Line 1 when present; otherwise affidavit-derived net."
+            aria-label="Used for Florida guideline child support calculations. If left empty, the gross field above is used for Line 1 when present; otherwise affidavit-derived net."
+            >ⓘ</span
+          >
+        </label>
+        <input
+          id="parentBMonthlyNetIncome"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="data.parentBMonthlyNetIncome"
+          name="parentBMonthlyNetIncome"
+          class="input"
         />
       </div>
 
@@ -210,6 +230,9 @@
         <button type="submit" [disabled]="saveBusy">Save</button>
         <button type="button" (click)="goBack()" [disabled]="saveBusy">Cancel</button>
         <span *ngIf="saveBusy">Saving…</span>
+        <span *ngIf="saveSuccess" class="saveStatusPill" role="status" aria-live="polite">
+          Saved{{ lastSavedAtLabel ? (' at ' + lastSavedAtLabel) : '' }}
+        </span>
       </div>
     </form>
   </section>

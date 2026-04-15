@@ -1,6 +1,10 @@
 <main class="page">
   <h1>Child support guidelines worksheet</h1>
-  <p *ngIf="isRespondentViewer" class="muted">View and print the worksheet for the case you are a respondent on.</p>
+  <p *ngIf="isRespondentViewer" class="muted">
+    View and print the worksheet. You or your attorney may enter the respondent’s monthly gross and net income below;
+    other worksheet fields are edited by the petitioner side. Official PDF generation is limited to admin and
+    petitioner-side staff.
+  </p>
 
   <p *ngIf="error" class="error">{{ error }}</p>
 
@@ -15,6 +19,52 @@
         >Back to Admin affidavit</a
       >
       <span *ngIf="busy">Loading…</span>
+    </div>
+
+    <!-- Outside summary: visible even if worksheet summary fails to load (respondent still has caseId). -->
+
+    <div *ngIf="isRespondentViewer && caseId" class="panel mt12">
+      <h2 class="panelTitle">
+        {{ isRespondentAttorney ? 'Respondent income' : 'Your income' }} (guidelines worksheet)
+      </h2>
+      <p class="muted mt8">
+        Monthly <strong>gross</strong> appears on the worksheet PDF. Monthly <strong>net</strong> is used for guideline
+        Line 1 calculations. Enter at least one; both is recommended.
+      </p>
+      <p *ngIf="busy" class="muted mt8">Loading saved worksheet values…</p>
+      <div class="formGroup mt12">
+        <label for="respGross">Respondent monthly gross income</label>
+        <input
+          id="respGross"
+          type="number"
+          step="0.01"
+          min="0"
+          name="respGross"
+          [(ngModel)]="respondentGross"
+          class="input incomeFieldMax"
+          [disabled]="busy"
+        />
+      </div>
+      <div class="formGroup mt12">
+        <label for="respNet">Respondent monthly net income (Line 1)</label>
+        <input
+          id="respNet"
+          type="number"
+          step="0.01"
+          min="0"
+          name="respNet"
+          [(ngModel)]="respondentNet"
+          class="input incomeFieldMax"
+          [disabled]="busy"
+        />
+      </div>
+      <div class="rowActions mt12">
+        <button type="button" class="submit" (click)="saveRespondentIncome()" [disabled]="busy || saveIncomeBusy">
+          Save income
+        </button>
+        <span *ngIf="saveIncomeBusy">Saving…</span>
+        <span *ngIf="saveIncomeSuccess" class="success">Saved.</span>
+      </div>
     </div>
 
     <div *ngIf="summary" class="panel mt12">
@@ -88,8 +138,11 @@
         >
           Edit worksheet data
         </a>
-        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy">
+        <button *ngIf="canGetOfficialPdf" type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy">
           Generate PDF
+        </button>
+        <button *ngIf="!canGetOfficialPdf" type="button" (click)="printFriendlyHtml()" [disabled]="busy">
+          Print (HTML)
         </button>
         <span *ngIf="pdfBusy">Generating…</span>
       </div>

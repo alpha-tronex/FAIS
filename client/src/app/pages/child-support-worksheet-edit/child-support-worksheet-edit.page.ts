@@ -22,6 +22,7 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
   saveBusy = false;
   error: string | null = null;
   saveSuccess = false;
+  lastSavedAtLabel: string | null = null;
 
   subscription: Subscription | null = null;
   private routeParamsSub: Subscription | null = null;
@@ -123,6 +124,11 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
         this.caseId || undefined
       );
       this.saveSuccess = true;
+      this.lastSavedAtLabel = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     } catch (e: unknown) {
       const err = e as { error?: { error?: string }; status?: number };
       if (err?.status === 403) {

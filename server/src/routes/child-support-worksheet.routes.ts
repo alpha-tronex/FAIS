@@ -7,9 +7,12 @@ import {
   buildWorksheetDefaultsFromCaseAndAffidavits,
   mergeStoredWorksheetWithDefaults
 } from '../lib/child-support-worksheet-defaults.js';
-import { getWorksheet, putWorksheet } from '../lib/child-support-worksheet-store.js';
+import { getWorksheet, putWorksheet, type WorksheetData } from '../lib/child-support-worksheet-store.js';
 import { fillChildSupportWorksheetPdf } from '../lib/child-support-worksheet-pdf.js';
-import { resolveParentNetMonthlyIncomes } from '../lib/child-support-worksheet-values.js';
+import {
+  resolveParentNetMonthlyIncomes,
+  worksheetParentBNetMonthlyForGuidelines
+} from '../lib/child-support-worksheet-values.js';
 import { computeChildSupport } from '../lib/child-support-calculator.js';
 import {
   canSeeCase,
@@ -27,6 +30,7 @@ const worksheetDataSchema = z.object({
   childDatesOfBirth: z.array(z.string()).optional(),
   parentAMonthlyGrossIncome: z.number().finite().nonnegative().optional(),
   parentBMonthlyGrossIncome: z.number().finite().nonnegative().optional(),
+  parentBMonthlyNetIncome: z.number().finite().nonnegative().optional(),
   overnightsParentA: z.number().int().min(0).max(365).optional(),
   overnightsParentB: z.number().int().min(0).max(365).optional(),
   timesharingPercentageParentA: z.number().min(0).max(100).optional(),
@@ -42,6 +46,28 @@ const putBodySchema = z.object({ data: worksheetDataSchema });
 
 function isRespondentViewer(roleTypeId: number): boolean {
   return roleTypeId === 2 || roleTypeId === 4;
+}
+
+const RESPONDENT_WORKSHEET_INCOME_KEYS = new Set(['parentBMonthlyGrossIncome', 'parentBMonthlyNetIncome']);
+
+function toIdStr(v: unknown): string | null {
+  if (v == null) return null;
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object' && v !== null && '_id' in v) return String((v as { _id: unknown })._id);
+  return String(v);
+}
+
+/** Respondent (2) or respondent attorney (4) on the case may PATCH worksheet respondent income only. */
+function assertRespondentOrRespondentAttOnCase(auth: AuthPayload, caseDoc: any | null): void {
+  if (!caseDoc) {
+    throw Object.assign(new Error('Case not found'), { status: 404 });
+  }
+  const sub = auth.sub;
+  const respondentId = toIdStr(caseDoc.respondentId);
+  const respondentAttId = toIdStr(caseDoc.respondentAttId);
+  if (sub !== respondentId && sub !== respondentAttId) {
+    throw Object.assign(new Error('Forbidden'), { status: 403 });
+  }
 }
 
 async function assertChildSupportWorksheetAllowedForRequest(
@@ -100,10 +126,12 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
         const defaults = await buildWorksheetDefaultsFromCaseAndAffidavits(caseId);
         worksheet = mergeStoredWorksheetWithDefaults(worksheetStored, defaults);
       }
+      const parentANetEffective = Number(worksheet.parentAMonthlyGrossIncome ?? netIncomeContext.parentANetMonthlyIncome);
+      const parentBNetEffective = worksheetParentBNetMonthlyForGuidelines(worksheet, netIncomeContext.parentBNetMonthlyIncome);
       const calc = await computeChildSupport({
         numberOfChildren: Number(worksheet.numberOfChildren ?? 1),
-        parentANetMonthlyIncome: Number(worksheet.parentAMonthlyGrossIncome ?? netIncomeContext.parentANetMonthlyIncome),
-        parentBNetMonthlyIncome: Number(worksheet.parentBMonthlyGrossIncome ?? netIncomeContext.parentBNetMonthlyIncome),
+        parentANetMonthlyIncome: parentANetEffective,
+        parentBNetMonthlyIncome: parentBNetEffective,
         overnightsParentA: Number(worksheet.overnightsParentA ?? 0),
         overnightsParentB: Number(worksheet.overnightsParentB ?? 0),
         healthInsuranceMonthly: Number(worksheet.healthInsuranceMonthly ?? 0),
@@ -118,8 +146,8 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
         form: affidavitSummary.form,
         worksheet,
         netMonthlyIncome: {
-          parentA: netIncomeContext.parentANetMonthlyIncome,
-          parentB: netIncomeContext.parentBNetMonthlyIncome
+          parentA: parentANetEffective,
+          parentB: parentBNetEffective
         },
         calculated: calc
       });
@@ -133,6 +161,13 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
       const { auth, targetUserObjectId } = await resolveAffidavitTarget(req);
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
       await assertChildSupportWorksheetAllowedForRequest(req, targetUserObjectId, caseId);
+      /** Mirror affidavit official PDF policy: Admin (5), Petitioner Attorney (3), Legal Assistant (6). */
+      const canGetOfficialPdf = [3, 5, 6].includes(auth.roleTypeId);
+      if (!canGetOfficialPdf) {
+        return res.status(403).json({
+          error: 'Official child support worksheet PDF is only available to admin and petitioner-side staff. Use Print (HTML) instead.'
+        });
+      }
 
       const pdfBuffer = await fillChildSupportWorksheetPdf({
         targetUserObjectId,
@@ -169,21 +204,67 @@ export function createChildSupportWorksheetRouter(authMw: Pick<AuthMiddlewares, 
 
   router.put('/child-support-worksheet', authMw.requireAuth, async (req, res) => {
     try {
-      const auth = (req as express.Request & { auth?: { roleTypeId: number } }).auth;
-      if (auth && isRespondentViewer(auth.roleTypeId)) {
-        return res.status(403).json({ error: 'Respondents cannot edit the worksheet' });
-      }
-
-      const { targetUserObjectId } = await resolveAffidavitTarget(req);
+      const auth = (req as express.Request & { auth?: AuthPayload }).auth as AuthPayload;
       const caseId = typeof req.query.caseId === 'string' ? req.query.caseId : undefined;
-      await assertChildSupportWorksheetAllowedForRequest(req, targetUserObjectId, caseId);
 
       const parsed = putBodySchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ error: 'Invalid payload', details: parsed.error.flatten() });
       }
 
-      await putWorksheet(targetUserObjectId, parsed.data.data, caseId ?? null);
+      const { targetUserObjectId } = await resolveAffidavitTarget(req);
+      await assertChildSupportWorksheetAllowedForRequest(req, targetUserObjectId, caseId);
+
+      if (isRespondentViewer(auth.roleTypeId)) {
+        if (!caseId || !mongoose.isValidObjectId(caseId)) {
+          return res.status(400).json({ error: 'caseId is required to update respondent income' });
+        }
+
+        const caseDoc = await findCaseForWorksheetContext(targetUserObjectId, caseId);
+        if (!caseDoc || caseDoc._id?.toString() !== caseId) {
+          return res.status(404).json({ error: 'Case not found' });
+        }
+        assertRespondentOrRespondentAttOnCase(auth, caseDoc);
+
+        const rawBody = req.body as { data?: Record<string, unknown> };
+        const rawData = rawBody?.data && typeof rawBody.data === 'object' ? rawBody.data : null;
+        if (!rawData) {
+          return res.status(400).json({ error: 'Request body must include a data object' });
+        }
+        const rawKeys = Object.keys(rawData);
+        const unknownKeys = rawKeys.filter((k) => !RESPONDENT_WORKSHEET_INCOME_KEYS.has(k));
+        if (unknownKeys.length > 0) {
+          return res.status(400).json({
+            error: 'Only respondent gross and net monthly income may be updated from this role',
+            details: unknownKeys
+          });
+        }
+
+        if (
+          rawData.parentBMonthlyGrossIncome === undefined &&
+          rawData.parentBMonthlyNetIncome === undefined
+        ) {
+          return res.status(400).json({
+            error: 'Provide parentBMonthlyGrossIncome and/or parentBMonthlyNetIncome'
+          });
+        }
+
+        const incoming = parsed.data.data as Record<string, unknown>;
+        const existingDoc = await getWorksheet(targetUserObjectId, caseId);
+        const merged: WorksheetData = { ...(existingDoc?.data ?? {}) };
+        if (incoming.parentBMonthlyGrossIncome !== undefined) {
+          merged.parentBMonthlyGrossIncome = parsed.data.data.parentBMonthlyGrossIncome;
+        }
+        if (incoming.parentBMonthlyNetIncome !== undefined) {
+          merged.parentBMonthlyNetIncome = parsed.data.data.parentBMonthlyNetIncome;
+        }
+
+        await putWorksheet(targetUserObjectId, merged, caseId, { updatedBy: auth.sub });
+        res.json({ ok: true });
+        return;
+      }
+
+      await putWorksheet(targetUserObjectId, parsed.data.data, caseId ?? null, { updatedBy: auth.sub });
       res.json({ ok: true });
     } catch (e) {
       sendError(res, e);

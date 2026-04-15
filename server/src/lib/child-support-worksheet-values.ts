@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { CaseModel } from '../models.js';
 import { listAffidavitRows, userScopedFilter } from './affidavit-store.js';
+import type { WorksheetData } from './child-support-worksheet-store.js';
 
 function sumAmounts(rows: any[] | null | undefined): number {
   if (!rows || rows.length === 0) return 0;
@@ -8,6 +9,22 @@ function sumAmounts(rows: any[] | null | undefined): number {
     const amt = Number(r?.amount ?? 0);
     return acc + (Number.isFinite(amt) ? amt : 0);
   }, 0);
+}
+
+/**
+ * Net monthly income for respondent (Line 1) from worksheet overrides, with legacy fallback:
+ * explicit net → stored gross column → affidavit-derived net.
+ */
+export function worksheetParentBNetMonthlyForGuidelines(data: WorksheetData, affidavitNetB: number): number {
+  const netField = data.parentBMonthlyNetIncome;
+  if (netField != null && Number.isFinite(Number(netField))) {
+    return Math.max(0, Number(netField));
+  }
+  const grossField = data.parentBMonthlyGrossIncome;
+  if (grossField != null && Number.isFinite(Number(grossField))) {
+    return Math.max(0, Number(grossField));
+  }
+  return Math.max(0, Number(affidavitNetB) || 0);
 }
 
 async function computeNetMonthlyIncomeForUser(userObjectId: string): Promise<number> {
