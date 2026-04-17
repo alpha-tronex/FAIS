@@ -115,6 +115,14 @@ export class MyCasesPage implements OnInit, OnDestroy {
     return this.auth.hasRole(3, 6);
   }
 
+  /**
+   * Row "Summary" button is redundant for petitioner-side roles because
+   * their "Select" destination includes a summary link.
+   */
+  get showSummaryTableButton(): boolean {
+    return !this.auth.hasRole(1, 3, 6);
+  }
+
   get sortedCases(): CaseListItem[] {
     if (!this.isCaseTableSortable) return this.cases;
     const rows = [...this.cases];
@@ -181,7 +189,7 @@ export class MyCasesPage implements OnInit, OnDestroy {
   }
 
   openWorksheet(caseId: string) {
-    void this.router.navigate(['/child-support-worksheet'], { queryParams: { caseId } });
+    void this.router.navigate(['/child-support-worksheet'], { queryParams: { caseId, from: 'my-cases' } });
   }
 
   async onWorksheetFiledSelectChange(c: CaseListItem, raw: string): Promise<void> {

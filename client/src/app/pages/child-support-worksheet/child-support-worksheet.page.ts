@@ -18,6 +18,8 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
   summary: ChildSupportWorksheetSummary | null = null;
   userId: string | null = null;
   caseId: string | null = null;
+  /** Where the user opened the worksheet from (`affidavit`, `affidavit-edit`, `admin-affidavit`, `my-cases`). */
+  fromSource: string | null = null;
 
   busy = false;
   pdfBusy = false;
@@ -60,6 +62,7 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
 
       const qpCaseId = params.get('caseId')?.trim() || null;
       this.caseId = qpCaseId;
+      this.fromSource = params.get('from')?.trim() || null;
 
       if (this.auth.hasRole(3, 6) && !this.caseId) {
         void this.router.navigateByUrl('/my-cases');
@@ -83,8 +86,33 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
     return this.auth.hasRole(4);
   }
 
+  get showBackToAffidavitSummary(): boolean {
+    return this.fromSource === 'affidavit';
+  }
+
+  get showBackToAffidavitEdit(): boolean {
+    return this.fromSource === 'affidavit-edit';
+  }
+
   get showBackToMyCases(): boolean {
-    return this.isRespondentViewer || !this.auth.isAdmin();
+    if (this.showBackToAffidavitSummary || this.showBackToAffidavitEdit) return false;
+    if (this.fromSource === 'admin-affidavit') return false;
+    return (
+      this.fromSource === 'my-cases' ||
+      (!this.fromSource && (this.isRespondentViewer || !this.auth.isAdmin()))
+    );
+  }
+
+  get showBackToAdminAffidavit(): boolean {
+    if (this.showBackToAffidavitSummary || this.showBackToAffidavitEdit) return false;
+    return (
+      this.fromSource === 'admin-affidavit' ||
+      (!!this.auth.isAdmin() && !this.fromSource && !this.isRespondentViewer)
+    );
+  }
+
+  get affidavitSummaryBackLabel(): string {
+    return this.isRespondentViewer ? "Back to Petitioner's financial affidavit" : 'Back to financial affidavit';
   }
 
   /** Matches server-side official worksheet PDF role gate. */
@@ -93,6 +121,15 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
   }
 
   navQueryParams(): Record<string, string> {
+    const qp: Record<string, string> = {};
+    if (this.userId) qp['userId'] = this.userId;
+    if (this.caseId) qp['caseId'] = this.caseId;
+    if (this.fromSource) qp['from'] = this.fromSource;
+    return qp;
+  }
+
+  /** Query params for affidavit / admin-affidavit routes (no `from`). */
+  affidavitBackQueryParams(): Record<string, string> {
     const qp: Record<string, string> = {};
     if (this.userId) qp['userId'] = this.userId;
     if (this.caseId) qp['caseId'] = this.caseId;
@@ -161,11 +198,19 @@ export class ChildSupportWorksheetPage implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    if (this.isRespondentViewer || !this.auth.isAdmin()) {
-      void this.router.navigateByUrl('/my-cases');
-    } else {
-      void this.router.navigate(['/admin', 'affidavit'], { queryParams: this.navQueryParams() });
+    if (this.showBackToAffidavitSummary) {
+      void this.router.navigate(['/affidavit'], { queryParams: this.affidavitBackQueryParams() });
+      return;
     }
+    if (this.showBackToAffidavitEdit) {
+      void this.router.navigate(['/affidavit/edit'], { queryParams: this.affidavitBackQueryParams() });
+      return;
+    }
+    if (this.showBackToMyCases) {
+      void this.router.navigateByUrl('/my-cases');
+      return;
+    }
+    void this.router.navigate(['/admin', 'affidavit'], { queryParams: this.affidavitBackQueryParams() });
   }
 
   async saveRespondentIncome(): Promise<void> {

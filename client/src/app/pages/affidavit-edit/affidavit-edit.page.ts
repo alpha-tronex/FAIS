@@ -270,6 +270,11 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     return this.auth.hasRole(2, 4);
   }
 
+  /** Official worksheet PDF: same as server `GET /child-support-worksheet/pdf` (roles 3, 5, 6). */
+  get canOfficialWorksheetPdf(): boolean {
+    return this.auth.hasRole(3, 5, 6);
+  }
+
   get canEditChildSupportWorksheetFiled(): boolean {
     return this.auth.isAdmin() || this.auth.hasRole(1, 3, 6);
   }
@@ -336,8 +341,9 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     this.pdfBusy = true;
     this.error = null;
     try {
+      const form = this.usesOfficialAffidavitPdf ? this.officialPdfForm : 'auto';
       const blob = await this.affidavitApi.generatePdf(
-        this.officialPdfForm,
+        form,
         this.userId || undefined,
         this.caseId || undefined
       );
@@ -361,6 +367,11 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
     return q;
   }
 
+  /** Child support worksheet: back link returns to affidavit editor. */
+  worksheetNavQueryParams(): Record<string, string> {
+    return { ...this.summaryQueryParams(), from: 'affidavit-edit' };
+  }
+
   async onWorksheetFiledModelChange(value: boolean | null): Promise<void> {
     if (!this.caseId || !this.canEditChildSupportWorksheetFiled) return;
     this.error = null;
@@ -378,6 +389,7 @@ export class AffidavitEditPage implements OnInit, OnChanges, OnDestroy {
   }
 
   async generateWorksheetPdf(): Promise<void> {
+    if (!this.canOfficialWorksheetPdf) return;
     if (!this.caseId || !this.worksheetAllowed || this.worksheetPdfBusy || this.busy || this.pdfBusy) return;
     this.worksheetPdfBusy = true;
     this.error = null;

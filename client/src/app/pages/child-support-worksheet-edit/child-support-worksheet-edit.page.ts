@@ -16,6 +16,7 @@ import {
 export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
   userId: string | null = null;
   caseId: string | null = null;
+  fromSource: string | null = null;
 
   data: WorksheetData = {};
   busy = false;
@@ -54,6 +55,7 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
 
       const qpCaseId = params.get('caseId')?.trim() || null;
       this.caseId = qpCaseId;
+      this.fromSource = params.get('from')?.trim() || null;
 
       if (this.auth.hasRole(3, 6) && !this.caseId) {
         void this.router.navigateByUrl('/my-cases');
@@ -73,6 +75,7 @@ export class ChildSupportWorksheetEditPage implements OnInit, OnDestroy {
     const qp: Record<string, string> = {};
     if (this.userId) qp['userId'] = this.userId;
     if (this.caseId) qp['caseId'] = this.caseId;
+    if (this.fromSource) qp['from'] = this.fromSource;
     return qp;
   }
 

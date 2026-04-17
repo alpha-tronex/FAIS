@@ -153,6 +153,7 @@ export class AdminAffidavitPage implements OnInit, OnDestroy {
     const q: Record<string, string> = {};
     if (this.selectedUserId) q['userId'] = this.selectedUserId;
     if (this.selectedCaseId) q['caseId'] = this.selectedCaseId;
+    q['from'] = 'admin-affidavit';
     return q;
   }
 

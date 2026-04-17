@@ -76,8 +76,24 @@ export class AffidavitPage implements OnInit, OnDestroy {
     return this.auth.hasRole(2, 4);
   }
 
-  /** True when back link should go to My cases (non-admin or respondent). */
+  /** Official worksheet PDF: same policy as `GET /child-support-worksheet/pdf` (roles 3, 5, 6). */
+  get canOfficialWorksheetPdf(): boolean {
+    return this.auth.hasRole(3, 5, 6);
+  }
+
+  /** Official financial affidavit PDF: same policy as `GET /affidavit/pdf` (roles 3, 5, 6). */
+  get canOfficialAffidavitPdf(): boolean {
+    return this.auth.hasRole(3, 5, 6);
+  }
+
+  /** Petitioner-side roles return to affidavit editor from summary (when case context exists). */
+  get showBackToAffidavitEdit(): boolean {
+    return Boolean(this.caseId) && !this.isRespondentViewer && this.auth.hasRole(1, 3, 6);
+  }
+
+  /** True when back link should go to My cases (respondent-side and non-editor contexts). */
   get showBackToMyCases(): boolean {
+    if (this.showBackToAffidavitEdit) return false;
     return this.isRespondentViewer || !this.auth.isAdmin();
   }
 
@@ -130,6 +146,11 @@ export class AffidavitPage implements OnInit, OnDestroy {
     if (this.userId) qp['userId'] = this.userId;
     if (this.caseId) qp['caseId'] = this.caseId;
     return qp;
+  }
+
+  /** Child support worksheet: tells the worksheet page to offer a back link to this summary. */
+  worksheetNavQueryParams(): Record<string, string> {
+    return { ...this.navQueryParams(), from: 'affidavit' };
   }
 
   ngOnDestroy(): void {
@@ -194,6 +215,7 @@ export class AffidavitPage implements OnInit, OnDestroy {
   }
 
   async generateWorksheetPdf(): Promise<void> {
+    if (!this.canOfficialWorksheetPdf) return;
     if (!this.showWorksheetPanel || this.worksheetPdfBusy || this.pdfBusy || this.busy) return;
     this.worksheetPdfBusy = true;
     this.error = null;

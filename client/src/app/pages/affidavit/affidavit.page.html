@@ -1,13 +1,21 @@
 <main class="page">
-  <h1>{{ isRespondentViewer ? "Petitioner's financial affidavit" : 'Financial affidavit' }}</h1>
+  <h1>{{ isRespondentViewer ? "Petitioner's financial affidavit" : 'Financial affidavit summary' }}</h1>
   <p *ngIf="isRespondentViewer" class="muted">Summary view for the case you are a respondent on. You may print the HTML summary only.</p>
 
   <p *ngIf="error" class="error">{{ error }}</p>
 
   <section class="mt16">
     <div class="rowActions">
+      <a
+        *ngIf="showBackToAffidavitEdit"
+        [routerLink]="['/affidavit/edit']"
+        [queryParams]="navQueryParams()"
+        class="link"
+      >
+        Back to Edit affidavit data
+      </a>
       <a *ngIf="showBackToMyCases" routerLink="/my-cases" class="link">Back to My cases</a>
-      <a *ngIf="!showBackToMyCases" routerLink="/admin" class="link">Back to Admin</a>
+      <a *ngIf="!showBackToAffidavitEdit && !showBackToMyCases" routerLink="/admin" class="link">Back to Admin</a>
       <span *ngIf="busy">Loading…</span>
     </div>
 
@@ -63,7 +71,9 @@
       </p>
 
       <div class="rowActions mt12">
-        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy || worksheetPdfBusy">{{ isRespondentViewer ? 'Print (HTML)' : 'Generate PDF' }}</button>
+        <button type="button" (click)="generatePdf()" [disabled]="busy || pdfBusy || worksheetPdfBusy">
+          {{ canOfficialAffidavitPdf ? 'Generate PDF' : 'Print (HTML)' }}
+        </button>
         <span *ngIf="pdfBusy">Generating…</span>
       </div>
     </div>
@@ -97,9 +107,16 @@
         worksheet fields are edited by the petitioner side.
       </p>
       <div class="rowActions mt12">
-        <a [routerLink]="['/child-support-worksheet']" [queryParams]="navQueryParams()" class="link mr12">View worksheet</a>
-        <a *ngIf="!isRespondentViewer" [routerLink]="['/child-support-worksheet/edit']" [queryParams]="navQueryParams()" class="link mr12">Edit worksheet data</a>
-        <button type="button" (click)="generateWorksheetPdf()" [disabled]="busy || pdfBusy || worksheetPdfBusy">Generate worksheet PDF</button>
+        <a [routerLink]="['/child-support-worksheet']" [queryParams]="worksheetNavQueryParams()" class="link mr12">View worksheet</a>
+        <a *ngIf="!isRespondentViewer" [routerLink]="['/child-support-worksheet/edit']" [queryParams]="worksheetNavQueryParams()" class="link mr12">Edit worksheet data</a>
+        <button
+          *ngIf="canOfficialWorksheetPdf"
+          type="button"
+          (click)="generateWorksheetPdf()"
+          [disabled]="busy || pdfBusy || worksheetPdfBusy"
+        >
+          Generate worksheet PDF
+        </button>
         <span *ngIf="worksheetPdfBusy">Generating…</span>
       </div>
     </div>

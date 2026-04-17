@@ -16,15 +16,16 @@
   <p *ngIf="error" class="error">{{ error }}</p>
 
   <section *ngIf="showAffidavitPdfPanel" class="panel mt16">
-    <h2 class="panelTitle">Financial affidavit PDF</h2>
+    <h2 class="panelTitle">{{ usesOfficialAffidavitPdf ? 'Financial affidavit PDF' : 'Financial affidavit report' }}</h2>
     <p class="muted mt8" *ngIf="usesOfficialAffidavitPdf">
       Downloads the official Florida financial affidavit form using your saved data.
     </p>
     <p class="muted mt8" *ngIf="!usesOfficialAffidavitPdf">
-      Downloads a summary PDF from your saved answers (not the court PDF template).
+      Use Print (HTML) for a summary from your saved answers (not the court PDF template). Same as the financial affidavit
+      overview page.
     </p>
     <div class="pdfGenRow mt12">
-      <label class="mr12">
+      <label *ngIf="usesOfficialAffidavitPdf" class="mr12">
         Form
         <select
           name="officialPdfForm"
@@ -38,13 +39,14 @@
         </select>
       </label>
       <button type="button" (click)="generateAffidavitPdf()" [disabled]="pdfBusy || worksheetPdfBusy || busy">
-        Generate PDF
+        {{ usesOfficialAffidavitPdf ? 'Generate PDF' : 'Print (HTML)' }}
       </button>
       <span *ngIf="pdfBusy" class="ml8">Generating…</span>
     </div>
     <p class="muted mt12">
       <a routerLink="/affidavit" [queryParams]="summaryQueryParams()" class="link">Open summary overview</a>
-      for another review and PDF option.
+      <ng-container *ngIf="usesOfficialAffidavitPdf"> for another review and PDF option.</ng-container>
+      <ng-container *ngIf="!usesOfficialAffidavitPdf"> for another review and the same print option.</ng-container>
     </p>
   </section>
 
@@ -74,9 +76,14 @@
     <p class="muted mt8">View, edit, or generate the worksheet for this case (uses case data and affidavit income where available).</p>
     <p *ngIf="isRespondentViewer" class="muted mt8">You can view or print the worksheet. Only petitioner-side parties edit worksheet data.</p>
     <div class="pdfGenRow mt12">
-      <a [routerLink]="['/child-support-worksheet']" [queryParams]="summaryQueryParams()" class="link mr12">View worksheet</a>
-      <a *ngIf="!isRespondentViewer" [routerLink]="['/child-support-worksheet/edit']" [queryParams]="summaryQueryParams()" class="link mr12">Edit worksheet data</a>
-      <button type="button" (click)="generateWorksheetPdf()" [disabled]="pdfBusy || worksheetPdfBusy || busy">
+      <a [routerLink]="['/child-support-worksheet']" [queryParams]="worksheetNavQueryParams()" class="link mr12">View worksheet</a>
+      <a *ngIf="!isRespondentViewer" [routerLink]="['/child-support-worksheet/edit']" [queryParams]="worksheetNavQueryParams()" class="link mr12">Edit worksheet data</a>
+      <button
+        *ngIf="canOfficialWorksheetPdf"
+        type="button"
+        (click)="generateWorksheetPdf()"
+        [disabled]="pdfBusy || worksheetPdfBusy || busy"
+      >
         Generate worksheet PDF
       </button>
       <span *ngIf="worksheetPdfBusy" class="ml8">Generating…</span>

@@ -76,7 +76,7 @@
             <span class="caseActions caseActionsStack">
               <span class="caseActionsRow">
                 <button *ngIf="!isRespondentViewer" type="button" (click)="selectCase(c.id)" [disabled]="busy" class="submit">Select</button>
-                <button type="button" (click)="viewSummary(c.id)" [disabled]="busy" class="submit">Summary</button>
+                <button *ngIf="showSummaryTableButton" type="button" (click)="viewSummary(c.id)" [disabled]="busy" class="submit">Summary</button>
                 <!-- <button
                   *ngIf="worksheetRowShortcutVisible(c)"
                   type="button"
